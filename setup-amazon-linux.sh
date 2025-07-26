@@ -31,7 +31,7 @@ cd /home/ec2-user/admin-portal
 
 # Clone repository (replace with your repo URL)
 echo "📥 Cloning repository..."
-git clone https://github.com/your-username/your-repo.git .
+git clone https://github.com/chokshics/cloudagent.git .
 
 # Install dependencies
 echo "📦 Installing dependencies..."
@@ -41,7 +41,7 @@ npm run install-all
 echo "🔧 Creating environment file..."
 cat > .env << EOF
 NODE_ENV=production
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+JWT_SECRET=88620138d110da53ab9b68427d42cf5e517bdd303a97abd1dc0edce7dd909a1256c999e8259b8e1a89a6932e9dc7b4295100b9351848ead400d209488f5fc026
 TWILIO_ACCOUNT_SID=your_twilio_account_sid_here
 TWILIO_AUTH_TOKEN=your_twilio_auth_token_here
 TWILIO_WHATSAPP_NUMBER=+14155238886
