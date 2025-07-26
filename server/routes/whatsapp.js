@@ -1,0 +1,341 @@
+const express = require('express');
+const router = express.Router();
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+const { body, validationResult } = require('express-validator');
+const twilio = require('twilio');
+const { authenticateToken, requireShopkeeperOrAdmin } = require('../middleware/auth');
+
+// Initialize Twilio client conditionally
+let twilioClient = null;
+let whatsappStatus = {
+  connected: false,
+  message: 'WhatsApp not configured'
+};
+
+// Database setup
+const dbPath = path.join(__dirname, '..', 'database', 'admin_portal.db');
+const db = new sqlite3.Database(dbPath);
+
+// Create whatsapp_logs table if it doesn't exist
+db.run(`
+  CREATE TABLE IF NOT EXISTS whatsapp_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    promotion_id INTEGER,
+    mobile_number TEXT NOT NULL,
+    message TEXT NOT NULL,
+    status TEXT DEFAULT 'pending',
+    twilio_sid TEXT,
+    error_message TEXT,
+    created_by INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (promotion_id) REFERENCES promotions (id),
+    FOREIGN KEY (created_by) REFERENCES users (id)
+  )
+`);
+
+// Check if Twilio credentials are available
+if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+  try {
+    twilioClient = twilio(
+      process.env.TWILIO_ACCOUNT_SID,
+      process.env.TWILIO_AUTH_TOKEN
+    );
+    console.log('✅ Twilio client initialized');
+    whatsappStatus = {
+      connected: true,
+      message: 'WhatsApp connected via Twilio'
+    };
+  } catch (error) {
+    console.error('❌ Failed to initialize Twilio client:', error.message);
+    whatsappStatus = {
+      connected: false,
+      message: 'Failed to initialize Twilio: ' + error.message
+    };
+  }
+} else {
+  console.log('⚠️ Twilio credentials not found. Please set TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN in .env file');
+  whatsappStatus = {
+    connected: false,
+    message: 'Twilio credentials not configured'
+  };
+}
+
+// Initialize WhatsApp connection using Twilio
+async function initializeWhatsApp() {
+  if (!twilioClient) {
+    whatsappStatus = {
+      connected: false,
+      message: 'Twilio client not initialized. Please check your environment variables.'
+    };
+    return;
+  }
+
+  try {
+    // Test the Twilio connection
+    const account = await twilioClient.api.accounts(process.env.TWILIO_ACCOUNT_SID).fetch();
+    
+    if (account) {
+      whatsappStatus = {
+        connected: true,
+        message: 'WhatsApp connected via Twilio'
+      };
+      console.log('✅ WhatsApp connected via Twilio');
+    }
+  } catch (error) {
+    console.error('❌ Twilio WhatsApp connection failed:', error.message);
+    whatsappStatus = {
+      connected: false,
+      message: `Twilio connection failed: ${error.message}`
+    };
+  }
+}
+
+// Initialize on startup
+initializeWhatsApp();
+
+// Apply authentication middleware to all routes
+router.use(authenticateToken);
+router.use(requireShopkeeperOrAdmin);
+
+// Get WhatsApp status
+router.get('/status', (req, res) => {
+  res.json(whatsappStatus);
+});
+
+// Helper function to send WhatsApp messages
+async function sendWhatsAppMessages(req, res, to, message, promotionId) {
+  const results = [];
+  const failedNumbers = [];
+
+  for (const phoneNumber of to) {
+    try {
+      // Format phone number for WhatsApp (remove + if present and add country code if needed)
+      let formattedNumber = phoneNumber.replace(/^\+/, '');
+      
+      // If number doesn't start with country code, assume it's a US number
+      if (!formattedNumber.startsWith('1') && formattedNumber.length === 10) {
+        formattedNumber = '1' + formattedNumber;
+      }
+
+      // Send WhatsApp message via Twilio
+      const twilioMessage = await twilioClient.messages.create({
+        from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+        to: `whatsapp:+${formattedNumber}`,
+        body: message
+      });
+
+      // Log successful message
+      const logQuery = `
+        INSERT INTO whatsapp_logs (mobile_number, message, status, twilio_sid, promotion_id, created_by, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+      `;
+      
+      db.run(logQuery, [
+        phoneNumber,
+        message,
+        'delivered',
+        twilioMessage.sid,
+        promotionId || null,
+        req.user.userId
+      ]);
+
+      results.push({
+        phoneNumber,
+        status: 'sent',
+        sid: twilioMessage.sid
+      });
+
+      console.log(`✅ WhatsApp message sent to ${phoneNumber}: ${twilioMessage.sid}`);
+
+    } catch (error) {
+      console.error(`❌ Failed to send WhatsApp to ${phoneNumber}:`, error.message);
+      
+      // Log failed message
+      const logQuery = `
+        INSERT INTO whatsapp_logs (mobile_number, message, status, error_message, promotion_id, created_by, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+      `;
+      
+      db.run(logQuery, [
+        phoneNumber,
+        message,
+        'failed',
+        error.message,
+        promotionId || null,
+        req.user.userId
+      ]);
+
+      failedNumbers.push({
+        phoneNumber,
+        error: error.message
+      });
+    }
+  }
+
+  // Increment WhatsApp campaigns count (1 campaign = 1 increment, regardless of number of recipients)
+  db.run(
+    'UPDATE user_subscriptions SET whatsapp_sends_used = whatsapp_sends_used + 1 WHERE user_id = ? AND is_active = 1',
+    [req.user.userId],
+    function(err) {
+      if (err) {
+        console.error('Failed to update campaign count:', err);
+      }
+    }
+  );
+
+  res.json({
+    success: true,
+    message: `WhatsApp campaign completed. ${results.length} sent, ${failedNumbers.length} failed`,
+    results,
+    failedNumbers
+  });
+}
+
+// Send WhatsApp message using Twilio
+router.post('/send', [
+  body('to').isArray().withMessage('Recipients must be an array'),
+  body('message').notEmpty().withMessage('Message is required'),
+  body('promotionId').optional().isInt().withMessage('Promotion ID must be a number')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { to, message, promotionId } = req.body;
+
+    // Check if user can send WhatsApp messages
+    const subscriptionQuery = `
+      SELECT 
+        us.whatsapp_sends_used,
+        sp.whatsapp_send_limit
+      FROM user_subscriptions us
+      JOIN subscription_plans sp ON us.plan_id = sp.id
+      WHERE us.user_id = ? AND us.is_active = 1
+      ORDER BY us.created_at DESC
+      LIMIT 1
+    `;
+    
+    db.get(subscriptionQuery, [req.user.userId], (err, subscription) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+      
+      if (!subscription) {
+        return res.status(403).json({ 
+          error: 'Subscription not found. Please contact support.' 
+        });
+      }
+      
+      if (subscription.whatsapp_sends_used >= subscription.whatsapp_send_limit) {
+        return res.status(403).json({ 
+          error: 'WhatsApp campaign limit reached. Please upgrade your plan to send more campaigns.',
+          sendsUsed: subscription.whatsapp_sends_used,
+          sendLimit: subscription.whatsapp_send_limit
+        });
+      }
+
+      // Continue with sending messages
+      sendWhatsAppMessages(req, res, to, message, promotionId);
+    });
+
+  } catch (error) {
+    console.error('WhatsApp send error:', error);
+    res.status(500).json({ error: 'Failed to send WhatsApp messages' });
+  }
+});
+
+// Get WhatsApp logs
+router.get('/logs', (req, res) => {
+  const query = `
+    SELECT 
+      wl.*,
+      p.title as promotion_title
+    FROM whatsapp_logs wl
+    LEFT JOIN promotions p ON wl.promotion_id = p.id
+    WHERE wl.created_by = ?
+    ORDER BY wl.created_at DESC
+    LIMIT 100
+  `;
+
+  db.all(query, [req.user.userId], (err, rows) => {
+    if (err) {
+      console.error('Error fetching WhatsApp logs:', err);
+      return res.status(500).json({ error: 'Failed to fetch logs' });
+    }
+    res.json(rows);
+  });
+});
+
+// Get WhatsApp logs by promotion
+router.get('/logs/:promotionId', (req, res) => {
+  const { promotionId } = req.params;
+  
+  const query = `
+    SELECT 
+      wl.*,
+      p.title as promotion_title
+    FROM whatsapp_logs wl
+    LEFT JOIN promotions p ON wl.promotion_id = p.id
+    WHERE wl.promotion_id = ? AND wl.created_by = ?
+    ORDER BY wl.created_at DESC
+  `;
+
+  db.all(query, [promotionId, req.user.userId], (err, rows) => {
+    if (err) {
+      console.error('Error fetching promotion WhatsApp logs:', err);
+      return res.status(500).json({ error: 'Failed to fetch logs' });
+    }
+    res.json(rows);
+  });
+});
+
+// Test WhatsApp connection
+router.post('/test', async (req, res) => {
+  try {
+    if (!whatsappStatus.connected) {
+      return res.status(400).json({ 
+        error: 'WhatsApp not connected', 
+        message: whatsappStatus.message 
+      });
+    }
+
+    if (!twilioClient) {
+      return res.status(500).json({ 
+        error: 'Twilio client not available' 
+      });
+    }
+
+    // Test with a sample number (you can modify this)
+    const testNumber = process.env.TEST_WHATSAPP_NUMBER;
+    
+    if (!testNumber) {
+      return res.status(400).json({ 
+        error: 'Test number not configured. Please set TEST_WHATSAPP_NUMBER in .env file' 
+      });
+    }
+
+    const testMessage = await twilioClient.messages.create({
+      from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+      to: `whatsapp:${testNumber}`,
+      body: 'This is a test message from your WhatsApp campaign system! 🚀'
+    });
+
+    res.json({
+      success: true,
+      message: 'Test WhatsApp message sent successfully',
+      sid: testMessage.sid
+    });
+
+  } catch (error) {
+    console.error('WhatsApp test error:', error);
+    res.status(500).json({ 
+      error: 'Failed to send test WhatsApp message',
+      details: error.message 
+    });
+  }
+});
+
+module.exports = router; 

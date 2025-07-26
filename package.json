@@ -1,0 +1,38 @@
+{
+  "name": "admin-portal",
+  "version": "1.0.0",
+  "description": "Admin portal with promotion management and WhatsApp campaigns",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon server/index.js",
+    "client": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "start": "node server/index.js",
+    "install-all": "npm install && cd client && npm install",
+    "deploy:build": "npm run build && npm run copy-build",
+    "copy-build": "cp -r client/build server/public",
+    "deploy:eb": "eb deploy",
+    "deploy:init": "eb init",
+    "deploy:create": "eb create"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "twilio": "^4.19.0",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "concurrently": "^8.2.2"
+  },
+  "keywords": ["admin", "portal", "promotion", "whatsapp"],
+  "author": "Admin Portal Team",
+  "license": "MIT"
+} 
