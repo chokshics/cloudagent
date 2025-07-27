@@ -17,7 +17,21 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable CSP for development
+  crossOriginEmbedderPolicy: false
+}));
+
+// Handle HTTPS redirects in production
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https' && req.header('x-forwarded-proto') !== 'http') {
+      // If no protocol is specified, redirect to HTTP
+      return res.redirect(`http://${req.header('host')}${req.url}`);
+    }
+    next();
+  });
+}
 
 // Trust proxy for rate limiting
 app.set('trust proxy', 1);
@@ -62,11 +76,21 @@ app.get('/api/debug/static', (req, res) => {
   
   try {
     const files = fs.readdirSync(staticPath);
+    const indexHtmlPath = path.join(buildPath, 'index.html');
+    let indexHtmlContent = '';
+    
+    if (fs.existsSync(indexHtmlPath)) {
+      indexHtmlContent = fs.readFileSync(indexHtmlPath, 'utf8');
+    }
+    
     res.json({ 
       buildPath,
       staticPath,
       files,
-      exists: fs.existsSync(buildPath)
+      buildExists: fs.existsSync(buildPath),
+      indexHtmlExists: fs.existsSync(indexHtmlPath),
+      indexHtmlContent: indexHtmlContent.substring(0, 500) + '...',
+      env: process.env.NODE_ENV || 'development'
     });
   } catch (error) {
     res.json({ error: error.message, buildPath, staticPath });
@@ -78,7 +102,13 @@ if (process.env.NODE_ENV === 'production') {
   // Serve static files from the React app build directory
   const buildPath = path.join(__dirname, '../client/build');
   console.log('📁 Serving static files from:', buildPath);
-  app.use(express.static(buildPath));
+  
+  // Serve static files with cache busting
+  app.use(express.static(buildPath, {
+    maxAge: '1h',
+    etag: true,
+    lastModified: true
+  }));
   
   // Handle React routing, return all requests to React app
   app.get('*', (req, res) => {
@@ -89,7 +119,10 @@ if (process.env.NODE_ENV === 'production') {
   // In development, serve static files for debugging
   const buildPath = path.join(__dirname, '../client/build');
   console.log('📁 Serving static files from:', buildPath);
-  app.use(express.static(buildPath));
+  app.use(express.static(buildPath, {
+    maxAge: 0, // No caching in development
+    etag: false
+  }));
 }
 
 // Error handling middleware
