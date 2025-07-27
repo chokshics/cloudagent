@@ -22,11 +22,11 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false
 }));
 
-// Handle HTTPS redirects in production
+// Handle HTTPS redirects and force HTTP in production
 if (process.env.NODE_ENV === 'production') {
   app.use((req, res, next) => {
-    if (req.header('x-forwarded-proto') !== 'https' && req.header('x-forwarded-proto') !== 'http') {
-      // If no protocol is specified, redirect to HTTP
+    // Force HTTP for all requests to prevent HTTPS redirects
+    if (req.header('x-forwarded-proto') === 'https') {
       return res.redirect(`http://${req.header('host')}${req.url}`);
     }
     next();
@@ -90,11 +90,23 @@ app.get('/api/debug/static', (req, res) => {
       buildExists: fs.existsSync(buildPath),
       indexHtmlExists: fs.existsSync(indexHtmlPath),
       indexHtmlContent: indexHtmlContent.substring(0, 500) + '...',
-      env: process.env.NODE_ENV || 'development'
+      env: process.env.NODE_ENV || 'development',
+      protocol: req.protocol,
+      headers: req.headers
     });
   } catch (error) {
     res.json({ error: error.message, buildPath, staticPath });
   }
+});
+
+// Force HTTP endpoint
+app.get('/api/force-http', (req, res) => {
+  res.setHeader('Strict-Transport-Security', 'max-age=0');
+  res.json({ 
+    message: 'HTTP forced',
+    protocol: req.protocol,
+    url: req.url
+  });
 });
 
 // Serve static files in production
@@ -103,16 +115,23 @@ if (process.env.NODE_ENV === 'production') {
   const buildPath = path.join(__dirname, '../client/build');
   console.log('📁 Serving static files from:', buildPath);
   
-  // Serve static files with cache busting
+  // Serve static files with cache busting and force HTTP
   app.use(express.static(buildPath, {
     maxAge: '1h',
     etag: true,
-    lastModified: true
+    lastModified: true,
+    setHeaders: (res, path) => {
+      // Force HTTP and prevent HTTPS redirects
+      res.setHeader('Strict-Transport-Security', 'max-age=0');
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+    }
   }));
   
   // Handle React routing, return all requests to React app
   app.get('*', (req, res) => {
     console.log('🔄 Serving React app for route:', req.path);
+    // Force HTTP headers
+    res.setHeader('Strict-Transport-Security', 'max-age=0');
     res.sendFile(path.join(buildPath, 'index.html'));
   });
 } else {
