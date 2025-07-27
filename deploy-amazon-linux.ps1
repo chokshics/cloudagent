@@ -67,11 +67,11 @@ try {
     
     # Clone repository (you'll need to update this URL)
     Write-Host "📥 Cloning repository..." -ForegroundColor Yellow
-    Invoke-SSHCommand "cd /home/ec2-user/admin-portal && git clone https://github.com/your-username/your-repo.git ."
+    Invoke-SSHCommand "cd /home/ec2-user/admin-portal; git clone https://github.com/chokshics/cloudagent.git ."
     
     # Run setup script
     Write-Host "🔧 Running setup script..." -ForegroundColor Yellow
-    Invoke-SSHCommand "cd /home/ec2-user/admin-portal && ./setup-amazon-linux.sh"
+    Invoke-SSHCommand "cd /home/ec2-user/admin-portal; ./setup-amazon-linux.sh"
     
     Write-Host "✅ Deployment completed successfully!" -ForegroundColor Green
     Write-Host "🌐 Your application should be available at: http://$EC2IP:5000" -ForegroundColor Cyan
