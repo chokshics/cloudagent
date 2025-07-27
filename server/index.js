@@ -54,13 +54,42 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Admin Portal API is running' });
 });
 
+// Debug endpoint to check static files
+app.get('/api/debug/static', (req, res) => {
+  const fs = require('fs');
+  const buildPath = path.join(__dirname, '../client/build');
+  const staticPath = path.join(buildPath, 'static/js');
+  
+  try {
+    const files = fs.readdirSync(staticPath);
+    res.json({ 
+      buildPath,
+      staticPath,
+      files,
+      exists: fs.existsSync(buildPath)
+    });
+  } catch (error) {
+    res.json({ error: error.message, buildPath, staticPath });
+  }
+});
+
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/build')));
+  // Serve static files from the React app build directory
+  const buildPath = path.join(__dirname, '../client/build');
+  console.log('📁 Serving static files from:', buildPath);
+  app.use(express.static(buildPath));
   
+  // Handle React routing, return all requests to React app
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+    console.log('🔄 Serving React app for route:', req.path);
+    res.sendFile(path.join(buildPath, 'index.html'));
   });
+} else {
+  // In development, serve static files for debugging
+  const buildPath = path.join(__dirname, '../client/build');
+  console.log('📁 Serving static files from:', buildPath);
+  app.use(express.static(buildPath));
 }
 
 // Error handling middleware
@@ -85,9 +114,10 @@ const startServer = async () => {
     console.log('✅ Database initialized successfully');
     
     // Start server after database is ready
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server running on port ${PORT}`);
       console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`Server accessible at: http://0.0.0.0:${PORT}`);
     });
   } catch (error) {
     console.error('❌ Failed to initialize database:', error);
