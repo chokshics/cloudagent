@@ -55,14 +55,20 @@ if (process.env.NODE_ENV === 'production') {
 // Trust proxy for rate limiting
 app.set('trust proxy', 1);
 
-// Rate limiting
+// Rate limiting - More lenient for production
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 1000, // limit each IP to 1000 requests per windowMs (increased from 100)
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: {
+    error: 'Too many requests from this IP, please try again later.',
+    retryAfter: '15 minutes'
+  }
 });
-app.use(limiter);
+
+// Apply rate limiting only to API routes, not to static files
+app.use('/api', limiter);
 
 // CORS configuration
 app.use(cors({
