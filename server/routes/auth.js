@@ -9,6 +9,64 @@ const { authenticateToken } = require('../middleware/auth');
 // Get shared database connection
 const db = getDatabase();
 
+// Helper function to create default subscription for new users
+function createDefaultSubscriptionForUser(userId, callback) {
+  // First, get the first available subscription plan
+  db.get("SELECT id FROM subscription_plans ORDER BY id ASC LIMIT 1", (err, plan) => {
+    if (err) {
+      console.error('Error getting default plan:', err);
+      return callback(err);
+    }
+    
+    if (!plan) {
+      console.error('No subscription plans available');
+      return callback(new Error('No subscription plans available'));
+    }
+    
+    // Create user_subscriptions table if it doesn't exist
+    const createSubscriptionsTable = `
+      CREATE TABLE IF NOT EXISTS user_subscriptions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        plan_id INTEGER NOT NULL,
+        is_active INTEGER DEFAULT 1,
+        whatsapp_sends_used INTEGER DEFAULT 0,
+        mobile_numbers_used INTEGER DEFAULT 0,
+        promotions_used INTEGER DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        expires_at DATETIME,
+        FOREIGN KEY (user_id) REFERENCES users (id),
+        FOREIGN KEY (plan_id) REFERENCES subscription_plans (id)
+      )
+    `;
+    
+    db.run(createSubscriptionsTable, (err) => {
+      if (err) {
+        console.error('Error creating user_subscriptions table:', err);
+        return callback(err);
+      }
+      
+      // Create the subscription
+      const insertSubscription = `
+        INSERT INTO user_subscriptions (
+          user_id, plan_id, is_active, whatsapp_sends_used, 
+          mobile_numbers_used, promotions_used, created_at, expires_at
+        ) VALUES (?, ?, 1, 0, 0, 0, datetime('now'), datetime('now', '+30 days'))
+      `;
+      
+      db.run(insertSubscription, [userId, plan.id], function(err) {
+        if (err) {
+          console.error('Error creating subscription:', err);
+          return callback(err);
+        }
+        
+        console.log(`✅ Created subscription ID: ${this.lastID} for user ID: ${userId}`);
+        callback(null);
+      });
+    });
+  });
+}
+
 // Validation middleware
 const validateRegistration = [
   body('firstName').trim().notEmpty().withMessage('First name is required').isLength({ min: 2 }).withMessage('First name must be at least 2 characters'),
@@ -70,9 +128,22 @@ router.post('/register', validateRegistration, async (req, res) => {
               return res.status(500).json({ message: 'Error creating user' });
             }
 
-            res.status(201).json({ 
-              message: 'User registered successfully',
-              userId: this.lastID 
+            const newUserId = this.lastID;
+            console.log(`✅ Created user with ID: ${newUserId}`);
+
+            // Automatically create a subscription for the new user
+            createDefaultSubscriptionForUser(newUserId, (subscriptionErr) => {
+              if (subscriptionErr) {
+                console.error('Error creating subscription for new user:', subscriptionErr);
+                // Still return success for user creation, but log the subscription error
+              } else {
+                console.log(`✅ Created default subscription for user ID: ${newUserId}`);
+              }
+
+              res.status(201).json({ 
+                message: 'User registered successfully',
+                userId: newUserId 
+              });
             });
           }
         );
