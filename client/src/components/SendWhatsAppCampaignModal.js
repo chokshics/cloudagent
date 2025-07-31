@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useMutation, useQueryClient } from 'react-query';
-import { Send, Users, CheckSquare, Square } from 'lucide-react';
+import { useMutation, useQueryClient, useQuery } from 'react-query';
+import { Send, Users, CheckSquare, Square, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -10,7 +10,24 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
   const [customMessage, setCustomMessage] = useState('');
   const [previewMessage, setPreviewMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const [campaignSent, setCampaignSent] = useState(false);
   const queryClient = useQueryClient();
+
+  // Query to check if campaign has already been sent for this promotion
+  const { data: campaignHistory } = useQuery(
+    ['whatsapp-campaign-history', promotion?.id],
+    () => axios.get(`/api/whatsapp/logs/${promotion?.id}`),
+    {
+      enabled: !!promotion?.id && isOpen,
+      onSuccess: (response) => {
+        // Check if any successful campaigns were sent for this promotion
+        const hasSuccessfulCampaigns = response.data.some(log => 
+          log.status === 'delivered' || log.status === 'sent'
+        );
+        setCampaignSent(hasSuccessfulCampaigns);
+      }
+    }
+  );
 
   const sendWhatsAppCampaignMutation = useMutation(
     (data) => axios.post('/api/whatsapp/send', data),
@@ -18,6 +35,8 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
       onSuccess: (response) => {
         queryClient.invalidateQueries('whatsapp-logs');
         queryClient.invalidateQueries('subscription-info');
+        queryClient.invalidateQueries(['whatsapp-campaign-history', promotion?.id]);
+        setCampaignSent(true);
         toast.success('WhatsApp campaign sent successfully!');
         onClose();
       },
@@ -145,6 +164,7 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
     setCustomMessage('');
     setPreviewMessage('');
     setSending(false);
+    setCampaignSent(false);
     onClose();
   };
 
@@ -265,21 +285,36 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                     </div>
                   </div>
 
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className={`border rounded-lg p-4 ${
+                    campaignSent 
+                      ? 'bg-yellow-50 border-yellow-200' 
+                      : 'bg-green-50 border-green-200'
+                  }`}>
                     <div className="flex">
                       <div className="flex-shrink-0">
-                        <Users className="h-5 w-5 text-green-400" />
+                        {campaignSent ? (
+                          <AlertCircle className="h-5 w-5 text-yellow-400" />
+                        ) : (
+                          <Users className="h-5 w-5 text-green-400" />
+                        )}
                       </div>
                       <div className="ml-3">
-                        <h3 className="text-sm font-medium text-green-800">
+                        <h3 className={`text-sm font-medium ${
+                          campaignSent ? 'text-yellow-800' : 'text-green-800'
+                        }`}>
                           Campaign Summary
                         </h3>
-                        <div className="mt-2 text-sm text-green-700">
+                        <div className={`mt-2 text-sm ${
+                          campaignSent ? 'text-yellow-700' : 'text-green-700'
+                        }`}>
                           <ul className="list-disc pl-5 space-y-1">
                             <li>Promotion: {promotion.title}</li>
                             <li>Recipients: {selectedNumbers.length}</li>
                             <li>Message length: {previewMessage.length} characters</li>
                             <li>Platform: WhatsApp (via Twilio)</li>
+                            {campaignSent && (
+                              <li className="font-medium">Status: Campaign Already Sent</li>
+                            )}
                           </ul>
                         </div>
                       </div>
@@ -291,17 +326,37 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
           </div>
 
           <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            {campaignSent && (
+              <div className="w-full mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-center">
+                  <AlertCircle className="h-5 w-5 text-yellow-600 mr-2" />
+                  <span className="text-sm text-yellow-800">
+                    A WhatsApp campaign has already been sent for this promotion. You cannot send another campaign.
+                  </span>
+                </div>
+              </div>
+            )}
+            
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={sending || selectedNumbers.length === 0}
-              className="btn-primary sm:ml-3 sm:w-auto"
+              disabled={sending || selectedNumbers.length === 0 || campaignSent}
+              className={`sm:ml-3 sm:w-auto ${
+                campaignSent 
+                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                  : 'btn-primary'
+              }`}
             >
               {sending ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Sending...
                 </div>
+              ) : campaignSent ? (
+                <>
+                  <Send className="h-4 w-4 mr-2" />
+                  Campaign Already Sent
+                </>
               ) : (
                 <>
                   <Send className="h-4 w-4 mr-2" />
