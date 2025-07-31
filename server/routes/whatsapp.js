@@ -35,13 +35,18 @@ db.run(`
 `);
 
 // Check if Twilio credentials are available
+console.log('🔍 Checking Twilio credentials...');
+console.log('TWILIO_ACCOUNT_SID:', process.env.TWILIO_ACCOUNT_SID ? 'set' : 'not-set');
+console.log('TWILIO_AUTH_TOKEN:', process.env.TWILIO_AUTH_TOKEN ? 'set' : 'not-set');
+console.log('TWILIO_WHATSAPP_NUMBER:', process.env.TWILIO_WHATSAPP_NUMBER || 'not-set');
+
 if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
   try {
     twilioClient = twilio(
       process.env.TWILIO_ACCOUNT_SID,
       process.env.TWILIO_AUTH_TOKEN
     );
-    console.log('✅ Twilio client initialized');
+    console.log('✅ Twilio client initialized successfully');
     whatsappStatus = {
       connected: true,
       message: 'WhatsApp connected via Twilio'
@@ -101,6 +106,20 @@ router.use(requireShopkeeperOrAdmin);
 // Get WhatsApp status
 router.get('/status', (req, res) => {
   res.json(whatsappStatus);
+});
+
+// Debug endpoint to check Twilio configuration
+router.get('/debug', (req, res) => {
+  const debugInfo = {
+    twilioAccountSid: process.env.TWILIO_ACCOUNT_SID ? 'set' : 'not-set',
+    twilioAuthToken: process.env.TWILIO_AUTH_TOKEN ? 'set' : 'not-set',
+    twilioWhatsappNumber: process.env.TWILIO_WHATSAPP_NUMBER || 'not-set',
+    twilioClientInitialized: !!twilioClient,
+    whatsappStatus: whatsappStatus,
+    nodeEnv: process.env.NODE_ENV || 'development'
+  };
+  
+  res.json(debugInfo);
 });
 
 // Helper function to send WhatsApp messages
