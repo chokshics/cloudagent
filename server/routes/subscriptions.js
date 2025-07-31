@@ -150,7 +150,7 @@ router.post('/increment-whatsapp-sends', (req, res) => {
   const db = getDatabase();
   
   db.run(
-    'UPDATE user_subscriptions SET whatsapp_sends_used = whatsapp_sends_used + 1 WHERE user_id = ? AND is_active = 1',
+    'UPDATE user_subscriptions SET whatsapp_sends_used = whatsapp_sends_used + 1 WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
     [req.user.userId],
     function(err) {
       if (err) {

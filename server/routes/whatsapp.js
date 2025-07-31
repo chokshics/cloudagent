@@ -200,7 +200,7 @@ async function sendWhatsAppMessages(req, res, to, message, promotionId) {
 
   // Increment WhatsApp campaigns count (1 campaign = 1 increment, regardless of number of recipients)
   db.run(
-    'UPDATE user_subscriptions SET whatsapp_sends_used = whatsapp_sends_used + 1 WHERE user_id = ? AND is_active = 1',
+    'UPDATE user_subscriptions SET whatsapp_sends_used = whatsapp_sends_used + 1 WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
     [req.user.userId],
     function(err) {
       if (err) {
@@ -238,7 +238,7 @@ router.post('/send', [
         sp.whatsapp_send_limit
       FROM user_subscriptions us
       JOIN subscription_plans sp ON us.plan_id = sp.id
-      WHERE us.user_id = ? AND us.is_active = 1
+      WHERE us.user_id = ?
       ORDER BY us.created_at DESC
       LIMIT 1
     `;
@@ -335,6 +335,7 @@ router.post('/test', async (req, res) => {
 
     // Test with a sample number (you can modify this)
     const testNumber = process.env.TEST_WHATSAPP_NUMBER;
+    const twilioNumber = process.env.TWILIO_WHATSAPP_NUMBER;
     
     if (!testNumber) {
       return res.status(400).json({ 
@@ -342,8 +343,16 @@ router.post('/test', async (req, res) => {
       });
     }
 
+    // Check if test number is different from Twilio number
+    if (testNumber === twilioNumber) {
+      return res.status(400).json({ 
+        error: 'Test number cannot be the same as Twilio WhatsApp number. Please set a different TEST_WHATSAPP_NUMBER in .env file',
+        details: 'The test number and Twilio number must be different for testing'
+      });
+    }
+
     const testMessage = await twilioClient.messages.create({
-      from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+      from: `whatsapp:${twilioNumber}`,
       to: `whatsapp:${testNumber}`,
       body: 'This is a test message from your WhatsApp campaign system! 🚀'
     });
