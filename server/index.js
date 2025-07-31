@@ -68,6 +68,14 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Admin Portal API is running' });
 });
 
+// Favicon endpoint to prevent 404 errors
+app.get('/favicon.ico', (req, res) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Content-Type', 'image/x-icon');
+  res.status(204).end(); // No content response
+});
+
 // Debug endpoint to check JWT_SECRET (remove in production)
 app.get('/api/debug/jwt-secret', (req, res) => {
   const jwt = require('jsonwebtoken');
@@ -150,6 +158,12 @@ if (process.env.NODE_ENV === 'production') {
       // Force HTTP and prevent HTTPS redirects
       res.setHeader('Strict-Transport-Security', 'max-age=0');
       res.setHeader('X-Content-Type-Options', 'nosniff');
+      
+      // Add CORS headers for favicon and other static assets
+      if (path.endsWith('.ico') || path.endsWith('.png') || path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.gif') || path.endsWith('.svg')) {
+        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+      }
     }
   }));
   
