@@ -166,14 +166,6 @@ if (process.env.NODE_ENV === 'production') {
       }
     }
   }));
-  
-  // Handle React routing, return all requests to React app
-  app.get('*', (req, res) => {
-    console.log('🔄 Serving React app for route:', req.path);
-    // Force HTTP headers
-    res.setHeader('Strict-Transport-Security', 'max-age=0');
-    res.sendFile(path.join(buildPath, 'index.html'));
-  });
 } else {
   // In development, serve static files for debugging
   const buildPath = path.join(__dirname, '../client/build');
@@ -184,6 +176,21 @@ if (process.env.NODE_ENV === 'production') {
   }));
 }
 
+// Handle React routing for all non-API routes
+app.get('*', (req, res) => {
+  // Skip API routes
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API route not found' });
+  }
+  
+  console.log('🔄 Serving React app for route:', req.path);
+  const buildPath = path.join(__dirname, '../client/build');
+  
+  // Force HTTP headers
+  res.setHeader('Strict-Transport-Security', 'max-age=0');
+  res.sendFile(path.join(buildPath, 'index.html'));
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -191,11 +198,6 @@ app.use((err, req, res, next) => {
     error: 'Something went wrong!',
     message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
   });
-});
-
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Route not found' });
 });
 
 // Initialize database and start server
