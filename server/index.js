@@ -3,7 +3,26 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
-require('dotenv').config();
+const fs = require('fs');
+
+// Load environment variables
+console.log('🔧 Loading environment variables...');
+console.log('Current working directory:', process.cwd());
+console.log('.env file exists:', fs.existsSync('.env'));
+
+const dotenvResult = require('dotenv').config();
+if (dotenvResult.error) {
+  console.error('❌ Error loading .env file:', dotenvResult.error);
+} else {
+  console.log('✅ .env file loaded successfully');
+  console.log('Environment variables found:', Object.keys(dotenvResult.parsed || {}));
+}
+
+// Check Twilio environment variables
+console.log('🔍 Checking Twilio environment variables...');
+console.log('TWILIO_ACCOUNT_SID:', process.env.TWILIO_ACCOUNT_SID ? 'set' : 'not-set');
+console.log('TWILIO_AUTH_TOKEN:', process.env.TWILIO_AUTH_TOKEN ? 'set' : 'not-set');
+console.log('TWILIO_WHATSAPP_NUMBER:', process.env.TWILIO_WHATSAPP_NUMBER || 'not-set');
 
 const authRoutes = require('./routes/auth');
 const promotionRoutes = require('./routes/promotions');

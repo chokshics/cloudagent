@@ -116,7 +116,13 @@ router.get('/debug', (req, res) => {
     twilioWhatsappNumber: process.env.TWILIO_WHATSAPP_NUMBER || 'not-set',
     twilioClientInitialized: !!twilioClient,
     whatsappStatus: whatsappStatus,
-    nodeEnv: process.env.NODE_ENV || 'development'
+    nodeEnv: process.env.NODE_ENV || 'development',
+    // Additional debugging info
+    allEnvVars: Object.keys(process.env).filter(key => key.includes('TWILIO')),
+    dotenvLoaded: typeof require('dotenv').config === 'function',
+    cwd: process.cwd(),
+    envFileExists: require('fs').existsSync('.env'),
+    pm2ProcessId: process.env.pm_id || 'not-pm2'
   };
   
   res.json(debugInfo);
