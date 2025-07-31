@@ -138,12 +138,25 @@ async function sendWhatsAppMessages(req, res, to, message, promotionId) {
       // Format phone number for WhatsApp (remove + if present and add country code if needed)
       let formattedNumber = phoneNumber.replace(/^\+/, '');
       
-      // If number doesn't start with country code, assume it's a US number
-      if (!formattedNumber.startsWith('1') && formattedNumber.length === 10) {
-        formattedNumber = '1' + formattedNumber;
+      // If number doesn't start with country code, assume it's an Indian number
+      if (formattedNumber.length === 10) {
+        // Assume Indian number (91 prefix)
+        formattedNumber = '91' + formattedNumber;
+      } else if (formattedNumber.startsWith('91') && formattedNumber.length === 12) {
+        // Already has Indian country code
+        formattedNumber = formattedNumber;
+      } else if (formattedNumber.startsWith('1') && formattedNumber.length === 11) {
+        // US number
+        formattedNumber = formattedNumber;
+      } else {
+        // Unknown format, try to use as is
+        console.log(`⚠️ Unknown phone number format: ${phoneNumber} -> ${formattedNumber}`);
       }
 
       // Send WhatsApp message via Twilio
+      console.log(`📤 Sending WhatsApp to: ${phoneNumber} -> +${formattedNumber}`);
+      console.log(`📤 From: whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`);
+      
       const twilioMessage = await twilioClient.messages.create({
         from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
         to: `whatsapp:+${formattedNumber}`,
@@ -175,6 +188,8 @@ async function sendWhatsAppMessages(req, res, to, message, promotionId) {
 
     } catch (error) {
       console.error(`❌ Failed to send WhatsApp to ${phoneNumber}:`, error.message);
+      console.error(`❌ Error details:`, error);
+      console.error(`❌ Phone number: ${phoneNumber}, Formatted: +${formattedNumber}`);
       
       // Log failed message
       const logQuery = `
