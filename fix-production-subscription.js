@@ -250,46 +250,84 @@ function createDefaultSubscription(db, user) {
 }
 
 function createSubscriptionForUser(db, user, planId) {
-  // Create user_subscriptions table if it doesn't exist
-  const createSubscriptionsTable = `
-    CREATE TABLE IF NOT EXISTS user_subscriptions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      plan_id INTEGER NOT NULL,
-      is_active INTEGER DEFAULT 1,
-      whatsapp_sends_used INTEGER DEFAULT 0,
-      mobile_numbers_used INTEGER DEFAULT 0,
-      promotions_used INTEGER DEFAULT 0,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      expires_at DATETIME,
-      FOREIGN KEY (user_id) REFERENCES users (id),
-      FOREIGN KEY (plan_id) REFERENCES subscription_plans (id)
-    )
-  `;
-  
-  db.run(createSubscriptionsTable, (err) => {
+  // First, check if user_subscriptions table exists and get its structure
+  db.all("PRAGMA table_info(user_subscriptions)", (err, columns) => {
     if (err) {
-      console.log('❌ Error creating user_subscriptions table:', err.message);
+      console.log('❌ Error checking user_subscriptions table:', err.message);
       return;
     }
     
-    console.log('✅ Created user_subscriptions table');
+    console.log('📊 user_subscriptions table columns:', columns.map(col => col.name));
     
-    // Create subscription
-    const insertSubscription = `
-      INSERT INTO user_subscriptions (
-        user_id, plan_id, is_active, whatsapp_sends_used, 
-        mobile_numbers_used, promotions_used, created_at, expires_at
-      ) VALUES (?, ?, 1, 0, 0, 0, datetime('now'), datetime('now', '+30 days'))
-    `;
+    // Check if we need to add missing columns
+    const existingColumnNames = columns.map(col => col.name);
+    const missingColumns = [];
     
-    db.run(insertSubscription, [user.id, planId], function(err) {
-      if (err) {
-        console.log(`❌ Error creating subscription for ${user.email}:`, err.message);
-      } else {
-        console.log(`✅ Created default subscription for ${user.email} (ID: ${this.lastID})`);
-      }
-    });
+    if (!existingColumnNames.includes('mobile_numbers_used')) {
+      missingColumns.push('mobile_numbers_used INTEGER DEFAULT 0');
+    }
+    if (!existingColumnNames.includes('promotions_used')) {
+      missingColumns.push('promotions_used INTEGER DEFAULT 0');
+    }
+    if (!existingColumnNames.includes('expires_at')) {
+      missingColumns.push('expires_at DATETIME');
+    }
+    
+    // Add missing columns if needed
+    if (missingColumns.length > 0) {
+      console.log('⚠️ Adding missing columns to user_subscriptions table...');
+      missingColumns.forEach(columnDef => {
+        const columnName = columnDef.split(' ')[0];
+        const addColumnSQL = `ALTER TABLE user_subscriptions ADD COLUMN ${columnDef}`;
+        
+        db.run(addColumnSQL, (err) => {
+          if (err) {
+            console.log(`❌ Error adding column ${columnName}:`, err.message);
+          } else {
+            console.log(`✅ Added column: ${columnName}`);
+          }
+        });
+      });
+      
+      // Wait a bit then create subscription
+      setTimeout(() => createSubscriptionRecord(db, user, planId), 1000);
+    } else {
+      // Table structure is correct, create subscription directly
+      createSubscriptionRecord(db, user, planId);
+    }
+  });
+}
+
+function createSubscriptionRecord(db, user, planId) {
+  // Create subscription with safe column names
+  const insertSubscription = `
+    INSERT INTO user_subscriptions (
+      user_id, plan_id, is_active, whatsapp_sends_used, 
+      mobile_numbers_used, promotions_used, created_at, expires_at
+    ) VALUES (?, ?, 1, 0, 0, 0, datetime('now'), datetime('now', '+30 days'))
+  `;
+  
+  db.run(insertSubscription, [user.id, planId], function(err) {
+    if (err) {
+      console.log(`❌ Error creating subscription for ${user.email}:`, err.message);
+      console.log('💡 Trying with minimal columns...');
+      
+      // Try with minimal columns if the full insert fails
+      const minimalInsert = `
+        INSERT INTO user_subscriptions (user_id, plan_id, is_active, created_at)
+        VALUES (?, ?, 1, datetime('now'))
+      `;
+      
+      db.run(minimalInsert, [user.id, planId], function(err2) {
+        if (err2) {
+          console.log(`❌ Error creating subscription for ${user.email} (minimal):`, err2.message);
+        } else {
+          console.log(`✅ Created default subscription for ${user.email} (ID: ${this.lastID})`);
+        }
+      });
+    } else {
+      console.log(`✅ Created default subscription for ${user.email} (ID: ${this.lastID})`);
+    }
   });
 }
 
