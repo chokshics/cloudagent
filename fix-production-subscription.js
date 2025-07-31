@@ -21,31 +21,74 @@ async function fixProductionSubscription() {
     
     console.log('✅ Database file found');
     
-    // Step 1: Check subscription plans
-    console.log('\n📋 Step 1: Checking subscription plans...');
+    // Step 1: Check subscription plans table structure
+    console.log('\n📋 Step 1: Checking subscription plans table structure...');
     
-    db.get("SELECT COUNT(*) as count FROM subscription_plans", (err, result) => {
+    db.get("PRAGMA table_info(subscription_plans)", (err, result) => {
       if (err) {
-        console.log('❌ Error checking subscription_plans:', err.message);
+        console.log('❌ Error checking subscription_plans table:', err.message);
         console.log('💡 Creating subscription_plans table...');
         createSubscriptionPlansTable(db);
         return;
       }
       
-      console.log(`Found ${result.count} subscription plans`);
+      console.log('✅ subscription_plans table exists');
       
-      if (result.count === 0) {
-        console.log('⚠️ No subscription plans found. Creating default plans...');
-        createDefaultPlans(db);
-      } else {
-        console.log('✅ Subscription plans exist');
-        checkUserSubscriptions(db);
-      }
+      // Check what columns exist
+      db.all("PRAGMA table_info(subscription_plans)", (err, columns) => {
+        if (err) {
+          console.log('❌ Error getting table info:', err.message);
+          return;
+        }
+        
+        console.log('📊 Table columns:', columns.map(col => col.name));
+        
+        // Check if we have the required columns
+        const hasPrice = columns.some(col => col.name === 'price');
+        const hasWhatsappLimit = columns.some(col => col.name === 'whatsapp_send_limit');
+        
+        if (!hasPrice || !hasWhatsappLimit) {
+          console.log('⚠️ Table structure is different. Adding missing columns...');
+          addMissingColumns(db, columns);
+        } else {
+          console.log('✅ Table structure is correct');
+          checkUserSubscriptions(db);
+        }
+      });
     });
     
   } catch (error) {
     console.error('❌ Error:', error);
   }
+}
+
+function addMissingColumns(db, existingColumns) {
+  const requiredColumns = [
+    { name: 'price', type: 'REAL', defaultValue: '0.0' },
+    { name: 'duration_days', type: 'INTEGER', defaultValue: '30' },
+    { name: 'whatsapp_send_limit', type: 'INTEGER', defaultValue: '100' },
+    { name: 'mobile_number_limit', type: 'INTEGER', defaultValue: '500' },
+    { name: 'promotion_limit', type: 'INTEGER', defaultValue: '10' }
+  ];
+  
+  const existingColumnNames = existingColumns.map(col => col.name);
+  
+  requiredColumns.forEach(column => {
+    if (!existingColumnNames.includes(column.name)) {
+      const addColumnSQL = `ALTER TABLE subscription_plans ADD COLUMN ${column.name} ${column.type} DEFAULT ${column.defaultValue}`;
+      
+      db.run(addColumnSQL, (err) => {
+        if (err) {
+          console.log(`❌ Error adding column ${column.name}:`, err.message);
+        } else {
+          console.log(`✅ Added column: ${column.name}`);
+        }
+      });
+    }
+  });
+  
+  // Wait a bit then check user subscriptions
+  setTimeout(() => checkUserSubscriptions(db), 2000);
 }
 
 function createSubscriptionPlansTable(db) {
@@ -54,11 +97,11 @@ function createSubscriptionPlansTable(db) {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       description TEXT,
-      price REAL NOT NULL,
-      duration_days INTEGER NOT NULL,
-      whatsapp_send_limit INTEGER NOT NULL,
-      mobile_number_limit INTEGER NOT NULL,
-      promotion_limit INTEGER NOT NULL,
+      price REAL NOT NULL DEFAULT 0.0,
+      duration_days INTEGER NOT NULL DEFAULT 30,
+      whatsapp_send_limit INTEGER NOT NULL DEFAULT 100,
+      mobile_number_limit INTEGER NOT NULL DEFAULT 500,
+      promotion_limit INTEGER NOT NULL DEFAULT 10,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `;
@@ -178,58 +221,74 @@ function checkUserSubscriptions(db) {
 function createDefaultSubscription(db, user) {
   console.log(`🔧 Creating default subscription for ${user.email}...`);
   
-  // Get the first available plan (Basic Plan)
-  db.get("SELECT id FROM subscription_plans ORDER BY price ASC LIMIT 1", (err, plan) => {
+  // Get the first available plan (Basic Plan) - use a safer query
+  const getPlanQuery = `
+    SELECT id FROM subscription_plans 
+    WHERE name LIKE '%Basic%' OR name LIKE '%Free%' OR name LIKE '%Standard%'
+    ORDER BY id ASC LIMIT 1
+  `;
+  
+  db.get(getPlanQuery, (err, plan) => {
     if (err) {
       console.log(`❌ Error getting default plan:`, err.message);
       return;
     }
     
     if (!plan) {
-      console.log('❌ No subscription plans available');
+      // Try to get any plan
+      db.get("SELECT id FROM subscription_plans ORDER BY id ASC LIMIT 1", (err, anyPlan) => {
+        if (err || !anyPlan) {
+          console.log('❌ No subscription plans available');
+          return;
+        }
+        createSubscriptionForUser(db, user, anyPlan.id);
+      });
+    } else {
+      createSubscriptionForUser(db, user, plan.id);
+    }
+  });
+}
+
+function createSubscriptionForUser(db, user, planId) {
+  // Create user_subscriptions table if it doesn't exist
+  const createSubscriptionsTable = `
+    CREATE TABLE IF NOT EXISTS user_subscriptions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      plan_id INTEGER NOT NULL,
+      is_active INTEGER DEFAULT 1,
+      whatsapp_sends_used INTEGER DEFAULT 0,
+      mobile_numbers_used INTEGER DEFAULT 0,
+      promotions_used INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      expires_at DATETIME,
+      FOREIGN KEY (user_id) REFERENCES users (id),
+      FOREIGN KEY (plan_id) REFERENCES subscription_plans (id)
+    )
+  `;
+  
+  db.run(createSubscriptionsTable, (err) => {
+    if (err) {
+      console.log('❌ Error creating user_subscriptions table:', err.message);
       return;
     }
     
-    // Create user_subscriptions table if it doesn't exist
-    const createSubscriptionsTable = `
-      CREATE TABLE IF NOT EXISTS user_subscriptions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        plan_id INTEGER NOT NULL,
-        is_active INTEGER DEFAULT 1,
-        whatsapp_sends_used INTEGER DEFAULT 0,
-        mobile_numbers_used INTEGER DEFAULT 0,
-        promotions_used INTEGER DEFAULT 0,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        expires_at DATETIME,
-        FOREIGN KEY (user_id) REFERENCES users (id),
-        FOREIGN KEY (plan_id) REFERENCES subscription_plans (id)
-      )
+    console.log('✅ Created user_subscriptions table');
+    
+    // Create subscription
+    const insertSubscription = `
+      INSERT INTO user_subscriptions (
+        user_id, plan_id, is_active, whatsapp_sends_used, 
+        mobile_numbers_used, promotions_used, created_at, expires_at
+      ) VALUES (?, ?, 1, 0, 0, 0, datetime('now'), datetime('now', '+30 days'))
     `;
     
-    db.run(createSubscriptionsTable, (err) => {
+    db.run(insertSubscription, [user.id, planId], function(err) {
       if (err) {
-        console.log('❌ Error creating user_subscriptions table:', err.message);
-        return;
+        console.log(`❌ Error creating subscription for ${user.email}:`, err.message);
+      } else {
+        console.log(`✅ Created default subscription for ${user.email} (ID: ${this.lastID})`);
       }
-      
-      console.log('✅ Created user_subscriptions table');
-      
-      // Create subscription
-      const insertSubscription = `
-        INSERT INTO user_subscriptions (
-          user_id, plan_id, is_active, whatsapp_sends_used, 
-          mobile_numbers_used, promotions_used, created_at, expires_at
-        ) VALUES (?, ?, 1, 0, 0, 0, datetime('now'), datetime('now', '+30 days'))
-      `;
-      
-      db.run(insertSubscription, [user.id, plan.id], function(err) {
-        if (err) {
-          console.log(`❌ Error creating subscription for ${user.email}:`, err.message);
-        } else {
-          console.log(`✅ Created default subscription for ${user.email} (ID: ${this.lastID})`);
-        }
-      });
     });
   });
 }
