@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { getDatabase } = require('../database/init');
 const { body, validationResult } = require('express-validator');
+const { authenticateToken } = require('../middleware/auth');
 
 // Get shared database connection
 const db = getDatabase();
@@ -120,7 +121,7 @@ router.post('/login', validateLogin, (req, res) => {
             username: user.username, 
             role: user.role 
           },
-          process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production',
+          process.env.JWT_SECRET || '88620138d110da53ab9b68427d42cf5e517bdd303a97abd1dc0edce7dd909a1256c999e8259b8e1a89a6932e9dc7b4295100b9351848ead400d209488f5fc026',
           { expiresIn: '24h' }
         );
 
@@ -171,22 +172,6 @@ router.post('/logout', (req, res) => {
   res.json({ message: 'Logout successful' });
 });
 
-// Middleware to authenticate JWT token
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
 
-  if (!token) {
-    return res.status(401).json({ message: 'Access token required' });
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production', (err, user) => {
-    if (err) {
-      return res.status(403).json({ message: 'Invalid or expired token' });
-    }
-    req.user = user;
-    next();
-  });
-}
 
 module.exports = router; 

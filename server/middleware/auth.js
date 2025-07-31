@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { getDatabase } = require('../database/init');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || '88620138d110da53ab9b68427d42cf5e517bdd303a97abd1dc0edce7dd909a1256c999e8259b8e1a89a6932e9dc7b4295100b9351848ead400d209488f5fc026';
 
 // Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {

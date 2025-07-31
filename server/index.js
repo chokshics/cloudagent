@@ -68,6 +68,32 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Admin Portal API is running' });
 });
 
+// Debug endpoint to check JWT_SECRET (remove in production)
+app.get('/api/debug/jwt-secret', (req, res) => {
+  const jwt = require('jsonwebtoken');
+  const testSecret = 'your-super-secret-jwt-key-change-this-in-production';
+  const testPayload = { test: 'data' };
+  
+  try {
+    const token = jwt.sign(testPayload, testSecret);
+    const decoded = jwt.verify(token, testSecret);
+    res.json({ 
+      message: 'JWT_SECRET test',
+      testSecret,
+      tokenGenerated: !!token,
+      tokenVerified: !!decoded,
+      envJWTSecret: process.env.JWT_SECRET ? 'set' : 'not-set'
+    });
+  } catch (error) {
+    res.json({ 
+      message: 'JWT_SECRET test failed',
+      error: error.message,
+      testSecret,
+      envJWTSecret: process.env.JWT_SECRET ? 'set' : 'not-set'
+    });
+  }
+});
+
 // Debug endpoint to check static files
 app.get('/api/debug/static', (req, res) => {
   const fs = require('fs');
