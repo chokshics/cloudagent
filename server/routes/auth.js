@@ -46,15 +46,22 @@ function createDefaultSubscriptionForUser(userId, callback) {
         return callback(err);
       }
       
-      // Create the subscription
-      const insertSubscription = `
-        INSERT INTO user_subscriptions (
-          user_id, plan_id, is_active, whatsapp_sends_used, 
-          mobile_numbers_used, promotions_used, created_at, expires_at
-        ) VALUES (?, ?, 1, 0, 0, 0, datetime('now'), datetime('now', '+30 days'))
-      `;
-      
-      db.run(insertSubscription, [userId, plan.id], function(err) {
+                    // Calculate expiration date (30 days from now)
+       const expirationDate = new Date();
+       expirationDate.setDate(expirationDate.getDate() + 30);
+       const expirationString = expirationDate.toISOString().replace('T', ' ').replace('Z', '');
+       
+       console.log(`📅 Setting expiration date to: ${expirationString}`);
+       
+       // Create the subscription with proper expiration date
+       const insertSubscription = `
+         INSERT INTO user_subscriptions (
+           user_id, plan_id, is_active, whatsapp_sends_used, 
+           mobile_numbers_used, promotions_used, created_at, expires_at
+         ) VALUES (?, ?, 1, 0, 0, 0, datetime('now'), ?)
+       `;
+       
+       db.run(insertSubscription, [userId, plan.id, expirationString], function(err) {
         if (err) {
           console.error('Error creating subscription:', err);
           return callback(err);
