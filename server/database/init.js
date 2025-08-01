@@ -17,7 +17,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 const initDatabase = async () => {
   return new Promise((resolve, reject) => {
     db.serialize(() => {
-      // Create users table with shopkeeper fields
+      // Create users table with merchant fields
       db.run(`
         CREATE TABLE IF NOT EXISTS users (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,7 +27,7 @@ const initDatabase = async () => {
           first_name TEXT,
           last_name TEXT,
           phone_number TEXT,
-          role TEXT DEFAULT 'shopkeeper',
+          role TEXT DEFAULT 'merchant',
           is_active BOOLEAN DEFAULT 1,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP

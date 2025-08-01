@@ -153,11 +153,11 @@ const MobileNumberModal = ({ isOpen, onClose, mobileNumber }) => {
                   value={formData.phone_number}
                   onChange={handleChange}
                   className={`input mt-1 ${errors.phone_number ? 'border-red-500' : ''}`}
-                  placeholder="+1234567890"
+                  placeholder="+919876543210"
                 />
                 {errors.phone_number && <p className="mt-1 text-sm text-red-600">{errors.phone_number}</p>}
                 <p className="mt-1 text-xs text-gray-500">
-                  Enter phone number in international format (e.g., +1234567890)
+                  Enter phone number in international format (e.g., +919876543210)
                 </p>
               </div>
 

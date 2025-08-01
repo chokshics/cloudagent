@@ -82,7 +82,7 @@ const validateRegistration = [
   body('phoneNumber').trim().notEmpty().withMessage('Phone number is required').matches(/^\+?[1-9]\d{1,14}$/).withMessage('Please enter a valid phone number'),
   body('username').trim().notEmpty().withMessage('Username is required').isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
   body('password').notEmpty().withMessage('Password is required').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('role').optional().isIn(['admin', 'shopkeeper']).withMessage('Invalid role')
+  body('role').optional().isIn(['admin', 'merchant']).withMessage('Invalid role')
 ];
 
 const validateLogin = [
@@ -90,7 +90,7 @@ const validateLogin = [
   body('password').notEmpty().withMessage('Password is required')
 ];
 
-// Register new user (shopkeeper)
+// Register new user (merchant)
 router.post('/register', validateRegistration, async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -98,7 +98,7 @@ router.post('/register', validateRegistration, async (req, res) => {
       return res.status(400).json({ message: errors.array()[0].msg });
     }
 
-    const { firstName, lastName, email, phoneNumber, username, password, role = 'shopkeeper' } = req.body;
+    const { firstName, lastName, email, phoneNumber, username, password, role = 'merchant' } = req.body;
 
     // Check if username already exists
     db.get('SELECT id FROM users WHERE username = ?', [username], async (err, row) => {

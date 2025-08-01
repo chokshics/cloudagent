@@ -198,8 +198,8 @@ router.post('/create-payment', [
           const paymentId = this.lastID;
           
           // Generate UPI payment link
-          const upiId = 'shopkeeperpro@paytm'; // You can make this configurable
-          const upiLink = `upi://pay?pa=${upiId}&pn=ShopKeeper Pro&am=${amountInr}&tn=Subscription Payment ${paymentId}`;
+          const upiId = 'merchantspro@paytm'; // You can make this configurable
+          const upiLink = `upi://pay?pa=${upiId}&pn=Merchants Pro&am=${amountInr}&tn=Subscription Payment ${paymentId}`;
           
           res.json({
             paymentId,

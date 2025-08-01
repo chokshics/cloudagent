@@ -102,7 +102,7 @@ const HomePage = () => {
         phoneNumber: registrationData.phoneNumber,
         username: registrationData.username,
         password: registrationData.password,
-        role: 'shopkeeper'
+        role: 'merchant'
       });
 
       toast.success('Registration successful! Please login.');
@@ -147,7 +147,7 @@ const HomePage = () => {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-3">
               <Store className="h-8 w-8 text-indigo-600" />
-              <h1 className="text-2xl font-bold text-gray-900">ShopKeeper Pro</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Merchants Pro</h1>
             </div>
             <div className="flex space-x-4">
               <button
@@ -183,24 +183,17 @@ const HomePage = () => {
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Create promotions, manage customer contacts, and send WhatsApp campaigns to boost your sales. 
-            Perfect for shopkeepers who want to grow their business digitally.
+            Perfect for merchants who want to grow their business digitally.
           </p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <MessageSquare className="h-12 w-12 text-indigo-600 mb-4" />
             <h3 className="text-xl font-semibold mb-2">WhatsApp Campaigns</h3>
             <p className="text-gray-600">
               Send promotional messages directly to your customers via WhatsApp
-            </p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <BarChart3 className="h-12 w-12 text-indigo-600 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Analytics & Reports</h3>
-            <p className="text-gray-600">
-              Track campaign performance and customer engagement metrics
             </p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md">
@@ -321,7 +314,7 @@ const HomePage = () => {
                       onChange={handleRegistrationChange}
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      placeholder="+1234567890"
+                      placeholder="+919876543210"
                     />
                   </div>
                   <div>
@@ -383,7 +376,7 @@ const HomePage = () => {
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p>&copy; 2024 ShopKeeper Pro. All rights reserved.</p>
+          <p>&copy; 2025 Go AIz. All rights reserved.</p>
         </div>
       </footer>
     </div>

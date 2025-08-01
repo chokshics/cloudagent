@@ -37,10 +37,10 @@ const requireSuperAdmin = (req, res, next) => {
   next();
 };
 
-// Middleware to check if user is admin or shopkeeper
+// Middleware to check if user is admin or merchant
 const requireShopkeeperOrAdmin = (req, res, next) => {
-  if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'shopkeeper')) {
-    return res.status(403).json({ error: 'Access denied. Admin or shopkeeper access required.' });
+  if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'merchant')) {
+    return res.status(403).json({ error: 'Access denied. Admin or merchant access required.' });
   }
   next();
 };

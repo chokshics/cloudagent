@@ -93,7 +93,7 @@ const BulkImportModal = ({ isOpen, onClose }) => {
   };
 
   const downloadTemplate = () => {
-    const template = 'phone_number,name\n+1234567890,John Doe\n+0987654321,Jane Smith';
+    const template = 'phone_number,name\n+919876543210,John Doe\n+919876543211,Jane Smith';
     const blob = new Blob([template], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -138,7 +138,7 @@ const BulkImportModal = ({ isOpen, onClose }) => {
                       onChange={handleChange}
                       rows={10}
                       className={`input ${errors.importData ? 'border-red-500' : ''}`}
-                      placeholder="Enter mobile numbers (one per line or CSV format)&#10;Example:&#10;+1234567890,John Doe&#10;+0987654321,Jane Smith"
+                      placeholder="Enter mobile numbers (one per line or CSV format)&#10;Example:&#10;+919876543210,John Doe&#10;+919876543211,Jane Smith"
                     />
                   </div>
                   {errors.importData && <p className="mt-1 text-sm text-red-600">{errors.importData}</p>}
