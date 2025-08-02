@@ -223,8 +223,6 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
   };
 
   if (!isOpen) return null;
-  
-  console.log('🚨 MODAL IS OPENING! isOpen:', isOpen);
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -246,10 +244,6 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* TEST: Check if modal is rendering */}
-              <div className="bg-green-500 text-white p-2 text-center font-bold">
-                ✅ MODAL IS RENDERING - LOOK FOR IMAGE UPLOAD BELOW ✅
-              </div>
               <div>
                 <label htmlFor="title" className="block text-sm font-medium text-gray-700">
                   Title *
@@ -282,17 +276,13 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
               </div>
 
               <div>
-                {/* SUPER OBVIOUS TEST */}
-                <div className="bg-red-500 text-white p-4 border-4 border-yellow-400 text-center font-bold text-xl mb-4">
-                  🚨 IMAGE UPLOAD SECTION IS HERE! 🚨
-                </div>
                 <label htmlFor="image" className="block text-sm font-medium text-gray-700">
                   Promotion Image
                 </label>
                 <div className="mt-1">
                   <div className="flex items-center space-x-4">
-                    <label htmlFor="image" className="cursor-pointer bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-md border-4 border-yellow-400 text-lg font-bold transition-colors shadow-lg">
-                      🚨 CLICK HERE TO UPLOAD IMAGE! 🚨
+                    <label htmlFor="image" className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md border border-blue-700 text-base font-medium transition-colors shadow-md">
+                      📁 Choose Image File
                     </label>
                     <input
                       type="file"

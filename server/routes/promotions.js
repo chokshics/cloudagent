@@ -10,10 +10,7 @@ const router = express.Router();
 router.use(authenticateToken);
 router.use(requireShopkeeperOrAdmin);
 
-// Test endpoint
-router.get('/test', (req, res) => {
-  res.json({ message: 'Promotions route is working', user: req.user });
-});
+
 
 // Get all promotions for the logged-in user
 router.get('/', (req, res) => {
@@ -68,15 +65,8 @@ router.post('/', upload.single('image'), [
   body('is_active').optional().isBoolean().withMessage('is_active must be a boolean')
 ], (req, res) => {
   try {
-    console.log('Received promotion creation request:', {
-      body: req.body,
-      file: req.file,
-      user: req.user
-    });
-
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('Validation errors:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -98,10 +88,7 @@ router.post('/', upload.single('image'), [
 
     const db = getDatabase();
 
-    console.log('Creating promotion with data:', {
-      title, description, discount_percentage, discount_amount,
-      start_date, end_date, is_active, image_url, userId: req.user.userId
-    });
+
 
     db.run(`
       INSERT INTO promotions (
@@ -113,8 +100,7 @@ router.post('/', upload.single('image'), [
       start_date, end_date, is_active, image_url, req.user.userId
     ], function(err) {
       if (err) {
-        console.error('Database error creating promotion:', err);
-        return res.status(500).json({ error: 'Failed to create promotion', details: err.message });
+        return res.status(500).json({ error: 'Failed to create promotion' });
       }
 
       // Get the created promotion
@@ -136,8 +122,7 @@ router.post('/', upload.single('image'), [
     });
   } catch (error) {
     console.error('Create promotion error:', error);
-    console.error('Error stack:', error.stack);
-    res.status(500).json({ error: 'Internal server error', details: error.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
