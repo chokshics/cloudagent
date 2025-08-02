@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { getDatabase } = require('../database/init');
 const { authenticateToken, requireShopkeeperOrAdmin } = require('../middleware/auth');
-const upload = require('../middleware/upload');
+const { uploadMiddleware } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -55,7 +55,7 @@ router.get('/:id', (req, res) => {
 });
 
 // Create a new promotion
-router.post('/', upload.single('image'), [
+router.post('/', uploadMiddleware, [
   body('title').notEmpty().withMessage('Title is required'),
   body('description').optional(),
   body('discount_percentage').optional().isInt({ min: 0, max: 100 }).withMessage('Discount percentage must be between 0 and 100'),
@@ -127,7 +127,7 @@ router.post('/', upload.single('image'), [
 });
 
 // Update a promotion
-router.put('/:id', upload.single('image'), [
+router.put('/:id', uploadMiddleware, [
   body('title').optional().notEmpty().withMessage('Title cannot be empty'),
   body('description').optional(),
   body('discount_percentage').optional().isInt({ min: 0, max: 100 }).withMessage('Discount percentage must be between 0 and 100'),
