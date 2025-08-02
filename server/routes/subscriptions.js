@@ -401,15 +401,15 @@ router.get('/mobile-number-limits', (req, res) => {
       });
     }
     
-    // For Enterprise plan, always return 1000 as limit
-    if (subscription.plan_id === 4) {
-      return res.json({
-        mobileNumberLimit: 1000,
-        planName: 'Enterprise',
-        planId: 4,
-        canSendToAll: true
-      });
-    }
+               // For Enterprise plan, always return 250 as limit
+           if (subscription.plan_id === 4) {
+             return res.json({
+               mobileNumberLimit: 250,
+               planName: 'Enterprise',
+               planId: 4,
+               canSendToAll: true
+             });
+           }
     
     // For paid plans, check if subscription has expired
     const now = new Date();
