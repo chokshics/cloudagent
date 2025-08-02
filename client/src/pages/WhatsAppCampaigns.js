@@ -285,7 +285,7 @@ const WhatsAppCampaigns = () => {
                       <div className="flex items-center space-x-2">
                                                  <div className="text-xs text-red-600 flex items-center">
                            <AlertCircle className="h-3 w-3 mr-1" />
-                           {subscriptionInfo?.planName === 'Free' || subscriptionInfo?.planName === 'Starter' ? 'Monthly limit reached' : 'Limit reached'}
+                           {subscriptionInfo?.planName === 'Free' || subscriptionInfo?.planName === 'Starter' || subscriptionInfo?.planName === 'Professional' || subscriptionInfo?.planName === 'Enterprise' ? 'Monthly limit reached' : 'Limit reached'}
                          </div>
                         <Link
                           to="/subscription"

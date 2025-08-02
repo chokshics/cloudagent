@@ -216,7 +216,7 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                       </h4>
                                              <p className="text-sm text-red-700 mt-1">
                          You've used {subscriptionInfo.sendsUsed} out of {subscriptionInfo.sendLimit} campaigns this month. 
-                         {(subscriptionInfo.planName === 'Free' || subscriptionInfo.planName === 'Starter') ? ' Upgrade your plan to send more campaigns.' : ' Please wait until next month or upgrade your plan.'}
+                         {(subscriptionInfo.planName === 'Free' || subscriptionInfo.planName === 'Starter' || subscriptionInfo.planName === 'Professional' || subscriptionInfo.planName === 'Enterprise') ? ' Upgrade your plan to send more campaigns.' : ' Please wait until next month or upgrade your plan.'}
                        </p>
                     </div>
                   </div>

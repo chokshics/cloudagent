@@ -120,8 +120,8 @@ router.get('/can-send-whatsapp', (req, res) => {
       return;
     }
     
-    // For Free plan (plan_id = 1) and Starter plan (plan_id = 2), check monthly limits
-    if (subscription.plan_id === 1 || subscription.plan_id === 2) {
+    // For Free plan (plan_id = 1), Starter plan (plan_id = 2), Professional plan (plan_id = 3), and Enterprise plan (plan_id = 4), check monthly limits
+    if (subscription.plan_id === 1 || subscription.plan_id === 2 || subscription.plan_id === 3 || subscription.plan_id === 4) {
       const now = new Date();
       const subscriptionStart = new Date(subscription.created_at);
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -387,6 +387,26 @@ router.get('/mobile-number-limits', (req, res) => {
         mobileNumberLimit: 50,
         planName: 'Starter',
         planId: 2,
+        canSendToAll: true
+      });
+    }
+    
+    // For Professional plan, always return 100 as limit
+    if (subscription.plan_id === 3) {
+      return res.json({
+        mobileNumberLimit: 100,
+        planName: 'Professional',
+        planId: 3,
+        canSendToAll: true
+      });
+    }
+    
+    // For Enterprise plan, always return 1000 as limit
+    if (subscription.plan_id === 4) {
+      return res.json({
+        mobileNumberLimit: 1000,
+        planName: 'Enterprise',
+        planId: 4,
         canSendToAll: true
       });
     }

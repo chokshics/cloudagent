@@ -114,11 +114,11 @@ const SubscriptionPage = () => {
   const getQRCodeImage = (planName) => {
     switch (planName.toLowerCase()) {
       case 'starter':
-        return '/qrcode-250.jpeg';
+        return '/qrcode-750.jpeg';
       case 'professional':
-        return '/qrcode-250.jpeg';
+        return '/qrcode-750.jpeg';
       case 'enterprise':
-        return '/qrcode-500.jpeg';
+        return '/qrcode-1500.jpeg';
       default:
         return '/qrcode-100.jpeg';
     }
