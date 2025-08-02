@@ -13,6 +13,12 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
   const [campaignSent, setCampaignSent] = useState(false);
   const queryClient = useQueryClient();
 
+  // Query to get current subscription info
+  const { data: subscriptionInfo } = useQuery('subscription-info', async () => {
+    const response = await axios.get('/api/subscriptions/can-send-whatsapp');
+    return response.data;
+  });
+
   // Query to check if campaign has already been sent for this promotion
   const { data: campaignHistory } = useQuery(
     ['whatsapp-campaign-history', promotion?.id],
@@ -42,8 +48,8 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
       },
       onError: (error) => {
         const errorData = error.response?.data;
-        if (errorData?.error?.includes('campaign limit reached')) {
-          toast.error('Campaign limit reached. Please upgrade your plan to send more campaigns.');
+        if (errorData?.error?.includes('campaign limit reached') || errorData?.error?.includes('WhatsApp campaign limit reached')) {
+          toast.error('Monthly campaign limit reached for Free plan. Please upgrade your plan to send more campaigns.');
         } else {
           toast.error(errorData?.error || 'Failed to send WhatsApp campaign');
         }
@@ -58,13 +64,13 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
     if (promotion && mobileNumbers) {
       // Auto-select active mobile numbers up to the limit
       const activeNumbers = mobileNumbers.filter(m => m.is_active).map(m => m.id);
-      const limit = mobileNumberLimits?.mobileNumberLimit || activeNumbers.length;
+      const limit = mobileNumberLimits?.mobileNumberLimit || 10; // Default to 10 for Free plan
       const limitedNumbers = activeNumbers.slice(0, limit);
       setSelectedNumbers(limitedNumbers);
       setSelectAll(limitedNumbers.length === activeNumbers.length);
       
       if (activeNumbers.length > limit) {
-        toast.error(`Your plan allows only ${limit} mobile numbers per campaign. Only the first ${limit} numbers have been selected.`);
+        toast.error(`Your ${mobileNumberLimits?.planName || 'Free'} plan allows only ${limit} recipients per campaign. Only the first ${limit} numbers have been selected.`);
       }
       
       // Generate preview message
@@ -106,13 +112,13 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
       setSelectAll(false);
     } else {
       const allNumbers = mobileNumbers?.filter(m => m.is_active).map(m => m.id) || [];
-      const limit = mobileNumberLimits?.mobileNumberLimit || allNumbers.length;
+      const limit = mobileNumberLimits?.mobileNumberLimit || 10; // Default to 10 for Free plan
       const limitedNumbers = allNumbers.slice(0, limit);
       setSelectedNumbers(limitedNumbers);
       setSelectAll(limitedNumbers.length === allNumbers.length);
       
       if (allNumbers.length > limit) {
-        toast.error(`Your plan allows only ${limit} mobile numbers per campaign. Only the first ${limit} numbers have been selected.`);
+        toast.error(`Your ${mobileNumberLimits?.planName || 'Free'} plan allows only ${limit} recipients per campaign. Only the first ${limit} numbers have been selected.`);
       }
     }
   };
@@ -124,9 +130,9 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
         setSelectAll(newSelection.length === mobileNumbers?.filter(m => m.is_active).length);
         return newSelection;
       } else {
-        const limit = mobileNumberLimits?.mobileNumberLimit || mobileNumbers?.length || 0;
+        const limit = mobileNumberLimits?.mobileNumberLimit || 10; // Default to 10 for Free plan
         if (prev.length >= limit) {
-          toast.error(`Your plan allows only ${limit} mobile numbers per campaign. Please deselect some numbers first.`);
+          toast.error(`Your ${mobileNumberLimits?.planName || 'Free'} plan allows only ${limit} recipients per campaign. Please deselect some numbers first.`);
           return prev;
         }
         const newSelection = [...prev, numberId];
@@ -180,9 +186,16 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
         <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
           <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
-                Send WhatsApp Campaign
-              </h3>
+              <div>
+                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  Send WhatsApp Campaign
+                </h3>
+                {subscriptionInfo && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    {subscriptionInfo.planName} Plan • {subscriptionInfo.sendsUsed}/{subscriptionInfo.sendLimit} campaigns used this month
+                  </p>
+                )}
+              </div>
               <button
                 onClick={handleClose}
                 className="text-gray-400 hover:text-gray-600"
@@ -192,15 +205,40 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Subscription Limit Warning */}
+              {subscriptionInfo && !subscriptionInfo.canSend && (
+                <div className="lg:col-span-2 mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-center">
+                    <AlertCircle className="h-5 w-5 text-red-600 mr-3" />
+                    <div>
+                      <h4 className="text-sm font-medium text-red-800">
+                        Monthly Campaign Limit Reached
+                      </h4>
+                      <p className="text-sm text-red-700 mt-1">
+                        You've used {subscriptionInfo.sendsUsed} out of {subscriptionInfo.sendLimit} campaigns this month. 
+                        {subscriptionInfo.planName === 'Free' ? ' Upgrade your plan to send more campaigns.' : ' Please wait until next month or upgrade your plan.'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Left Column - Recipients */}
               <div>
                 <h4 className="text-sm font-medium text-gray-900 mb-3">Select Recipients</h4>
                 
                 <div className="border border-gray-200 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm text-gray-600">
-                      {selectedNumbers.length} of {activeMobileNumbers.length} selected
-                    </span>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-gray-600">
+                        {selectedNumbers.length} of {activeMobileNumbers.length} selected
+                      </span>
+                      {mobileNumberLimits && (
+                        <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">
+                          Limit: {mobileNumberLimits.mobileNumberLimit} recipients
+                        </span>
+                      )}
+                    </div>
                     <button
                       type="button"
                       onClick={handleSelectAll}
@@ -340,9 +378,9 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={sending || selectedNumbers.length === 0 || campaignSent}
+              disabled={sending || selectedNumbers.length === 0 || campaignSent || (subscriptionInfo && !subscriptionInfo.canSend)}
               className={`sm:ml-3 sm:w-auto ${
-                campaignSent 
+                campaignSent || (subscriptionInfo && !subscriptionInfo.canSend)
                   ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
                   : 'btn-primary'
               }`}
@@ -356,6 +394,11 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                 <>
                   <Send className="h-4 w-4 mr-2" />
                   Campaign Already Sent
+                </>
+              ) : subscriptionInfo && !subscriptionInfo.canSend ? (
+                <>
+                  <Send className="h-4 w-4 mr-2" />
+                  Monthly Limit Reached
                 </>
               ) : (
                 <>

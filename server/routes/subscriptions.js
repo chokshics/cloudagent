@@ -78,9 +78,11 @@ router.get('/can-send-whatsapp', (req, res) => {
     SELECT 
       us.whatsapp_sends_used,
       us.end_date,
+      us.created_at,
       sp.whatsapp_send_limit,
       sp.mobile_number_limit,
-      sp.name as plan_name
+      sp.name as plan_name,
+      sp.id as plan_id
     FROM user_subscriptions us
     JOIN subscription_plans sp ON us.plan_id = sp.id
     WHERE us.user_id = ? AND us.is_active = 1
@@ -94,42 +96,78 @@ router.get('/can-send-whatsapp', (req, res) => {
     }
     
     if (!subscription) {
-      return res.json({ 
-        canSend: true, 
-        sendsUsed: 0, 
-        sendLimit: 2, 
-        mobileNumberLimit: 10,
-        isExpired: false, 
-        planName: 'Free' 
-      });
-    }
-    
-    // Check if subscription has expired
-    const now = new Date();
-    const endDate = new Date(subscription.end_date);
-    const isExpired = now > endDate;
-    
-    // If expired, deactivate the subscription
-    if (isExpired) {
+      // For new users without subscription, create a free plan subscription
       db.run(
-        'UPDATE user_subscriptions SET is_active = 0 WHERE user_id = ? AND is_active = 1',
-        [req.user.userId],
+        'INSERT INTO user_subscriptions (user_id, plan_id, whatsapp_sends_used, start_date) VALUES (?, 1, 0, ?)',
+        [req.user.userId, new Date().toISOString()],
         function(err) {
           if (err) {
-            console.error('Failed to deactivate expired subscription:', err);
+            return res.status(500).json({ error: 'Failed to create subscription' });
           }
+          
+          // Return free plan limits
+          return res.json({ 
+            canSend: true, 
+            sendsUsed: 0, 
+            sendLimit: 2, 
+            mobileNumberLimit: 10,
+            isExpired: false, 
+            planName: 'Free',
+            planId: 1
+          });
         }
       );
+      return;
+    }
+    
+    // For Free plan (plan_id = 1), check monthly limits
+    if (subscription.plan_id === 1) {
+      const now = new Date();
+      const subscriptionStart = new Date(subscription.created_at);
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
       
-      return res.json({
-        canSend: false,
-        sendsUsed: subscription.whatsapp_sends_used,
-        sendLimit: subscription.whatsapp_send_limit,
-        mobileNumberLimit: subscription.mobile_number_limit,
-        isExpired: true,
-        planName: subscription.plan_name,
-        message: 'Subscription has expired. Please renew your plan.'
-      });
+      // If subscription was created before this month, reset the count
+      if (subscriptionStart < monthStart) {
+        db.run(
+          'UPDATE user_subscriptions SET whatsapp_sends_used = 0 WHERE user_id = ? AND is_active = 1',
+          [req.user.userId],
+          function(err) {
+            if (err) {
+              console.error('Failed to reset monthly count:', err);
+            }
+          }
+        );
+        subscription.whatsapp_sends_used = 0;
+      }
+    } else {
+      // For paid plans, check if subscription has expired
+      const now = new Date();
+      const endDate = new Date(subscription.end_date);
+      const isExpired = now > endDate;
+      
+      // If expired, deactivate the subscription
+      if (isExpired) {
+        db.run(
+          'UPDATE user_subscriptions SET is_active = 0 WHERE user_id = ? AND is_active = 1',
+          [req.user.userId],
+          function(err) {
+            if (err) {
+              console.error('Failed to deactivate expired subscription:', err);
+            }
+          }
+        );
+        
+        return res.json({
+          canSend: false,
+          sendsUsed: subscription.whatsapp_sends_used,
+          sendLimit: subscription.whatsapp_send_limit,
+          mobileNumberLimit: subscription.mobile_number_limit,
+          isExpired: true,
+          planName: subscription.plan_name,
+          planId: subscription.plan_id,
+          message: 'Subscription has expired. Please renew your plan.'
+        });
+      }
     }
     
     const canSend = subscription.whatsapp_sends_used < subscription.whatsapp_send_limit;
@@ -140,7 +178,8 @@ router.get('/can-send-whatsapp', (req, res) => {
       sendLimit: subscription.whatsapp_send_limit,
       mobileNumberLimit: subscription.mobile_number_limit,
       isExpired: false,
-      planName: subscription.plan_name
+      planName: subscription.plan_name,
+      planId: subscription.plan_id
     });
   });
 });
@@ -297,7 +336,8 @@ router.get('/mobile-number-limits', (req, res) => {
   const query = `
     SELECT 
       sp.mobile_number_limit,
-      sp.name as plan_name
+      sp.name as plan_name,
+      sp.id as plan_id
     FROM user_subscriptions us
     JOIN subscription_plans sp ON us.plan_id = sp.id
     WHERE us.user_id = ? AND us.is_active = 1
@@ -311,14 +351,37 @@ router.get('/mobile-number-limits', (req, res) => {
     }
     
     if (!subscription) {
-      return res.json({ 
-        mobileNumberLimit: 10, 
+      // Create free plan subscription for new users
+      db.run(
+        'INSERT INTO user_subscriptions (user_id, plan_id, whatsapp_sends_used, start_date) VALUES (?, 1, 0, ?)',
+        [req.user.userId, new Date().toISOString()],
+        function(err) {
+          if (err) {
+            return res.status(500).json({ error: 'Failed to create subscription' });
+          }
+          
+          return res.json({ 
+            mobileNumberLimit: 10, 
+            planName: 'Free',
+            planId: 1,
+            canSendToAll: true 
+          });
+        }
+      );
+      return;
+    }
+    
+    // For Free plan, always return 10 as limit
+    if (subscription.plan_id === 1) {
+      return res.json({
+        mobileNumberLimit: 10,
         planName: 'Free',
-        canSendToAll: true 
+        planId: 1,
+        canSendToAll: true
       });
     }
     
-    // Check if subscription has expired
+    // For paid plans, check if subscription has expired
     const now = new Date();
     const endDate = new Date(subscription.end_date);
     const isExpired = now > endDate;
@@ -327,6 +390,7 @@ router.get('/mobile-number-limits', (req, res) => {
       return res.json({
         mobileNumberLimit: 10,
         planName: 'Free',
+        planId: 1,
         canSendToAll: false,
         message: 'Subscription has expired. Please renew your plan.'
       });
@@ -335,6 +399,7 @@ router.get('/mobile-number-limits', (req, res) => {
     res.json({
       mobileNumberLimit: subscription.mobile_number_limit,
       planName: subscription.plan_name,
+      planId: subscription.plan_id,
       canSendToAll: true
     });
   });
