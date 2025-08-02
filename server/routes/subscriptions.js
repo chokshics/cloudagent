@@ -371,25 +371,25 @@ router.get('/mobile-number-limits', (req, res) => {
       return;
     }
     
-    // For Free plan, always return 10 as limit
-    if (subscription.plan_id === 1) {
-      return res.json({
-        mobileNumberLimit: 10,
-        planName: 'Free',
-        planId: 1,
-        canSendToAll: true
-      });
-    }
-    
-    // For Starter plan, always return 50 as limit
-    if (subscription.plan_id === 2) {
-      return res.json({
-        mobileNumberLimit: 50,
-        planName: 'Starter',
-        planId: 2,
-        canSendToAll: true
-      });
-    }
+               // For Free plan, always return 5 as limit
+           if (subscription.plan_id === 1) {
+             return res.json({
+               mobileNumberLimit: 5,
+               planName: 'Free',
+               planId: 1,
+               canSendToAll: true
+             });
+           }
+           
+           // For Starter plan, always return 25 as limit
+           if (subscription.plan_id === 2) {
+             return res.json({
+               mobileNumberLimit: 25,
+               planName: 'Starter',
+               planId: 2,
+               canSendToAll: true
+             });
+           }
     
     // For Professional plan, always return 100 as limit
     if (subscription.plan_id === 3) {
