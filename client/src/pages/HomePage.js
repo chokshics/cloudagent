@@ -187,6 +187,54 @@ const HomePage = () => {
           </p>
         </div>
 
+        {/* 4 Steps to Boost Sales */}
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 mb-12 text-white">
+          <div className="text-center mb-8">
+            <h3 className="text-3xl font-bold mb-2">🚀 4 Simple Steps to Boost Your Sales</h3>
+            <p className="text-indigo-100 text-lg">Transform your business with our powerful WhatsApp marketing platform</p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/20 transition-all duration-300">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold">1</span>
+              </div>
+              <h4 className="text-xl font-semibold mb-2">Register Yourself</h4>
+              <p className="text-indigo-100 text-sm">Create your account in just 2 minutes</p>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/20 transition-all duration-300">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold">2</span>
+              </div>
+              <h4 className="text-xl font-semibold mb-2">Add Customer Contacts</h4>
+              <p className="text-indigo-100 text-sm">Import your customer database easily</p>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/20 transition-all duration-300">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold">3</span>
+              </div>
+              <h4 className="text-xl font-semibold mb-2">Create Promotions</h4>
+              <p className="text-indigo-100 text-sm">Design attractive promotional campaigns</p>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/20 transition-all duration-300">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold">4</span>
+              </div>
+              <h4 className="text-xl font-semibold mb-2">Send WhatsApp Campaigns</h4>
+              <p className="text-indigo-100 text-sm">Reach customers instantly and boost sales</p>
+            </div>
+          </div>
+          
+          <div className="text-center mt-8">
+            <div className="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-6 py-3">
+              <span className="text-indigo-100 font-semibold">✨ Start Your Success Journey Today!</span>
+            </div>
+          </div>
+        </div>
+
         {/* Features Grid */}
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           <div className="bg-white p-6 rounded-lg shadow-md">
