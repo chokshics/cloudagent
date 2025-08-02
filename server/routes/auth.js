@@ -111,50 +111,62 @@ router.post('/register', validateRegistration, async (req, res) => {
         return res.status(400).json({ message: 'Username already exists' });
       }
 
-      // Check if email already exists
-      db.get('SELECT id FROM users WHERE email = ?', [email], async (err, emailRow) => {
-        if (err) {
-          console.error('Database error:', err);
-          return res.status(500).json({ message: 'Database error' });
-        }
+              // Check if email already exists
+        db.get('SELECT id FROM users WHERE email = ?', [email], async (err, emailRow) => {
+          if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ message: 'Database error' });
+          }
 
-        if (emailRow) {
-          return res.status(400).json({ message: 'Email already exists' });
-        }
+          if (emailRow) {
+            return res.status(400).json({ message: 'Email already exists' });
+          }
 
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Insert new user
-        db.run(
-          'INSERT INTO users (username, email, password, first_name, last_name, phone_number, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          [username, email, hashedPassword, firstName, lastName, phoneNumber, role],
-          function(err) {
+          // Check if phone number already exists
+          db.get('SELECT id FROM users WHERE phone_number = ?', [phoneNumber], async (err, phoneRow) => {
             if (err) {
-              console.error('Error creating user:', err);
-              return res.status(500).json({ message: 'Error creating user' });
+              console.error('Database error:', err);
+              return res.status(500).json({ message: 'Database error' });
             }
 
-            const newUserId = this.lastID;
-            console.log(`✅ Created user with ID: ${newUserId}`);
+            if (phoneRow) {
+              return res.status(400).json({ message: 'Phone number already exists' });
+            }
 
-            // Automatically create a subscription for the new user
-            createDefaultSubscriptionForUser(newUserId, (subscriptionErr) => {
-              if (subscriptionErr) {
-                console.error('Error creating subscription for new user:', subscriptionErr);
-                // Still return success for user creation, but log the subscription error
-              } else {
-                console.log(`✅ Created default subscription for user ID: ${newUserId}`);
+            // Hash password
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            // Insert new user
+            db.run(
+              'INSERT INTO users (username, email, password, first_name, last_name, phone_number, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
+              [username, email, hashedPassword, firstName, lastName, phoneNumber, role],
+              function(err) {
+                if (err) {
+                  console.error('Error creating user:', err);
+                  return res.status(500).json({ message: 'Error creating user' });
+                }
+
+                const newUserId = this.lastID;
+                console.log(`✅ Created user with ID: ${newUserId}`);
+
+                // Automatically create a subscription for the new user
+                createDefaultSubscriptionForUser(newUserId, (subscriptionErr) => {
+                  if (subscriptionErr) {
+                    console.error('Error creating subscription for new user:', subscriptionErr);
+                    // Still return success for user creation, but log the subscription error
+                  } else {
+                    console.log(`✅ Created default subscription for user ID: ${newUserId}`);
+                  }
+
+                  res.status(201).json({ 
+                    message: 'User registered successfully',
+                    userId: newUserId 
+                  });
+                });
               }
-
-              res.status(201).json({ 
-                message: 'User registered successfully',
-                userId: newUserId 
-              });
-            });
-          }
-        );
-      });
+            );
+          });
+        });
     });
   } catch (error) {
     console.error('Registration error:', error);
