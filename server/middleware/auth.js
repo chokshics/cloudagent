@@ -49,7 +49,7 @@ const requireShopkeeperOrAdmin = (req, res, next) => {
 const verifyUser = (req, res, next) => {
   const db = getDatabase();
   
-  db.get('SELECT id, username, email, role FROM users WHERE id = ?', [req.user.id], (err, user) => {
+  db.get('SELECT id, username, email, role FROM users WHERE id = ?', [req.user.userId], (err, user) => {
     if (err) {
       return res.status(500).json({ error: 'Database error' });
     }

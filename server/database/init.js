@@ -66,6 +66,23 @@ const initDatabase = async () => {
         )
       `);
 
+      // Create whatsapp_logs table
+      db.run(`
+        CREATE TABLE IF NOT EXISTS whatsapp_logs (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          promotion_id INTEGER,
+          mobile_number TEXT NOT NULL,
+          message TEXT NOT NULL,
+          status TEXT DEFAULT 'pending',
+          twilio_sid TEXT,
+          error_message TEXT,
+          created_by INTEGER,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (promotion_id) REFERENCES promotions (id),
+          FOREIGN KEY (created_by) REFERENCES users (id)
+        )
+      `);
+
 
 
       // Create subscription_plans table

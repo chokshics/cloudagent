@@ -332,6 +332,27 @@ router.get('/logs/:promotionId', (req, res) => {
   });
 });
 
+// Get WhatsApp stats
+router.get('/stats', (req, res) => {
+  const query = `
+    SELECT 
+      COUNT(*) as total,
+      COUNT(CASE WHEN status = 'delivered' THEN 1 END) as sent,
+      COUNT(CASE WHEN status = 'failed' THEN 1 END) as failed,
+      COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending
+    FROM whatsapp_logs 
+    WHERE created_by = ?
+  `;
+
+  db.get(query, [req.user.userId], (err, stats) => {
+    if (err) {
+      console.error('Error fetching WhatsApp stats:', err);
+      return res.status(500).json({ error: 'Failed to fetch stats' });
+    }
+    res.json({ stats });
+  });
+});
+
 // Test WhatsApp connection
 router.post('/test', async (req, res) => {
   try {
