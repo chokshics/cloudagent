@@ -49,7 +49,7 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
       onError: (error) => {
         const errorData = error.response?.data;
         if (errorData?.error?.includes('campaign limit reached') || errorData?.error?.includes('WhatsApp campaign limit reached')) {
-          toast.error('Monthly campaign limit reached for Free plan. Please upgrade your plan to send more campaigns.');
+          toast.error('Monthly campaign limit reached. Please upgrade your plan to send more campaigns.');
         } else {
           toast.error(errorData?.error || 'Failed to send WhatsApp campaign');
         }
@@ -214,10 +214,10 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                       <h4 className="text-sm font-medium text-red-800">
                         Monthly Campaign Limit Reached
                       </h4>
-                      <p className="text-sm text-red-700 mt-1">
-                        You've used {subscriptionInfo.sendsUsed} out of {subscriptionInfo.sendLimit} campaigns this month. 
-                        {subscriptionInfo.planName === 'Free' ? ' Upgrade your plan to send more campaigns.' : ' Please wait until next month or upgrade your plan.'}
-                      </p>
+                                             <p className="text-sm text-red-700 mt-1">
+                         You've used {subscriptionInfo.sendsUsed} out of {subscriptionInfo.sendLimit} campaigns this month. 
+                         {(subscriptionInfo.planName === 'Free' || subscriptionInfo.planName === 'Starter') ? ' Upgrade your plan to send more campaigns.' : ' Please wait until next month or upgrade your plan.'}
+                       </p>
                     </div>
                   </div>
                 </div>

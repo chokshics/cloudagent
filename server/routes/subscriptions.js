@@ -120,8 +120,8 @@ router.get('/can-send-whatsapp', (req, res) => {
       return;
     }
     
-    // For Free plan (plan_id = 1), check monthly limits
-    if (subscription.plan_id === 1) {
+    // For Free plan (plan_id = 1) and Starter plan (plan_id = 2), check monthly limits
+    if (subscription.plan_id === 1 || subscription.plan_id === 2) {
       const now = new Date();
       const subscriptionStart = new Date(subscription.created_at);
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -377,6 +377,16 @@ router.get('/mobile-number-limits', (req, res) => {
         mobileNumberLimit: 10,
         planName: 'Free',
         planId: 1,
+        canSendToAll: true
+      });
+    }
+    
+    // For Starter plan, always return 50 as limit
+    if (subscription.plan_id === 2) {
+      return res.json({
+        mobileNumberLimit: 50,
+        planName: 'Starter',
+        planId: 2,
         canSendToAll: true
       });
     }

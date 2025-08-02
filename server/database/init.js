@@ -137,7 +137,7 @@ const initDatabase = async () => {
       db.run(`
         INSERT OR IGNORE INTO subscription_plans (id, name, description, price_inr, whatsapp_send_limit, mobile_number_limit) VALUES
         (1, 'Free', 'Basic plan with limited campaigns', 0.00, 2, 10),
-        (2, 'Starter', 'Perfect for small businesses', 100.00, 10, 25),
+        (2, 'Starter', 'Perfect for small businesses', 250.00, 2, 50),
         (3, 'Professional', 'For growing businesses', 250.00, 50, 100),
         (4, 'Enterprise', 'Unlimited campaigns for large businesses', 500.00, 100, 1000)
       `);
