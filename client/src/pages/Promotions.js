@@ -35,7 +35,6 @@ const Promotions = () => {
   };
 
   const handleCreate = () => {
-    console.log('Create button clicked, setting modal to open');
     setEditingPromotion(null);
     setIsModalOpen(true);
   };
@@ -186,7 +185,6 @@ const Promotions = () => {
       )}
 
       {/* Modal */}
-      {console.log('Modal state - isOpen:', isModalOpen, 'editingPromotion:', editingPromotion)}
       <PromotionModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
