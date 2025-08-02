@@ -226,6 +226,7 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
   if (!isOpen) return null;
   
   console.log('PromotionModal is open, isOpen:', isOpen); // Debug log
+  console.log('PromotionModal rendering with promotion:', promotion); // Debug log
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -247,6 +248,17 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* DEBUG TEST BUTTON */}
+              <div className="bg-yellow-200 p-4 border-2 border-red-500">
+                <p className="text-red-600 font-bold">DEBUG: Modal is working!</p>
+                <button
+                  type="button"
+                  onClick={() => alert('Modal is working!')}
+                  className="bg-red-500 text-white px-4 py-2 rounded"
+                >
+                  Test Modal Button
+                </button>
+              </div>
               <div>
                 <label htmlFor="title" className="block text-sm font-medium text-gray-700">
                   Title *
@@ -279,13 +291,14 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
               </div>
 
               <div>
+                {console.log('Rendering image upload section')}
                 <label htmlFor="image" className="block text-sm font-medium text-gray-700">
                   Promotion Image
                 </label>
                 <div className="mt-1">
                   <div className="flex items-center space-x-4">
-                    <label htmlFor="image" className="cursor-pointer bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-md border border-blue-200 text-sm font-medium transition-colors">
-                      📁 Choose Image File
+                    <label htmlFor="image" className="cursor-pointer bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-md border border-red-600 text-base font-bold transition-colors shadow-lg">
+                      📁 CHOOSE IMAGE FILE
                     </label>
                     <input
                       type="file"
@@ -302,7 +315,10 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
                     )}
                     <button
                       type="button"
-                      onClick={() => document.getElementById('image').click()}
+                      onClick={() => {
+                        console.log('Test button clicked');
+                        document.getElementById('image').click();
+                      }}
                       className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs"
                     >
                       Test Upload
@@ -310,6 +326,9 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
                   </div>
                   <p className="mt-1 text-xs text-gray-500">
                     Accepted formats: PNG, JPEG, JPG. Maximum size: 2MB
+                  </p>
+                  <p className="mt-1 text-xs text-red-600 font-bold">
+                    DEBUG: Image upload section should be visible
                   </p>
                 </div>
                 
