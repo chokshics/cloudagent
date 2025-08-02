@@ -270,9 +270,9 @@ router.post('/verify-payment', [
     const { paymentId, upiTransactionId } = req.body;
     const db = getDatabase();
 
-    // Update payment status
+    // Update payment status with UPI transaction ID
     db.run(
-      'UPDATE payments SET payment_status = ?, upi_transaction_id = ? WHERE id = ? AND user_id = ?',
+      'UPDATE payments SET payment_status = ?, upi_transaction_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?',
       ['completed', upiTransactionId, paymentId, req.user.userId],
       function(err) {
         if (err) {
@@ -283,8 +283,13 @@ router.post('/verify-payment', [
           return res.status(404).json({ error: 'Payment not found' });
         }
 
-        // Get payment details
-        db.get('SELECT * FROM payments WHERE id = ?', [paymentId], (err, payment) => {
+        // Get payment details and plan information
+        db.get(`
+          SELECT p.*, sp.name as plan_name, sp.whatsapp_send_limit, sp.mobile_number_limit 
+          FROM payments p 
+          JOIN subscription_plans sp ON p.plan_id = sp.id 
+          WHERE p.id = ?
+        `, [paymentId], (err, payment) => {
           if (err) {
             return res.status(500).json({ error: 'Database error' });
           }
@@ -298,23 +303,29 @@ router.post('/verify-payment', [
                 return res.status(500).json({ error: 'Failed to deactivate current subscription' });
               }
 
-              // Create new subscription with expiry date (1 month from now)
+              // Create new subscription with reset WhatsApp counts and expiry date (1 month from now)
               const startDate = new Date();
               const endDate = new Date();
               endDate.setMonth(endDate.getMonth() + 1);
               
               db.run(
-                'INSERT INTO user_subscriptions (user_id, plan_id, whatsapp_sends_used, start_date, end_date) VALUES (?, ?, 0, ?, ?)',
+                'INSERT INTO user_subscriptions (user_id, plan_id, whatsapp_sends_used, mobile_numbers_used, promotions_used, start_date, end_date, is_active) VALUES (?, ?, 0, 0, 0, ?, ?, 1)',
                 [req.user.userId, payment.plan_id, startDate.toISOString(), endDate.toISOString()],
                 function(err) {
                   if (err) {
                     return res.status(500).json({ error: 'Failed to create new subscription' });
                   }
 
+                  // Log payment success with UPI transaction ID
+                  console.log(`✅ Payment Success: User ${req.user.userId} upgraded to ${payment.plan_name} plan. UPI Transaction ID: ${upiTransactionId}. Amount: ₹${payment.amount_inr}`);
+
                   res.json({
-                    message: 'Subscription upgraded successfully',
+                    message: `Payment successful! Your subscription has been upgraded to ${payment.plan_name} plan. UPI Transaction ID: ${upiTransactionId}`,
                     paymentId,
-                    upiTransactionId
+                    upiTransactionId,
+                    planName: payment.plan_name,
+                    whatsappSendLimit: payment.whatsapp_send_limit,
+                    mobileNumberLimit: payment.mobile_number_limit
                   });
                 }
               );
@@ -443,7 +454,9 @@ router.get('/payments', (req, res) => {
     SELECT 
       p.*,
       sp.name as plan_name,
-      sp.description as plan_description
+      sp.description as plan_description,
+      sp.whatsapp_send_limit,
+      sp.mobile_number_limit
     FROM payments p
     JOIN subscription_plans sp ON p.plan_id = sp.id
     WHERE p.user_id = ?

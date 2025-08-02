@@ -107,7 +107,8 @@ const initDatabase = async () => {
           user_id INTEGER NOT NULL,
           plan_id INTEGER NOT NULL,
           whatsapp_sends_used INTEGER DEFAULT 0,
-
+          mobile_numbers_used INTEGER DEFAULT 0,
+          promotions_used INTEGER DEFAULT 0,
           start_date DATETIME DEFAULT CURRENT_TIMESTAMP,
           end_date DATETIME,
           is_active BOOLEAN DEFAULT 1,

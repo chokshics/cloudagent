@@ -41,11 +41,12 @@ const SubscriptionPage = () => {
     },
     {
       onSuccess: (data) => {
-        toast.success('Payment verified! Your subscription has been upgraded.');
+        toast.success(data.message || 'Payment verified! Your subscription has been upgraded.');
         queryClient.invalidateQueries('current-subscription');
         queryClient.invalidateQueries('payment-history');
         setSelectedPlan(null);
         setUpiTransactionId('');
+        setPaymentId(null);
       },
       onError: (error) => {
         toast.error(error.response?.data?.error || 'Failed to verify payment');
@@ -58,9 +59,45 @@ const SubscriptionPage = () => {
 
   const handlePlanSelect = (plan) => {
     setSelectedPlan(plan);
+    setPaymentId(null);
+    setUpiTransactionId('');
   };
 
 
+
+  // Create payment mutation
+  const createPaymentMutation = useMutation(
+    async ({ planId, amountInr }) => {
+      const response = await axios.post('/api/subscriptions/create-payment', {
+        planId,
+        amountInr
+      });
+      return response.data;
+    },
+    {
+      onSuccess: (data) => {
+        setPaymentId(data.paymentId);
+        toast.success('Payment created successfully. Please complete the UPI payment and enter the transaction ID.');
+      },
+      onError: (error) => {
+        toast.error(error.response?.data?.error || 'Failed to create payment');
+      }
+    }
+  );
+
+  const [paymentId, setPaymentId] = useState(null);
+
+  const handleCreatePayment = async () => {
+    if (!selectedPlan) {
+      toast.error('Please select a plan first');
+      return;
+    }
+
+    createPaymentMutation.mutate({
+      planId: selectedPlan.id,
+      amountInr: selectedPlan.price_inr
+    });
+  };
 
   const handleVerifyPayment = async () => {
     if (!upiTransactionId.trim()) {
@@ -68,15 +105,14 @@ const SubscriptionPage = () => {
       return;
     }
 
-    if (!selectedPlan) {
-      toast.error('Please select a plan first');
+    if (!paymentId) {
+      toast.error('Please create a payment first');
       return;
     }
 
     setIsProcessingPayment(true);
     verifyPaymentMutation.mutate({
-      planId: selectedPlan.id,
-      amountInr: selectedPlan.price_inr,
+      paymentId,
       upiTransactionId: upiTransactionId.trim()
     });
   };
@@ -294,14 +330,25 @@ const SubscriptionPage = () => {
                 />
               </div>
 
-              <button
-                onClick={handleVerifyPayment}
-                disabled={isProcessingPayment || !upiTransactionId.trim()}
-                className="btn-primary flex items-center"
-              >
-                <ArrowRight className="h-4 w-4 mr-2" />
-                {isProcessingPayment ? 'Verifying...' : 'Verify Payment'}
-              </button>
+              {!paymentId ? (
+                <button
+                  onClick={handleCreatePayment}
+                  disabled={createPaymentMutation.isLoading}
+                  className="btn-primary flex items-center"
+                >
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  {createPaymentMutation.isLoading ? 'Creating Payment...' : 'Create Payment'}
+                </button>
+              ) : (
+                <button
+                  onClick={handleVerifyPayment}
+                  disabled={isProcessingPayment || !upiTransactionId.trim()}
+                  className="btn-primary flex items-center"
+                >
+                  <ArrowRight className="h-4 w-4 mr-2" />
+                  {isProcessingPayment ? 'Verifying...' : 'Verify Payment'}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -328,6 +375,9 @@ const SubscriptionPage = () => {
                       Status
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      UPI Transaction ID
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Date
                     </th>
                   </tr>
@@ -351,6 +401,15 @@ const SubscriptionPage = () => {
                         >
                           {payment.payment_status}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {payment.upi_transaction_id ? (
+                          <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                            {payment.upi_transaction_id}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Date(payment.created_at).toLocaleDateString()}
