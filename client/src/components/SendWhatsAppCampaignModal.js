@@ -312,6 +312,16 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                           </div>
                         </div>
                         <div className="flex-1">
+                          {/* Promotion Image */}
+                          {promotion.image_url && (
+                            <div className="mb-3">
+                              <img
+                                src={promotion.image_url}
+                                alt={promotion.title}
+                                className="w-full h-32 object-cover rounded-lg border border-gray-300"
+                              />
+                            </div>
+                          )}
                           <div className="text-sm text-gray-900 whitespace-pre-wrap">
                             {previewMessage}
                           </div>
@@ -336,7 +346,7 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                           <Users className="h-5 w-5 text-green-400" />
                         )}
                       </div>
-                      <div className="ml-3">
+                      <div className="ml-3 flex-1">
                         <h3 className={`text-sm font-medium ${
                           campaignSent ? 'text-yellow-800' : 'text-green-800'
                         }`}>
@@ -350,6 +360,9 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                             <li>Recipients: {selectedNumbers.length}</li>
                             <li>Message length: {previewMessage.length} characters</li>
                             <li>Platform: WhatsApp (via Twilio)</li>
+                            {promotion.image_url && (
+                              <li>Includes promotion image</li>
+                            )}
                             {campaignSent && (
                               <li className="font-medium">Status: Campaign Already Sent</li>
                             )}
