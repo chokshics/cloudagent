@@ -1,68 +1,55 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
+// Connect to the database
 const dbPath = path.join(__dirname, 'server', 'database', 'admin_portal.db');
-const db = new sqlite3.Database(dbPath);
+console.log('Database path:', dbPath);
 
-console.log('🔧 Updating all subscription plans with new pricing and limits...\n');
-
-// Update subscription plans table
-db.run(`
-  UPDATE subscription_plans 
-  SET price_inr = 750.00, whatsapp_send_limit = 5, mobile_number_limit = 100
-  WHERE id = 3 AND name = 'Professional'
-`, function(err) {
+const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
-    console.error('Error updating Professional plan:', err);
-  } else {
-    console.log(`✅ Updated ${this.changes} Professional plan records`);
+    console.error('Error opening database:', err);
+    return;
   }
+  console.log('Connected to database successfully');
+});
 
-  // Update Enterprise plan
-  db.run(`
-    UPDATE subscription_plans 
-    SET price_inr = 1500.00, whatsapp_send_limit = 5, mobile_number_limit = 250
-    WHERE id = 4 AND name = 'Enterprise'
-  `, function(err) {
+console.log('Updating Free and Starter plan limits...');
+
+// Update Free plan (id = 1) to 1 campaign/month and 5 recipients/campaign
+db.run(
+  'UPDATE subscription_plans SET whatsapp_send_limit = ?, mobile_number_limit = ? WHERE id = ?',
+  [1, 5, 1],
+  function(err) {
     if (err) {
-      console.error('Error updating Enterprise plan:', err);
+      console.error('Error updating Free plan:', err);
     } else {
-      console.log(`✅ Updated ${this.changes} Enterprise plan records`);
+      console.log(`Free plan updated successfully. Rows affected: ${this.changes}`);
     }
+  }
+);
 
-    // Check current subscription plans
-    db.all('SELECT id, name, price_inr, whatsapp_send_limit, mobile_number_limit FROM subscription_plans', (err, plans) => {
-      if (err) {
-        console.error('Error fetching subscription plans:', err);
-      } else {
-        console.log('\n📋 Updated Subscription Plans:');
-        console.table(plans);
-      }
-
-      // Check if there are any existing payments for these plans
-      db.all('SELECT id, plan_id, amount_inr, payment_status FROM payments WHERE plan_id IN (3, 4)', (err, payments) => {
+// Update Starter plan (id = 2) to 2 campaigns/month and 25 recipients/campaign
+db.run(
+  'UPDATE subscription_plans SET whatsapp_send_limit = ?, mobile_number_limit = ? WHERE id = ?',
+  [2, 25, 2],
+  function(err) {
+    if (err) {
+      console.error('Error updating Starter plan:', err);
+    } else {
+      console.log(`Starter plan updated successfully. Rows affected: ${this.changes}`);
+      
+      // Verify the updates
+      db.all('SELECT * FROM subscription_plans WHERE id IN (1, 2)', (err, rows) => {
         if (err) {
-          console.error('Error fetching payments:', err);
+          console.error('Error verifying updates:', err);
         } else {
-          console.log('\n💰 Existing Professional/Enterprise Plan Payments:');
-          if (payments.length > 0) {
-            console.table(payments);
-            console.log('\n⚠️  Note: Existing payment records still show the old amounts. New payments will use the updated pricing.');
-          } else {
-            console.log('No existing payments for Professional/Enterprise plans found.');
-          }
+          console.log('Updated plan details:');
+          rows.forEach(row => {
+            console.log(`${row.name}: ${row.whatsapp_send_limit} campaigns/month, ${row.mobile_number_limit} recipients/campaign`);
+          });
         }
-
-        console.log('\n✅ All subscription plans updated successfully!');
-        console.log('📱 QR codes updated:');
-        console.log('   - Starter: qrcode-750.jpeg');
-        console.log('   - Professional: qrcode-750.jpeg');
-        console.log('   - Enterprise: qrcode-1500.jpeg');
-        console.log('\n📊 New Limits:');
-        console.log('   - Professional: 5 campaigns/month, 100 recipients/campaign');
-        console.log('   - Enterprise: 5 campaigns/month, 1000 recipients/campaign');
         db.close();
       });
-    });
-  });
-}); 
+    }
+  }
+); 
