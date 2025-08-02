@@ -264,76 +264,103 @@ router.post('/verify-payment', [
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ error: errors.array()[0].msg });
     }
 
     const { paymentId, upiTransactionId } = req.body;
     const db = getDatabase();
 
-    // Update payment status with UPI transaction ID
-    db.run(
-      'UPDATE payments SET payment_status = ?, upi_transaction_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?',
-      ['completed', upiTransactionId, paymentId, req.user.userId],
-      function(err) {
-        if (err) {
-          return res.status(500).json({ error: 'Failed to update payment' });
-        }
+    // First, check if payment exists and belongs to the user
+    db.get('SELECT * FROM payments WHERE id = ? AND user_id = ?', [paymentId, req.user.userId], (err, payment) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
 
-        if (this.changes === 0) {
-          return res.status(404).json({ error: 'Payment not found' });
-        }
+      if (!payment) {
+        return res.status(404).json({ error: 'Payment not found' });
+      }
 
-        // Get payment details and plan information
-        db.get(`
-          SELECT p.*, sp.name as plan_name, sp.whatsapp_send_limit, sp.mobile_number_limit 
-          FROM payments p 
-          JOIN subscription_plans sp ON p.plan_id = sp.id 
-          WHERE p.id = ?
-        `, [paymentId], (err, payment) => {
+      // Check if payment is already completed
+      if (payment.payment_status === 'completed') {
+        return res.status(400).json({ error: 'Payment has already been processed' });
+      }
+
+      // Check if payment is failed
+      if (payment.payment_status === 'failed') {
+        return res.status(400).json({ error: 'Payment has failed and cannot be processed' });
+      }
+
+      // Validate UPI transaction ID format (basic validation)
+      if (!upiTransactionId.match(/^[A-Za-z0-9]{8,20}$/)) {
+        return res.status(400).json({ error: 'Invalid UPI transaction ID format' });
+      }
+
+      // Update payment status with UPI transaction ID
+      db.run(
+        'UPDATE payments SET payment_status = ?, upi_transaction_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?',
+        ['completed', upiTransactionId, paymentId, req.user.userId],
+        function(err) {
           if (err) {
-            return res.status(500).json({ error: 'Database error' });
+            return res.status(500).json({ error: 'Failed to update payment' });
           }
 
-          // Deactivate current subscription
-          db.run(
-            'UPDATE user_subscriptions SET is_active = 0 WHERE user_id = ? AND is_active = 1',
-            [req.user.userId],
-            function(err) {
-              if (err) {
-                return res.status(500).json({ error: 'Failed to deactivate current subscription' });
-              }
+          if (this.changes === 0) {
+            return res.status(404).json({ error: 'Payment not found' });
+          }
 
-              // Create new subscription with reset WhatsApp counts and expiry date (1 month from now)
-              const startDate = new Date();
-              const endDate = new Date();
-              endDate.setMonth(endDate.getMonth() + 1);
-              
-              db.run(
-                'INSERT INTO user_subscriptions (user_id, plan_id, whatsapp_sends_used, mobile_numbers_used, promotions_used, start_date, end_date, is_active) VALUES (?, ?, 0, 0, 0, ?, ?, 1)',
-                [req.user.userId, payment.plan_id, startDate.toISOString(), endDate.toISOString()],
-                function(err) {
-                  if (err) {
-                    return res.status(500).json({ error: 'Failed to create new subscription' });
-                  }
-
-                  // Log payment success with UPI transaction ID
-                  console.log(`✅ Payment Success: User ${req.user.userId} upgraded to ${payment.plan_name} plan. UPI Transaction ID: ${upiTransactionId}. Amount: ₹${payment.amount_inr}`);
-
-                  res.json({
-                    message: `Payment successful! Your subscription has been upgraded to ${payment.plan_name} plan. UPI Transaction ID: ${upiTransactionId}`,
-                    paymentId,
-                    upiTransactionId,
-                    planName: payment.plan_name,
-                    whatsappSendLimit: payment.whatsapp_send_limit,
-                    mobileNumberLimit: payment.mobile_number_limit
-                  });
-                }
-              );
+          // Get payment details and plan information
+          db.get(`
+            SELECT p.*, sp.name as plan_name, sp.whatsapp_send_limit, sp.mobile_number_limit 
+            FROM payments p 
+            JOIN subscription_plans sp ON p.plan_id = sp.id 
+            WHERE p.id = ?
+          `, [paymentId], (err, paymentWithPlan) => {
+            if (err) {
+              return res.status(500).json({ error: 'Database error' });
             }
-          );
-        });
-      }
-    );
+
+            // Deactivate current subscription
+            db.run(
+              'UPDATE user_subscriptions SET is_active = 0 WHERE user_id = ? AND is_active = 1',
+              [req.user.userId],
+              function(err) {
+                if (err) {
+                  return res.status(500).json({ error: 'Failed to deactivate current subscription' });
+                }
+
+                // Create new subscription with reset WhatsApp counts and expiry date (1 month from now)
+                const startDate = new Date();
+                const endDate = new Date();
+                endDate.setMonth(endDate.getMonth() + 1);
+                
+                db.run(
+                  'INSERT INTO user_subscriptions (user_id, plan_id, whatsapp_sends_used, mobile_numbers_used, promotions_used, start_date, end_date, is_active) VALUES (?, ?, 0, 0, 0, ?, ?, 1)',
+                  [req.user.userId, paymentWithPlan.plan_id, startDate.toISOString(), endDate.toISOString()],
+                  function(err) {
+                    if (err) {
+                      return res.status(500).json({ error: 'Failed to create new subscription' });
+                    }
+
+                    // Log payment success with UPI transaction ID
+                    console.log(`✅ Payment Success: User ${req.user.userId} upgraded to ${paymentWithPlan.plan_name} plan. UPI Transaction ID: ${upiTransactionId}. Amount: ₹${paymentWithPlan.amount_inr}. Expires: ${endDate.toISOString()}`);
+
+                    res.json({
+                      message: `Payment successful! Your subscription has been upgraded to ${paymentWithPlan.plan_name} plan. UPI Transaction ID: ${upiTransactionId}. Valid until ${endDate.toLocaleDateString()}`,
+                      paymentId,
+                      upiTransactionId,
+                      planName: paymentWithPlan.plan_name,
+                      whatsappSendLimit: paymentWithPlan.whatsapp_send_limit,
+                      mobileNumberLimit: paymentWithPlan.mobile_number_limit,
+                      expiresAt: endDate.toISOString()
+                    });
+                  }
+                );
+              }
+            );
+          });
+        }
+      );
+    });
   } catch (error) {
     console.error('Verify payment error:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -444,6 +471,48 @@ router.get('/mobile-number-limits', (req, res) => {
       canSendToAll: true
     });
   });
+});
+
+// Mark payment as failed
+router.post('/mark-payment-failed', [
+  body('paymentId').isInt().withMessage('Payment ID must be a number'),
+  body('reason').optional().isString().withMessage('Reason must be a string')
+], (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: errors.array()[0].msg });
+    }
+
+    const { paymentId, reason = 'Payment verification failed' } = req.body;
+    const db = getDatabase();
+
+    // Update payment status to failed
+    db.run(
+      'UPDATE payments SET payment_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?',
+      ['failed', paymentId, req.user.userId],
+      function(err) {
+        if (err) {
+          return res.status(500).json({ error: 'Failed to update payment status' });
+        }
+
+        if (this.changes === 0) {
+          return res.status(404).json({ error: 'Payment not found' });
+        }
+
+        console.log(`❌ Payment Failed: User ${req.user.userId}, Payment ID: ${paymentId}, Reason: ${reason}`);
+
+        res.json({
+          message: 'Payment marked as failed',
+          paymentId,
+          reason
+        });
+      }
+    );
+  } catch (error) {
+    console.error('Mark payment failed error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // Get payment history

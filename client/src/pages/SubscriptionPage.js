@@ -30,6 +30,28 @@ const SubscriptionPage = () => {
 
 
 
+  // Mark payment as failed mutation
+  const markPaymentFailedMutation = useMutation(
+    async ({ paymentId, reason }) => {
+      const response = await axios.post('/api/subscriptions/mark-payment-failed', {
+        paymentId,
+        reason
+      });
+      return response.data;
+    },
+    {
+      onSuccess: (data) => {
+        toast.success('Payment marked as failed. Please try again with a valid transaction ID.');
+        queryClient.invalidateQueries('payment-history');
+        setPaymentId(null);
+        setUpiTransactionId('');
+      },
+      onError: (error) => {
+        toast.error(error.response?.data?.error || 'Failed to mark payment as failed');
+      }
+    }
+  );
+
   // Verify payment mutation
   const verifyPaymentMutation = useMutation(
     async ({ paymentId, upiTransactionId }) => {
@@ -49,7 +71,16 @@ const SubscriptionPage = () => {
         setPaymentId(null);
       },
       onError: (error) => {
-        toast.error(error.response?.data?.error || 'Failed to verify payment');
+        const errorMessage = error.response?.data?.error || 'Failed to verify payment';
+        toast.error(errorMessage);
+        
+        // If payment verification fails, mark it as failed
+        if (paymentId && errorMessage.includes('Invalid') || errorMessage.includes('already been processed')) {
+          markPaymentFailedMutation.mutate({
+            paymentId,
+            reason: errorMessage
+          });
+        }
       },
       onSettled: () => {
         setIsProcessingPayment(false);
@@ -180,31 +211,67 @@ const SubscriptionPage = () => {
 
       {/* Current Subscription Status */}
       {currentSubscription && (
-        <div className="card border-green-200 bg-green-50">
+        <div className={`card ${
+          currentSubscription.end_date && new Date(currentSubscription.end_date) < new Date()
+            ? 'border-red-200 bg-red-50'
+            : 'border-green-200 bg-green-50'
+        }`}>
           <div className="card-body">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-medium text-green-800">
+                <h3 className={`text-lg font-medium ${
+                  currentSubscription.end_date && new Date(currentSubscription.end_date) < new Date()
+                    ? 'text-red-800'
+                    : 'text-green-800'
+                }`}>
                   Current Plan: {currentSubscription.plan_name}
+                  {currentSubscription.end_date && new Date(currentSubscription.end_date) < new Date() && (
+                    <span className="ml-2 text-sm bg-red-100 text-red-800 px-2 py-1 rounded-full">
+                      EXPIRED
+                    </span>
+                  )}
                 </h3>
-                <p className="text-sm text-green-700">
+                <p className={`text-sm ${
+                  currentSubscription.end_date && new Date(currentSubscription.end_date) < new Date()
+                    ? 'text-red-700'
+                    : 'text-green-700'
+                }`}>
                   WhatsApp campaigns: {currentSubscription.whatsapp_sends_used} / {currentSubscription.whatsapp_send_limit}
                 </p>
-                <p className="text-sm text-green-700">
+                <p className={`text-sm ${
+                  currentSubscription.end_date && new Date(currentSubscription.end_date) < new Date()
+                    ? 'text-red-700'
+                    : 'text-green-700'
+                }`}>
                   Mobile numbers per campaign: Up to {currentSubscription.mobile_number_limit}
                 </p>
                 {currentSubscription.end_date && (
-                  <p className="text-sm text-green-700">
-                    Expires: {new Date(currentSubscription.end_date).toLocaleDateString()}
+                  <p className={`text-sm ${
+                    new Date(currentSubscription.end_date) < new Date()
+                      ? 'text-red-700 font-semibold'
+                      : 'text-green-700'
+                  }`}>
+                    {new Date(currentSubscription.end_date) < new Date() 
+                      ? `Expired on: ${new Date(currentSubscription.end_date).toLocaleDateString()}`
+                      : `Expires on: ${new Date(currentSubscription.end_date).toLocaleDateString()}`
+                    }
                   </p>
                 )}
               </div>
               <div className="text-right">
-                <p className="text-sm text-green-600">
+                <p className={`text-sm ${
+                  currentSubscription.end_date && new Date(currentSubscription.end_date) < new Date()
+                    ? 'text-red-600'
+                    : 'text-green-600'
+                }`}>
                   Started: {new Date(currentSubscription.start_date).toLocaleDateString()}
                 </p>
                 {currentSubscription.end_date && (
-                  <p className="text-sm text-green-600">
+                  <p className={`text-sm ${
+                    currentSubscription.end_date && new Date(currentSubscription.end_date) < new Date()
+                      ? 'text-red-600'
+                      : 'text-green-600'
+                  }`}>
                     Duration: 1 month
                   </p>
                 )}
@@ -396,6 +463,8 @@ const SubscriptionPage = () => {
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                             payment.payment_status === 'completed'
                               ? 'bg-green-100 text-green-800'
+                              : payment.payment_status === 'failed'
+                              ? 'bg-red-100 text-red-800'
                               : 'bg-yellow-100 text-yellow-800'
                           }`}
                         >
