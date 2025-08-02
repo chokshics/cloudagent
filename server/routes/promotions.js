@@ -2,6 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { getDatabase } = require('../database/init');
 const { authenticateToken, requireShopkeeperOrAdmin } = require('../middleware/auth');
+const upload = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -52,7 +53,7 @@ router.get('/:id', (req, res) => {
 });
 
 // Create a new promotion
-router.post('/', [
+router.post('/', upload.single('image'), [
   body('title').notEmpty().withMessage('Title is required'),
   body('description').optional(),
   body('discount_percentage').optional().isInt({ min: 0, max: 100 }).withMessage('Discount percentage must be between 0 and 100'),
@@ -77,16 +78,22 @@ router.post('/', [
       is_active = true
     } = req.body;
 
+    // Handle uploaded image
+    let image_url = null;
+    if (req.file) {
+      image_url = `/uploads/${req.file.filename}`;
+    }
+
     const db = getDatabase();
 
     db.run(`
       INSERT INTO promotions (
         title, description, discount_percentage, discount_amount, 
-        start_date, end_date, is_active, created_by
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        start_date, end_date, is_active, image_url, created_by
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       title, description, discount_percentage, discount_amount,
-      start_date, end_date, is_active, req.user.userId
+      start_date, end_date, is_active, image_url, req.user.userId
     ], function(err) {
       if (err) {
         return res.status(500).json({ error: 'Failed to create promotion' });
@@ -116,7 +123,7 @@ router.post('/', [
 });
 
 // Update a promotion
-router.put('/:id', [
+router.put('/:id', upload.single('image'), [
   body('title').optional().notEmpty().withMessage('Title cannot be empty'),
   body('description').optional(),
   body('discount_percentage').optional().isInt({ min: 0, max: 100 }).withMessage('Discount percentage must be between 0 and 100'),
@@ -144,6 +151,12 @@ router.put('/:id', [
         return res.status(404).json({ error: 'Promotion not found' });
       }
 
+      // Handle uploaded image
+      let image_url = null;
+      if (req.file) {
+        image_url = `/uploads/${req.file.filename}`;
+      }
+
       // Build update query dynamically
       const updateFields = [];
       const updateValues = [];
@@ -154,6 +167,12 @@ router.put('/:id', [
           updateValues.push(req.body[key]);
         }
       });
+
+      // Add image_url to update if file was uploaded
+      if (image_url) {
+        updateFields.push('image_url = ?');
+        updateValues.push(image_url);
+      }
 
       if (updateFields.length === 0) {
         return res.status(400).json({ error: 'No fields to update' });

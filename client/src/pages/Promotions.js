@@ -104,6 +104,17 @@ const Promotions = () => {
           {promotions?.map((promotion) => (
             <div key={promotion.id} className="card">
               <div className="card-body">
+                {/* Promotion Image */}
+                {promotion.image_url && (
+                  <div className="mb-4">
+                    <img
+                      src={promotion.image_url}
+                      alt={promotion.title}
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                  </div>
+                )}
+                
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h3 className="text-lg font-medium text-gray-900">

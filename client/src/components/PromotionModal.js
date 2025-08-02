@@ -15,10 +15,32 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
     is_active: true
   });
   const [errors, setErrors] = useState({});
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const queryClient = useQueryClient();
 
   const createMutation = useMutation(
-    (data) => axios.post('/api/promotions', data),
+    (data) => {
+      const formData = new FormData();
+      
+      // Add all form fields
+      Object.keys(data).forEach(key => {
+        if (data[key] !== null && data[key] !== undefined) {
+          formData.append(key, data[key]);
+        }
+      });
+      
+      // Add image file if selected
+      if (selectedImage) {
+        formData.append('image', selectedImage);
+      }
+      
+      return axios.post('/api/promotions', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    },
     {
       onSuccess: () => {
         queryClient.invalidateQueries('promotions');
@@ -41,7 +63,27 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
   );
 
   const updateMutation = useMutation(
-    (data) => axios.put(`/api/promotions/${promotion?.id}`, data),
+    (data) => {
+      const formData = new FormData();
+      
+      // Add all form fields
+      Object.keys(data).forEach(key => {
+        if (data[key] !== null && data[key] !== undefined) {
+          formData.append(key, data[key]);
+        }
+      });
+      
+      // Add image file if selected
+      if (selectedImage) {
+        formData.append('image', selectedImage);
+      }
+      
+      return axios.put(`/api/promotions/${promotion?.id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    },
     {
       onSuccess: () => {
         queryClient.invalidateQueries('promotions');
@@ -74,6 +116,12 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
         end_date: promotion.end_date ? promotion.end_date.split('T')[0] : '',
         is_active: promotion.is_active
       });
+      // Set existing image preview if available
+      if (promotion.image_url) {
+        setImagePreview(promotion.image_url);
+      } else {
+        setImagePreview(null);
+      }
     } else {
       setFormData({
         title: '',
@@ -84,7 +132,9 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
         end_date: '',
         is_active: true
       });
+      setImagePreview(null);
     }
+    setSelectedImage(null);
     setErrors({});
   }, [promotion]);
 
@@ -99,6 +149,38 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('Please select a valid image file (.png, .jpeg, or .jpg)');
+        return;
+      }
+
+      // Validate file size (2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Image size must be less than 2MB');
+        return;
+      }
+
+      setSelectedImage(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
   };
 
   const handleSubmit = (e) => {
@@ -191,6 +273,45 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
                   className="input mt-1"
                   placeholder="Enter promotion description"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+                  Promotion Image
+                </label>
+                <div className="mt-1">
+                  <input
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept=".png,.jpeg,.jpg"
+                    onChange={handleImageChange}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Accepted formats: PNG, JPEG, JPG. Maximum size: 2MB
+                  </p>
+                </div>
+                
+                {/* Image Preview */}
+                {imagePreview && (
+                  <div className="mt-3">
+                    <div className="relative inline-block">
+                      <img
+                        src={imagePreview}
+                        alt="Promotion preview"
+                        className="h-32 w-auto rounded-lg border border-gray-300"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
