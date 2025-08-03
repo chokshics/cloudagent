@@ -134,7 +134,7 @@ const NewHomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center" aria-label="Go AIz Technologies Logo">
                 <span className="text-white font-bold text-xl">G</span>
               </div>
               <h1 className="text-2xl font-bold text-gray-900">Go AIz Technologies</h1>
