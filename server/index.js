@@ -179,31 +179,51 @@ if (process.env.NODE_ENV === 'production') {
   const buildPath = path.join(__dirname, '../client/build');
   console.log('📁 Serving static files from:', buildPath);
   
-  // Serve static files with cache busting and force HTTP
-  app.use(express.static(buildPath, {
-    maxAge: '1h',
-    etag: true,
-    lastModified: true,
-    setHeaders: (res, path) => {
-      // Force HTTP and prevent HTTPS redirects
-      res.setHeader('Strict-Transport-Security', 'max-age=0');
-      res.setHeader('X-Content-Type-Options', 'nosniff');
-      
-      // Add CORS headers for favicon and other static assets
-      if (path.endsWith('.ico') || path.endsWith('.png') || path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.gif') || path.endsWith('.svg')) {
-        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-        res.setHeader('Access-Control-Allow-Origin', '*');
+  // Check if build directory exists
+  if (fs.existsSync(buildPath)) {
+    // Serve static files with cache busting and force HTTP
+    app.use(express.static(buildPath, {
+      maxAge: '1h',
+      etag: true,
+      lastModified: true,
+      setHeaders: (res, path) => {
+        // Force HTTP and prevent HTTPS redirects
+        res.setHeader('Strict-Transport-Security', 'max-age=0');
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        
+        // Add CORS headers for favicon and other static assets
+        if (path.endsWith('.ico') || path.endsWith('.png') || path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.gif') || path.endsWith('.svg')) {
+          res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+          res.setHeader('Access-Control-Allow-Origin', '*');
+        }
       }
-    }
-  }));
+    }));
+  } else {
+    console.log('⚠️  Build directory not found. Serving API only.');
+    // Serve a simple message for non-API routes
+    app.get('*', (req, res) => {
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ error: 'API route not found' });
+      }
+      res.json({ 
+        message: 'Server is running in API-only mode. Please build the React app first.',
+        instructions: 'Run "npm run build" in the client directory to build the React app.'
+      });
+    });
+  }
 } else {
   // In development, serve static files for debugging
   const buildPath = path.join(__dirname, '../client/build');
   console.log('📁 Serving static files from:', buildPath);
-  app.use(express.static(buildPath, {
-    maxAge: 0, // No caching in development
-    etag: false
-  }));
+  
+  if (fs.existsSync(buildPath)) {
+    app.use(express.static(buildPath, {
+      maxAge: 0, // No caching in development
+      etag: false
+    }));
+  } else {
+    console.log('⚠️  Build directory not found in development mode.');
+  }
 }
 
 // Handle React routing for all non-API routes
@@ -216,9 +236,20 @@ app.get('*', (req, res) => {
   console.log('🔄 Serving React app for route:', req.path);
   const buildPath = path.join(__dirname, '../client/build');
   
-  // Force HTTP headers
-  res.setHeader('Strict-Transport-Security', 'max-age=0');
-  res.sendFile(path.join(buildPath, 'index.html'));
+  // Check if build directory and index.html exist
+  if (fs.existsSync(buildPath) && fs.existsSync(path.join(buildPath, 'index.html'))) {
+    // Force HTTP headers
+    res.setHeader('Strict-Transport-Security', 'max-age=0');
+    res.sendFile(path.join(buildPath, 'index.html'));
+  } else {
+    // If build doesn't exist, return a helpful message
+    res.json({ 
+      message: 'React app not built yet. Please build the client app first.',
+      instructions: 'Run "npm run build" in the client directory to build the React app.',
+      currentPath: req.path,
+      buildPath: buildPath
+    });
+  }
 });
 
 // Error handling middleware
