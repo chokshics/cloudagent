@@ -8,21 +8,50 @@ const fs = require('fs');
 // Load environment variables
 console.log('🔧 Loading environment variables...');
 console.log('Current working directory:', process.cwd());
-console.log('.env file exists:', fs.existsSync('.env'));
 
-const dotenvResult = require('dotenv').config();
-if (dotenvResult.error) {
-  console.error('❌ Error loading .env file:', dotenvResult.error);
-} else {
-  console.log('✅ .env file loaded successfully');
-  console.log('Environment variables found:', Object.keys(dotenvResult.parsed || {}));
+// Try to load .env file with error handling
+let dotenvResult;
+try {
+  dotenvResult = require('dotenv').config();
+  console.log('.env file exists:', fs.existsSync('.env'));
+  
+  if (dotenvResult.error) {
+    console.error('❌ Error loading .env file:', dotenvResult.error);
+    console.log('⚠️  Continuing without .env file...');
+  } else {
+    console.log('✅ .env file loaded successfully');
+    if (dotenvResult.parsed) {
+      console.log('Environment variables found:', Object.keys(dotenvResult.parsed));
+    }
+  }
+} catch (error) {
+  console.error('❌ Error in dotenv configuration:', error);
+  console.log('⚠️  Continuing without .env file...');
 }
 
-// Check Twilio environment variables
-console.log('🔍 Checking Twilio environment variables...');
-console.log('TWILIO_ACCOUNT_SID:', process.env.TWILIO_ACCOUNT_SID ? 'set' : 'not-set');
-console.log('TWILIO_AUTH_TOKEN:', process.env.TWILIO_AUTH_TOKEN ? 'set' : 'not-set');
-console.log('TWILIO_WHATSAPP_NUMBER:', process.env.TWILIO_WHATSAPP_NUMBER || 'not-set');
+// Set default environment variables if not present
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'production';
+  console.log('📝 Set NODE_ENV to production');
+}
+
+if (!process.env.PORT) {
+  process.env.PORT = '5000';
+  console.log('📝 Set PORT to 5000');
+}
+
+if (!process.env.JWT_SECRET) {
+  process.env.JWT_SECRET = 'your-super-secret-jwt-key-change-this-in-production';
+  console.log('📝 Set default JWT_SECRET');
+}
+
+// Check environment variables (without blocking)
+console.log('🔍 Environment check:');
+console.log('- NODE_ENV:', process.env.NODE_ENV);
+console.log('- PORT:', process.env.PORT);
+console.log('- JWT_SECRET:', process.env.JWT_SECRET ? 'set' : 'not-set');
+console.log('- TWILIO_ACCOUNT_SID:', process.env.TWILIO_ACCOUNT_SID ? 'set' : 'not-set');
+console.log('- EMAIL_USER:', process.env.EMAIL_USER ? 'set' : 'not-set');
 
 const authRoutes = require('./routes/auth');
 const promotionRoutes = require('./routes/promotions');
