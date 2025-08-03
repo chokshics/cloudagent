@@ -15,7 +15,8 @@ import {
   Mail,
   Phone,
   MapPin,
-  X
+  X,
+  Shield
 } from 'lucide-react';
 
 const NewHomePage = () => {
@@ -66,7 +67,7 @@ const NewHomePage = () => {
     { number: "50+", label: "Projects Delivered" },
     { number: "1000+", label: "Development Hours" },
     { number: "15+", label: "Technologies Mastered" },
-    { number: "5+", label: "Years Experience" },
+    { number: "10+", label: "Years Experience" },
     { number: "25+", label: "Happy Clients" }
   ];
 
@@ -316,124 +317,261 @@ const NewHomePage = () => {
         </div>
       </section>
 
-      {/* Engagement Models */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Simple Engagement, Competitive Pricing</h2>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Dedicated Teams</h3>
-              <p className="text-gray-600 mb-4">
-                Setup dedicated delivery team of developers, QA, Website Designer, BA and project managers
-              </p>
-            </div>
-            
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Time & Material</h3>
-              <p className="text-gray-600 mb-4">
-                Collaborative model when there is uncertainty about scope and time of the project
-              </p>
-            </div>
-            
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Fixed Price</h3>
-              <p className="text-gray-600 mb-4">
-                When you have fixed budget and detailed requirements, this model is more effective
-              </p>
-            </div>
-            
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Managed Services</h3>
-              <p className="text-gray-600 mb-4">
-                Long-term project with frequently changing requirements, schedule and timeline
-              </p>
-            </div>
-          </div>
-          
-          <div className="text-center mt-12">
-            <p className="text-gray-600 mb-4">
-              Are you not sure which model will suite to your project or need more information?
-            </p>
-            <p className="text-blue-600 font-semibold">Please drop a line to us at sales@goaiz.com</p>
-          </div>
-        </div>
-      </section>
+             {/* Engagement Models */}
+       <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+         {/* Background decorative elements */}
+         <div className="absolute inset-0">
+           <div className="absolute top-20 right-20 w-32 h-32 bg-blue-200 rounded-full opacity-10 animate-pulse"></div>
+           <div className="absolute bottom-20 left-20 w-24 h-24 bg-purple-200 rounded-full opacity-15 animate-bounce"></div>
+         </div>
+         
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+           <div className="text-center mb-16">
+             <div className="inline-flex items-center bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-medium mb-4">
+               <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+               Flexible Engagement Models
+             </div>
+             <h2 className="text-4xl font-bold text-gray-900 mb-4">Simple Engagement, Competitive Pricing</h2>
+             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+               Choose the engagement model that best fits your project requirements and budget
+             </p>
+           </div>
+           
+           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+             <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-bl-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
+               <div className="relative z-10">
+                 <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                   <Users className="w-8 h-8 text-white" />
+                 </div>
+                 <h3 className="text-xl font-bold text-gray-900 mb-4">Dedicated Teams</h3>
+                 <p className="text-gray-600 mb-4 leading-relaxed">
+                   Setup dedicated delivery team of developers, QA, Website Designer, BA and project managers
+                 </p>
+                 <div className="flex items-center text-blue-600 font-semibold text-sm">
+                   <span>Learn More</span>
+                   <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                 </div>
+               </div>
+             </div>
+             
+             <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-bl-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
+               <div className="relative z-10">
+                 <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                   <Clock className="w-8 h-8 text-white" />
+                 </div>
+                 <h3 className="text-xl font-bold text-gray-900 mb-4">Time & Material</h3>
+                 <p className="text-gray-600 mb-4 leading-relaxed">
+                   Collaborative model when there is uncertainty about scope and time of the project
+                 </p>
+                 <div className="flex items-center text-green-600 font-semibold text-sm">
+                   <span>Learn More</span>
+                   <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                 </div>
+               </div>
+             </div>
+             
+             <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-bl-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
+               <div className="relative z-10">
+                 <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                   <Award className="w-8 h-8 text-white" />
+                 </div>
+                 <h3 className="text-xl font-bold text-gray-900 mb-4">Fixed Price</h3>
+                 <p className="text-gray-600 mb-4 leading-relaxed">
+                   When you have fixed budget and detailed requirements, this model is more effective
+                 </p>
+                 <div className="flex items-center text-purple-600 font-semibold text-sm">
+                   <span>Learn More</span>
+                   <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                 </div>
+               </div>
+             </div>
+             
+             <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-bl-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
+               <div className="relative z-10">
+                 <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                   <Settings className="w-8 h-8 text-white" />
+                 </div>
+                 <h3 className="text-xl font-bold text-gray-900 mb-4">Managed Services</h3>
+                 <p className="text-gray-600 mb-4 leading-relaxed">
+                   Long-term project with frequently changing requirements, schedule and timeline
+                 </p>
+                 <div className="flex items-center text-orange-600 font-semibold text-sm">
+                   <span>Learn More</span>
+                   <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                 </div>
+               </div>
+             </div>
+           </div>
+           
+           <div className="text-center mt-16">
+             <div className="bg-white rounded-2xl p-8 shadow-lg max-w-2xl mx-auto">
+               <h3 className="text-2xl font-bold text-gray-900 mb-4">Not Sure Which Model Fits?</h3>
+               <p className="text-gray-600 mb-6">
+                 Are you not sure which model will suite to your project or need more information?
+               </p>
+               <div className="flex items-center justify-center space-x-4">
+                 <Mail className="w-5 h-5 text-blue-600" />
+                 <span className="text-blue-600 font-semibold">sales@goaiz.com</span>
+               </div>
+             </div>
+           </div>
+         </div>
+       </section>
 
-      {/* Industries Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Industries We Work With</h2>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                <span className="text-gray-700">Startups</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-green-600 rounded-full"></div>
-                <span className="text-gray-700">Software Engineering</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-purple-600 rounded-full"></div>
-                <span className="text-gray-700">Manufacturing</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-orange-600 rounded-full"></div>
-                <span className="text-gray-700">AI Products</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-red-600 rounded-full"></div>
-                <span className="text-gray-700">Retail</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-indigo-600 rounded-full"></div>
-                <span className="text-gray-700">Healthcare</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-pink-600 rounded-full"></div>
-                <span className="text-gray-700">Automobile</span>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                <span className="text-gray-700">e-Commerce</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-green-600 rounded-full"></div>
-                <span className="text-gray-700">Gaming</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-purple-600 rounded-full"></div>
-                <span className="text-gray-700">Education</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-orange-600 rounded-full"></div>
-                <span className="text-gray-700">Entertainment</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-red-600 rounded-full"></div>
-                <span className="text-gray-700">Travel & Leisure</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-indigo-600 rounded-full"></div>
-                <span className="text-gray-700">Information Management</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-pink-600 rounded-full"></div>
-                <span className="text-gray-700">Telecommunication</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+             {/* Industries Section */}
+       <section className="py-20 bg-gradient-to-br from-white to-gray-50 relative overflow-hidden">
+         {/* Background decorative elements */}
+         <div className="absolute inset-0">
+           <div className="absolute top-10 left-10 w-16 h-16 bg-blue-200 rounded-full opacity-20 animate-pulse"></div>
+           <div className="absolute bottom-10 right-10 w-20 h-20 bg-purple-200 rounded-full opacity-15 animate-bounce"></div>
+         </div>
+         
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+           <div className="text-center mb-16">
+             <div className="inline-flex items-center bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-medium mb-4">
+               <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+               Cross-Industry Expertise
+             </div>
+             <h2 className="text-4xl font-bold text-gray-900 mb-4">Industries We Work With</h2>
+             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+               We have successfully delivered solutions across diverse industries, understanding unique challenges and requirements
+             </p>
+           </div>
+           
+           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+             {/* Technology & Innovation */}
+             <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+               <div className="flex items-center mb-6">
+                 <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4">
+                   <Code className="w-6 h-6 text-white" />
+                 </div>
+                 <h3 className="text-xl font-bold text-gray-900">Technology & Innovation</h3>
+               </div>
+               <div className="space-y-3">
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform">
+                   <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                   <span className="text-gray-700">Startups</span>
+                 </div>
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-75">
+                   <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                   <span className="text-gray-700">Software Engineering</span>
+                 </div>
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-100">
+                   <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                   <span className="text-gray-700">AI Products</span>
+                 </div>
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-150">
+                   <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
+                   <span className="text-gray-700">Gaming</span>
+                 </div>
+               </div>
+             </div>
+             
+             {/* Business & Commerce */}
+             <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+               <div className="flex items-center mb-6">
+                 <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-4">
+                   <Building2 className="w-6 h-6 text-white" />
+                 </div>
+                 <h3 className="text-xl font-bold text-gray-900">Business & Commerce</h3>
+               </div>
+               <div className="space-y-3">
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform">
+                   <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                   <span className="text-gray-700">e-Commerce</span>
+                 </div>
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-75">
+                   <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                   <span className="text-gray-700">Retail</span>
+                 </div>
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-100">
+                   <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                   <span className="text-gray-700">Manufacturing</span>
+                 </div>
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-150">
+                   <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                   <span className="text-gray-700">Information Management</span>
+                 </div>
+               </div>
+             </div>
+             
+             {/* Healthcare & Life Sciences */}
+             <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+               <div className="flex items-center mb-6">
+                 <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center mr-4">
+                   <Shield className="w-6 h-6 text-white" />
+                 </div>
+                 <h3 className="text-xl font-bold text-gray-900">Healthcare & Life Sciences</h3>
+               </div>
+               <div className="space-y-3">
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform">
+                   <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                   <span className="text-gray-700">Healthcare</span>
+                 </div>
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-75">
+                   <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                   <span className="text-gray-700">Education</span>
+                 </div>
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-100">
+                   <div className="w-2 h-2 bg-pink-600 rounded-full"></div>
+                   <span className="text-gray-700">Telecommunication</span>
+                 </div>
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-150">
+                   <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
+                   <span className="text-gray-700">Entertainment</span>
+                 </div>
+               </div>
+             </div>
+             
+             {/* Transportation & Mobility */}
+             <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+               <div className="flex items-center mb-6">
+                 <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mr-4">
+                   <Globe className="w-6 h-6 text-white" />
+                 </div>
+                 <h3 className="text-xl font-bold text-gray-900">Transportation & Mobility</h3>
+               </div>
+               <div className="space-y-3">
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform">
+                   <div className="w-2 h-2 bg-pink-600 rounded-full"></div>
+                   <span className="text-gray-700">Automobile</span>
+                 </div>
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-75">
+                   <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                   <span className="text-gray-700">Travel & Leisure</span>
+                 </div>
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-100">
+                   <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                   <span className="text-gray-700">Logistics</span>
+                 </div>
+                 <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-150">
+                   <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                   <span className="text-gray-700">Supply Chain</span>
+                 </div>
+               </div>
+             </div>
+           </div>
+           
+           <div className="text-center mt-16">
+             <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
+               <h3 className="text-2xl font-bold mb-4">Ready to Transform Your Industry?</h3>
+               <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
+                 Whether you're in technology, healthcare, finance, or any other industry, we have the expertise to deliver innovative solutions that drive your business forward.
+               </p>
+               <button 
+                 onClick={handleGetStartedClick}
+                 className="bg-white text-blue-600 px-8 py-3 rounded-lg font-medium hover:bg-gray-100 transition-all duration-300 transform hover:scale-105"
+               >
+                 Start Your Project
+               </button>
+             </div>
+           </div>
+         </div>
+       </section>
 
       {/* Contact Section */}
       <section className="py-20 bg-gray-900 text-white">
