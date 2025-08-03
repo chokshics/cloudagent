@@ -173,14 +173,18 @@ app.get('/api/force-http', (req, res) => {
   });
 });
 
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
+// Handle static files and React routing
+const buildPath = path.join(__dirname, '../client/build');
+const buildExists = fs.existsSync(buildPath) && fs.existsSync(path.join(buildPath, 'index.html'));
+
+console.log('📁 Build path:', buildPath);
+console.log('📁 Build exists:', buildExists);
+
+if (buildExists) {
   // Serve static files from the React app build directory
-  const buildPath = path.join(__dirname, '../client/build');
   console.log('📁 Serving static files from:', buildPath);
   
-  // Check if build directory exists
-  if (fs.existsSync(buildPath)) {
+  if (process.env.NODE_ENV === 'production') {
     // Serve static files with cache busting and force HTTP
     app.use(express.static(buildPath, {
       maxAge: '1h',
@@ -199,58 +203,47 @@ if (process.env.NODE_ENV === 'production') {
       }
     }));
   } else {
-    console.log('⚠️  Build directory not found. Serving API only.');
-    // Serve a simple message for non-API routes
-    app.get('*', (req, res) => {
-      if (req.path.startsWith('/api/')) {
-        return res.status(404).json({ error: 'API route not found' });
-      }
-      res.json({ 
-        message: 'Server is running in API-only mode. Please build the React app first.',
-        instructions: 'Run "npm run build" in the client directory to build the React app.'
-      });
-    });
-  }
-} else {
-  // In development, serve static files for debugging
-  const buildPath = path.join(__dirname, '../client/build');
-  console.log('📁 Serving static files from:', buildPath);
-  
-  if (fs.existsSync(buildPath)) {
+    // In development, serve static files for debugging
     app.use(express.static(buildPath, {
       maxAge: 0, // No caching in development
       etag: false
     }));
-  } else {
-    console.log('⚠️  Build directory not found in development mode.');
-  }
-}
-
-// Handle React routing for all non-API routes
-app.get('*', (req, res) => {
-  // Skip API routes
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: 'API route not found' });
   }
   
-  console.log('🔄 Serving React app for route:', req.path);
-  const buildPath = path.join(__dirname, '../client/build');
-  
-  // Check if build directory and index.html exist
-  if (fs.existsSync(buildPath) && fs.existsSync(path.join(buildPath, 'index.html'))) {
+  // Handle React routing for all non-API routes (when build exists)
+  app.get('*', (req, res) => {
+    // Skip API routes
+    if (req.path.startsWith('/api/')) {
+      return res.status(404).json({ error: 'API route not found' });
+    }
+    
+    console.log('🔄 Serving React app for route:', req.path);
+    
     // Force HTTP headers
     res.setHeader('Strict-Transport-Security', 'max-age=0');
     res.sendFile(path.join(buildPath, 'index.html'));
-  } else {
-    // If build doesn't exist, return a helpful message
+  });
+  
+} else {
+  // Build doesn't exist - serve API only with helpful message
+  console.log('⚠️  Build directory not found. Serving API only.');
+  
+  // Handle all non-API routes with helpful message
+  app.get('*', (req, res) => {
+    if (req.path.startsWith('/api/')) {
+      return res.status(404).json({ error: 'API route not found' });
+    }
+    
+    console.log('🔄 API-only mode for route:', req.path);
     res.json({ 
-      message: 'React app not built yet. Please build the client app first.',
+      message: 'Server is running in API-only mode. Please build the React app first.',
       instructions: 'Run "npm run build" in the client directory to build the React app.',
       currentPath: req.path,
-      buildPath: buildPath
+      buildPath: buildPath,
+      status: 'API_ONLY_MODE'
     });
-  }
-});
+  });
+}
 
 // Error handling middleware
 app.use((err, req, res, next) => {
