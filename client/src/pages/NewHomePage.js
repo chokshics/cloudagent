@@ -13,7 +13,6 @@ import {
   Globe, 
   Award,
   Mail,
-  Phone,
   MapPin,
   X,
   Shield
@@ -195,12 +194,7 @@ const NewHomePage = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </button>
-                 <button className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-xl font-medium hover:bg-blue-600 hover:text-white transition-all duration-300 transform hover:scale-105 flex items-center justify-center">
-                   <span>Watch Demo</span>
-                   <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                   </svg>
-                 </button>
+
                </div>
                
                                {/* Stats row */}
@@ -268,33 +262,206 @@ const NewHomePage = () => {
        </section>
 
       {/* Services Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+        {/* Background decorative elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-32 h-32 bg-blue-200 rounded-full opacity-10 animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-24 h-24 bg-purple-200 rounded-full opacity-15 animate-bounce"></div>
+          <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-indigo-200 rounded-full opacity-20 animate-ping"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
+            <div className="inline-flex items-center bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-medium mb-4">
+              <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+              Our Core Services
+            </div>
             <h2 className="text-4xl font-bold text-gray-900 mb-4">What We Do</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               We offer comprehensive digital solutions to help your business thrive in the modern world
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300 border border-gray-100">
-                <div className="mb-6">
-                  {service.icon}
+            {/* Software Engineering */}
+            <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-bl-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Code className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">{service.title}</h3>
-                <p className="text-gray-600 mb-6">{service.description}</p>
-                <ul className="space-y-2">
-                  {service.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center text-sm text-gray-600">
-                      <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Software Engineering</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Custom software development with modern technologies and best practices
+                </p>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">Full-stack development</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-75">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">API integration</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-100">
+                    <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">Database design</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-150">
+                    <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">Performance optimization</span>
+                  </div>
+                </div>
+                <div className="flex items-center text-blue-600 font-semibold text-sm">
+                  <span>Learn More</span>
+                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                </div>
               </div>
-            ))}
+            </div>
+            
+            {/* Cloud Solutions */}
+            <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-bl-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Cloud className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Cloud Solutions & Support</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Comprehensive cloud infrastructure and managed services
+                </p>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">AWS/Azure management</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-75">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">Cloud migration</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-100">
+                    <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">24/7 monitoring</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-150">
+                    <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">Cost optimization</span>
+                  </div>
+                </div>
+                <div className="flex items-center text-green-600 font-semibold text-sm">
+                  <span>Learn More</span>
+                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </div>
+            
+            {/* DevOps Consulting */}
+            <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-bl-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Settings className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">DevOps Consulting</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Streamline your development and operations with modern DevOps practices
+                </p>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">CI/CD pipelines</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-75">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">Infrastructure as Code</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-100">
+                    <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">Container orchestration</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-150">
+                    <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">Automation</span>
+                  </div>
+                </div>
+                <div className="flex items-center text-purple-600 font-semibold text-sm">
+                  <span>Learn More</span>
+                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </div>
+            
+            {/* Product Engineering */}
+            <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-bl-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Package className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Product Engineering</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  End-to-end product development from concept to deployment
+                </p>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">Product strategy</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-75">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">UX/UI design</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-100">
+                    <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">MVP development</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-150">
+                    <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">Scalability planning</span>
+                  </div>
+                </div>
+                <div className="flex items-center text-orange-600 font-semibold text-sm">
+                  <span>Learn More</span>
+                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </div>
+            
+            {/* Building New Software */}
+            <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-bl-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Building2 className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Building New Software</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Turn your ideas into powerful, scalable software solutions
+                </p>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">Custom applications</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-75">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">Web platforms</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-100">
+                    <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">Mobile apps</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-150">
+                    <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
+                    <span className="text-gray-700 text-sm">Enterprise solutions</span>
+                  </div>
+                </div>
+                <div className="flex items-center text-red-600 font-semibold text-sm">
+                  <span>Learn More</span>
+                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -556,20 +723,7 @@ const NewHomePage = () => {
              </div>
            </div>
            
-           <div className="text-center mt-16">
-             <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
-               <h3 className="text-2xl font-bold mb-4">Ready to Transform Your Industry?</h3>
-               <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
-                 Whether you're in technology, healthcare, finance, or any other industry, we have the expertise to deliver innovative solutions that drive your business forward.
-               </p>
-               <button 
-                 onClick={handleGetStartedClick}
-                 className="bg-white text-blue-600 px-8 py-3 rounded-lg font-medium hover:bg-gray-100 transition-all duration-300 transform hover:scale-105"
-               >
-                 Start Your Project
-               </button>
-             </div>
-           </div>
+
          </div>
        </section>
 
@@ -592,10 +746,7 @@ const NewHomePage = () => {
                   <Mail className="h-5 w-5 text-blue-400" />
                   <span>Email: sales@goaiz.com</span>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <Phone className="h-5 w-5 text-blue-400" />
-                  <span>Phone: +91-9876543210</span>
-                </div>
+
               </div>
             </div>
             
@@ -603,7 +754,10 @@ const NewHomePage = () => {
               <p className="text-gray-300 mb-4">
                 Ready to transform your business? Let's discuss your project requirements.
               </p>
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300">
+              <button 
+                onClick={handleGetStartedClick}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
+              >
                 Start Your Project
               </button>
             </div>
