@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Code, 
@@ -14,11 +14,20 @@ import {
   Award,
   Mail,
   Phone,
-  MapPin
+  MapPin,
+  X
 } from 'lucide-react';
 
 const NewHomePage = () => {
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    requirements: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const services = [
     {
@@ -65,6 +74,59 @@ const NewHomePage = () => {
     navigate('/merchantspro');
   };
 
+  const handleGetStartedClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setFormData({
+      firstName: '',
+      lastName: '',
+      email: '',
+      requirements: ''
+    });
+  };
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmitForm = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // Send email using the backend API
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          to: 'sales@goaiz.com',
+          subject: 'New Project Inquiry from Go AIz Website'
+        })
+      });
+
+      if (response.ok) {
+        alert('Thank you! Your inquiry has been sent successfully. We will get back to you soon.');
+        handleCloseModal();
+      } else {
+        alert('There was an error sending your inquiry. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('There was an error sending your inquiry. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -104,10 +166,10 @@ const NewHomePage = () => {
            <div className="grid lg:grid-cols-2 gap-12 items-center">
              {/* Left side - Text content */}
              <div className="text-left">
-               <div className="inline-flex items-center bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
-                 <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
-                 Trusted by 500+ Companies
-               </div>
+                               <div className="inline-flex items-center bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+                  <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+                  Trusted by Global Businesses
+                </div>
                
                <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                  Digital IT Partner for Your{' '}
@@ -122,13 +184,16 @@ const NewHomePage = () => {
                  services to help your business grow.
                </p>
                
-               <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                 <button className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center">
-                   <span>Get Started Today</span>
-                   <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                   </svg>
-                 </button>
+                               <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                  <button 
+                    onClick={handleGetStartedClick}
+                    className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center"
+                  >
+                    <span>Get Started Today</span>
+                    <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </button>
                  <button className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-xl font-medium hover:bg-blue-600 hover:text-white transition-all duration-300 transform hover:scale-105 flex items-center justify-center">
                    <span>Watch Demo</span>
                    <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,21 +202,21 @@ const NewHomePage = () => {
                  </button>
                </div>
                
-               {/* Stats row */}
-               <div className="grid grid-cols-3 gap-6">
-                 <div className="text-center">
-                   <div className="text-2xl font-bold text-blue-600">500+</div>
-                   <div className="text-sm text-gray-600">Happy Clients</div>
-                 </div>
-                 <div className="text-center">
-                   <div className="text-2xl font-bold text-purple-600">1000+</div>
-                   <div className="text-sm text-gray-600">Projects Delivered</div>
-                 </div>
-                 <div className="text-center">
-                   <div className="text-2xl font-bold text-indigo-600">24/7</div>
-                   <div className="text-sm text-gray-600">Support</div>
-                 </div>
-               </div>
+                               {/* Stats row */}
+                <div className="grid grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">10+</div>
+                    <div className="text-sm text-gray-600">Years of Software Engineering Experience</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">1000+</div>
+                    <div className="text-sm text-gray-600">Hours of Work Delivered</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-indigo-600">24/7</div>
+                    <div className="text-sm text-gray-600">Support</div>
+                  </div>
+                </div>
              </div>
              
              {/* Right side - Image/Illustration */}
@@ -408,14 +473,111 @@ const NewHomePage = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p>&copy; 2025 by Go AIz Technologies. All rights reserved.</p>
-        </div>
-      </footer>
-    </div>
-  );
-};
+             {/* Footer */}
+       <footer className="bg-gray-800 text-white py-8">
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+           <p>&copy; 2025 by Go AIz Technologies. All rights reserved.</p>
+         </div>
+       </footer>
+
+       {/* Contact Form Modal */}
+       {isModalOpen && (
+         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative">
+             <button
+               onClick={handleCloseModal}
+               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+             >
+               <X className="h-6 w-6" />
+             </button>
+             
+             <div className="text-center mb-6">
+               <h2 className="text-2xl font-bold text-gray-900 mb-2">Get Started Today</h2>
+               <p className="text-gray-600">Tell us about your project requirements</p>
+             </div>
+             
+             <form onSubmit={handleSubmitForm} className="space-y-4">
+               <div className="grid grid-cols-2 gap-4">
+                 <div>
+                   <label className="block text-sm font-medium text-gray-700 mb-1">
+                     First Name *
+                   </label>
+                   <input
+                     type="text"
+                     name="firstName"
+                     value={formData.firstName}
+                     onChange={handleInputChange}
+                     required
+                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                     placeholder="First name"
+                   />
+                 </div>
+                 <div>
+                   <label className="block text-sm font-medium text-gray-700 mb-1">
+                     Last Name *
+                   </label>
+                   <input
+                     type="text"
+                     name="lastName"
+                     value={formData.lastName}
+                     onChange={handleInputChange}
+                     required
+                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                     placeholder="Last name"
+                   />
+                 </div>
+               </div>
+               
+               <div>
+                 <label className="block text-sm font-medium text-gray-700 mb-1">
+                   Email Address *
+                 </label>
+                 <input
+                   type="email"
+                   name="email"
+                   value={formData.email}
+                   onChange={handleInputChange}
+                   required
+                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   placeholder="your.email@example.com"
+                 />
+               </div>
+               
+               <div>
+                 <label className="block text-sm font-medium text-gray-700 mb-1">
+                   Your Requirements *
+                 </label>
+                 <textarea
+                   name="requirements"
+                   value={formData.requirements}
+                   onChange={handleInputChange}
+                   required
+                   rows={4}
+                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                   placeholder="Describe your project requirements, timeline, and any specific needs..."
+                 />
+               </div>
+               
+               <button
+                 type="submit"
+                 disabled={isSubmitting}
+                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+               >
+                 {isSubmitting ? (
+                   <>
+                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                     Sending...
+                   </>
+                 ) : (
+                   'Send Inquiry'
+                 )}
+               </button>
+             </form>
+           </div>
+         </div>
+       )}
+     </div>
+   );
+ };
 
 export default NewHomePage; 
