@@ -90,28 +90,116 @@ const NewHomePage = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              Digital IT Partner for Your Business
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Looking for Digital Transformation of your business? We provide comprehensive software engineering, 
-              cloud solutions, DevOps consulting, and product development services to help your business grow.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300">
-                Contact Us
-              </button>
-              <button className="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg font-medium hover:bg-blue-600 hover:text-white transition-all duration-300">
-                Learn More
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+             {/* Hero Section */}
+       <section className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-20 overflow-hidden">
+         {/* Background decorative elements */}
+         <div className="absolute inset-0">
+           <div className="absolute top-10 left-10 w-20 h-20 bg-blue-200 rounded-full opacity-20 animate-pulse"></div>
+           <div className="absolute top-32 right-20 w-16 h-16 bg-purple-200 rounded-full opacity-30 animate-bounce"></div>
+           <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-indigo-200 rounded-full opacity-25 animate-ping"></div>
+           <div className="absolute bottom-32 right-1/3 w-24 h-24 bg-blue-300 rounded-full opacity-15 animate-pulse"></div>
+         </div>
+         
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+           <div className="grid lg:grid-cols-2 gap-12 items-center">
+             {/* Left side - Text content */}
+             <div className="text-left">
+               <div className="inline-flex items-center bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+                 <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+                 Trusted by 500+ Companies
+               </div>
+               
+               <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                 Digital IT Partner for Your{' '}
+                 <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                   Business
+                 </span>
+               </h1>
+               
+               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                 Looking for <span className="font-semibold text-blue-600">Digital Transformation</span> of your business? 
+                 We provide comprehensive software engineering, cloud solutions, DevOps consulting, and product development 
+                 services to help your business grow.
+               </p>
+               
+               <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                 <button className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center">
+                   <span>Get Started Today</span>
+                   <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                   </svg>
+                 </button>
+                 <button className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-xl font-medium hover:bg-blue-600 hover:text-white transition-all duration-300 transform hover:scale-105 flex items-center justify-center">
+                   <span>Watch Demo</span>
+                   <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                   </svg>
+                 </button>
+               </div>
+               
+               {/* Stats row */}
+               <div className="grid grid-cols-3 gap-6">
+                 <div className="text-center">
+                   <div className="text-2xl font-bold text-blue-600">500+</div>
+                   <div className="text-sm text-gray-600">Happy Clients</div>
+                 </div>
+                 <div className="text-center">
+                   <div className="text-2xl font-bold text-purple-600">1000+</div>
+                   <div className="text-sm text-gray-600">Projects Delivered</div>
+                 </div>
+                 <div className="text-center">
+                   <div className="text-2xl font-bold text-indigo-600">24/7</div>
+                   <div className="text-sm text-gray-600">Support</div>
+                 </div>
+               </div>
+             </div>
+             
+             {/* Right side - Image/Illustration */}
+             <div className="relative">
+               <div className="relative z-10 bg-white rounded-2xl shadow-2xl p-8 transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                 <div className="grid grid-cols-2 gap-4">
+                   <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white">
+                     <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-3">
+                       <Code className="w-6 h-6" />
+                     </div>
+                     <h3 className="font-semibold mb-1">Software Engineering</h3>
+                     <p className="text-blue-100 text-sm">Custom solutions</p>
+                   </div>
+                   <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white">
+                     <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-3">
+                       <Cloud className="w-6 h-6" />
+                     </div>
+                     <h3 className="font-semibold mb-1">Cloud Solutions</h3>
+                     <p className="text-green-100 text-sm">Scalable infrastructure</p>
+                   </div>
+                   <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white">
+                     <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-3">
+                       <Settings className="w-6 h-6" />
+                     </div>
+                     <h3 className="font-semibold mb-1">DevOps</h3>
+                     <p className="text-purple-100 text-sm">Automation & CI/CD</p>
+                   </div>
+                   <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-4 text-white">
+                     <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-3">
+                       <Package className="w-6 h-6" />
+                     </div>
+                     <h3 className="font-semibold mb-1">Product Engineering</h3>
+                     <p className="text-orange-100 text-sm">End-to-end development</p>
+                   </div>
+                 </div>
+               </div>
+               
+               {/* Floating elements */}
+               <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full opacity-80 animate-bounce"></div>
+               <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-r from-pink-400 to-purple-500 rounded-full opacity-60 animate-pulse"></div>
+               
+               {/* Decorative lines */}
+               <div className="absolute top-1/2 left-0 w-32 h-1 bg-gradient-to-r from-blue-400 to-purple-400 transform -translate-y-1/2 -translate-x-8"></div>
+               <div className="absolute bottom-1/2 right-0 w-32 h-1 bg-gradient-to-r from-purple-400 to-pink-400 transform translate-y-1/2 translate-x-8"></div>
+             </div>
+           </div>
+         </div>
+       </section>
 
       {/* Services Section */}
       <section className="py-20 bg-white">
