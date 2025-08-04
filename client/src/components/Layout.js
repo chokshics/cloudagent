@@ -13,9 +13,11 @@ import {
   Crown,
   BarChart3
 } from 'lucide-react';
+import CurrencySelectionModal from './CurrencySelectionModal';
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showCurrencyModal, setShowCurrencyModal] = useState(false);
   const { user, logout } = useAuth();
   const location = useLocation();
 
@@ -24,7 +26,6 @@ const Layout = ({ children }) => {
     { name: 'Promotions', href: '/promotions', icon: Tag },
     { name: 'Mobile Numbers', href: '/mobile-numbers', icon: Users },
     { name: 'WhatsApp Campaigns', href: '/whatsapp-campaigns', icon: MessageSquare },
-    { name: 'Subscription', href: '/subscription', icon: Crown },
     ...(user?.role === 'superadmin' ? [{ name: 'Reports', href: '/reports', icon: BarChart3 }] : []),
   ];
 
@@ -61,6 +62,22 @@ const Layout = ({ children }) => {
                 {item.name}
               </Link>
             ))}
+            
+            {/* Subscription Button */}
+            <button
+              onClick={() => {
+                setShowCurrencyModal(true);
+                setSidebarOpen(false);
+              }}
+              className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-left ${
+                isActive('/subscription') || isActive('/subscription-usd')
+                  ? 'bg-primary-100 text-primary-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <Crown className="mr-3 h-5 w-5" />
+              Subscription
+            </button>
           </nav>
         </div>
       </div>
@@ -86,6 +103,19 @@ const Layout = ({ children }) => {
                 {item.name}
               </Link>
             ))}
+            
+            {/* Subscription Button */}
+            <button
+              onClick={() => setShowCurrencyModal(true)}
+              className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-left ${
+                isActive('/subscription') || isActive('/subscription-usd')
+                  ? 'bg-primary-100 text-primary-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <Crown className="mr-3 h-5 w-5" />
+              Subscription
+            </button>
           </nav>
         </div>
       </div>
@@ -127,6 +157,12 @@ const Layout = ({ children }) => {
           </div>
         </main>
       </div>
+
+      {/* Currency Selection Modal */}
+      <CurrencySelectionModal
+        isOpen={showCurrencyModal}
+        onClose={() => setShowCurrencyModal(false)}
+      />
     </div>
   );
 };

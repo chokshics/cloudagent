@@ -3,6 +3,7 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const { getDatabase } = require('../database/init');
 const { authenticateToken, requireShopkeeperOrAdmin } = require('../middleware/auth');
+const nodemailer = require('nodemailer');
 
 // Apply authentication middleware to all routes
 router.use(authenticateToken);
@@ -539,6 +540,71 @@ router.get('/payments', (req, res) => {
     
     res.json({ payments });
   });
+});
+
+// Complete USD payment and send email
+router.post('/complete-usd-payment', [
+  body('planName').isString().withMessage('Plan name is required'),
+  body('priceUSD').isFloat({ min: 0 }).withMessage('Price must be a valid number'),
+  body('userData').isObject().withMessage('User data is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: errors.array()[0].msg });
+    }
+
+    const { planName, priceUSD, userData } = req.body;
+    const db = getDatabase();
+
+    // Configure email transporter
+    const transporter = nodemailer.createTransporter({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER || 'your-email@gmail.com',
+        pass: process.env.EMAIL_PASS || 'your-app-password'
+      }
+    });
+
+    // Create email content
+    const emailContent = `
+      <h2>USD Subscription Payment Request</h2>
+      <p><strong>Plan:</strong> ${planName}</p>
+      <p><strong>Amount:</strong> $${priceUSD}</p>
+      <p><strong>User Details:</strong></p>
+      <ul>
+        <li><strong>Name:</strong> ${userData.first_name} ${userData.last_name}</li>
+        <li><strong>Email:</strong> ${userData.email}</li>
+        <li><strong>Phone:</strong> ${userData.phone_number}</li>
+        <li><strong>Country:</strong> ${userData.country || 'Not specified'}</li>
+      </ul>
+      <hr>
+      <p><em>This is a USD payment request for subscription via WISE. Please process the payment and send an invoice to the user.</em></p>
+    `;
+
+    // Email options
+    const mailOptions = {
+      from: process.env.EMAIL_USER || 'your-email@gmail.com',
+      to: 'sales@goaiz.com',
+      subject: `USD Subscription Payment Request - ${planName} Plan`,
+      html: emailContent
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+
+    console.log(`✅ USD Payment Request Sent: User ${userData.first_name} ${userData.last_name}, Plan: ${planName}, Amount: $${priceUSD}`);
+
+    res.json({
+      message: 'Payment request sent successfully. An invoice will be sent to your email soon.',
+      planName,
+      priceUSD
+    });
+
+  } catch (error) {
+    console.error('USD payment error:', error);
+    res.status(500).json({ error: 'Failed to process USD payment request' });
+  }
 });
 
 module.exports = router; 

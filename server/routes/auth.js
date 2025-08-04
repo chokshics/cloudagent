@@ -82,6 +82,7 @@ const validateRegistration = [
   body('phoneNumber').trim().notEmpty().withMessage('Phone number is required').matches(/^\+?[1-9]\d{1,14}$/).withMessage('Please enter a valid phone number'),
   body('username').trim().notEmpty().withMessage('Username is required').isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
   body('password').notEmpty().withMessage('Password is required').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('country').trim().notEmpty().withMessage('Country is required').isIn(['India', 'United States', 'Europe', 'Other']).withMessage('Please select a valid country'),
   body('role').optional().isIn(['admin', 'shopkeeper']).withMessage('Invalid role')
 ];
 
@@ -98,7 +99,7 @@ router.post('/register', validateRegistration, async (req, res) => {
       return res.status(400).json({ message: errors.array()[0].msg });
     }
 
-    const { firstName, lastName, email, phoneNumber, username, password, role = 'shopkeeper' } = req.body;
+    const { firstName, lastName, email, phoneNumber, username, password, country, role = 'shopkeeper' } = req.body;
 
     // Check if username already exists
     db.get('SELECT id FROM users WHERE username = ?', [username], async (err, row) => {
@@ -138,8 +139,8 @@ router.post('/register', validateRegistration, async (req, res) => {
 
             // Insert new user
             db.run(
-              'INSERT INTO users (username, email, password, first_name, last_name, phone_number, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
-              [username, email, hashedPassword, firstName, lastName, phoneNumber, role],
+              'INSERT INTO users (username, email, password, first_name, last_name, phone_number, country, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+              [username, email, hashedPassword, firstName, lastName, phoneNumber, country, role],
               function(err) {
                 if (err) {
                   console.error('Error creating user:', err);
@@ -172,6 +173,29 @@ router.post('/register', validateRegistration, async (req, res) => {
     console.error('Registration error:', error);
     res.status(500).json({ message: 'Server error' });
   }
+});
+
+// Get current user data
+router.get('/me', authenticateToken, (req, res) => {
+  const db = getDatabase();
+  
+  const query = `
+    SELECT id, username, email, first_name, last_name, phone_number, country, role, created_at
+    FROM users 
+    WHERE id = ?
+  `;
+  
+  db.get(query, [req.user.userId], (err, user) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.json({ user });
+  });
 });
 
 // Login user

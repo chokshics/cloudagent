@@ -27,6 +27,7 @@ const initDatabase = async () => {
           first_name TEXT,
           last_name TEXT,
           phone_number TEXT,
+          country TEXT,
           role TEXT DEFAULT 'shopkeeper',
           is_active BOOLEAN DEFAULT 1,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

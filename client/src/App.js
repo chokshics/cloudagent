@@ -9,6 +9,7 @@ import Promotions from './pages/Promotions';
 import MobileNumbers from './pages/MobileNumbers';
 import WhatsAppCampaigns from './pages/WhatsAppCampaigns';
 import SubscriptionPage from './pages/SubscriptionPage';
+import SubscriptionUSD from './pages/SubscriptionUSD';
 import Reports from './pages/Reports';
 import Layout from './components/Layout';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -76,6 +77,16 @@ function App() {
         } />
       ) : (
         <Route path="/subscription" element={<Navigate to="/" replace />} />
+      )}
+      
+      {user ? (
+        <Route path="/subscription-usd" element={
+          <Layout>
+            <SubscriptionUSD />
+          </Layout>
+        } />
+      ) : (
+        <Route path="/subscription-usd" element={<Navigate to="/" replace />} />
       )}
       
       {/* Super Admin only routes */}
