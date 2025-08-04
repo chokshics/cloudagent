@@ -11,7 +11,7 @@ const CookieConsent = () => {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-3">
               <Store className="h-8 w-8 text-indigo-600" />
-              <h1 className="text-2xl font-bold text-gray-900">Merchants Pro</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Go AIz Technologies</h1>
             </div>
             <Link
               to="/merchantspro"

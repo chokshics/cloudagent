@@ -265,8 +265,8 @@ const HomePage = () => {
                <h4 className="text-lg font-semibold mb-4">Contact</h4>
                <ul className="space-y-2 text-sm text-gray-300">
                  <li>
-                   <a href="mailto:support@goaiz.com" className="hover:text-white transition-colors">
-                     support@goaiz.com
+                   <a href="mailto:sales@goaiz.com" className="hover:text-white transition-colors">
+                     sales@goaiz.com
                    </a>
                  </li>
                </ul>

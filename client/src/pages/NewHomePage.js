@@ -501,10 +501,6 @@ const NewHomePage = () => {
                  <p className="text-gray-600 mb-4 leading-relaxed">
                    Setup dedicated delivery team of developers, QA, Website Designer, BA and project managers
                  </p>
-                 <div className="flex items-center text-blue-600 font-semibold text-sm">
-                   <span>Learn More</span>
-                   <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                 </div>
                </div>
              </div>
              
@@ -518,10 +514,6 @@ const NewHomePage = () => {
                  <p className="text-gray-600 mb-4 leading-relaxed">
                    Collaborative model when there is uncertainty about scope and time of the project
                  </p>
-                 <div className="flex items-center text-green-600 font-semibold text-sm">
-                   <span>Learn More</span>
-                   <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                 </div>
                </div>
              </div>
              
@@ -535,10 +527,6 @@ const NewHomePage = () => {
                  <p className="text-gray-600 mb-4 leading-relaxed">
                    When you have fixed budget and detailed requirements, this model is more effective
                  </p>
-                 <div className="flex items-center text-purple-600 font-semibold text-sm">
-                   <span>Learn More</span>
-                   <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                 </div>
                </div>
              </div>
              
@@ -552,10 +540,6 @@ const NewHomePage = () => {
                  <p className="text-gray-600 mb-4 leading-relaxed">
                    Long-term project with frequently changing requirements, schedule and timeline
                  </p>
-                 <div className="flex items-center text-orange-600 font-semibold text-sm">
-                   <span>Learn More</span>
-                   <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                 </div>
                </div>
              </div>
            </div>
@@ -720,33 +704,16 @@ const NewHomePage = () => {
             <h2 className="text-4xl font-bold mb-4">GET IN TOUCH</h2>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-12">
-            <div>
-              <h3 className="text-2xl font-bold mb-6">Go AIz Technologies</h3>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <MapPin className="h-5 w-5 text-blue-400" />
-                  <span>Vadodara, Gujarat, India - 390020</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Mail className="h-5 w-5 text-blue-400" />
-                  <span>Email: sales@goaiz.com</span>
-                </div>
-
-              </div>
-            </div>
-            
-            <div className="text-center md:text-right">
-              <p className="text-gray-300 mb-4">
-                Ready to transform your business? Let's discuss your project requirements.
-              </p>
-              <button 
-                onClick={handleGetStartedClick}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
-              >
-                Start Your Project
-              </button>
-            </div>
+          <div className="text-center">
+            <p className="text-gray-300 mb-6 text-lg">
+              Ready to transform your business? Let's discuss your project requirements.
+            </p>
+            <button 
+              onClick={handleGetStartedClick}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
+            >
+              Start Your Project
+            </button>
           </div>
         </div>
       </section>
@@ -780,11 +747,6 @@ const NewHomePage = () => {
                      Merchants Pro
                    </Link>
                  </li>
-                 <li>
-                   <a href="#services" className="hover:text-white transition-colors">
-                     Services
-                   </a>
-                 </li>
                </ul>
              </div>
 
@@ -815,8 +777,8 @@ const NewHomePage = () => {
                <h4 className="text-lg font-semibold mb-4">Contact</h4>
                <ul className="space-y-2 text-sm text-gray-300">
                  <li>
-                   <a href="mailto:support@goaiz.com" className="hover:text-white transition-colors">
-                     support@goaiz.com
+                   <a href="mailto:sales@goaiz.com" className="hover:text-white transition-colors">
+                     sales@goaiz.com
                    </a>
                  </li>
                </ul>
