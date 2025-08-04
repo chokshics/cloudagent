@@ -221,66 +221,56 @@ const HomePage = () => {
               </p>
             </div>
 
-            {/* Quick Links */}
-            <div className="text-center md:text-left">
-              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li>
-                  <Link to="/" className="hover:text-white transition-colors">
-                    Home
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/merchantspro" className="hover:text-white transition-colors">
-                    Merchants Pro
-                  </Link>
-                </li>
-                <li>
-                  <a href="#features" className="hover:text-white transition-colors">
-                    Features
-                  </a>
-                </li>
-              </ul>
-            </div>
+                         {/* Quick Links */}
+             <div className="text-center md:text-left">
+               <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+               <ul className="space-y-2 text-sm text-gray-300">
+                 <li>
+                   <Link to="/" className="hover:text-white transition-colors">
+                     Home
+                   </Link>
+                 </li>
+                 <li>
+                   <Link to="/merchantspro" className="hover:text-white transition-colors">
+                     Merchants Pro
+                   </Link>
+                 </li>
+               </ul>
+             </div>
 
-            {/* Legal */}
-            <div className="text-center md:text-left">
-              <h4 className="text-lg font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li>
-                  <Link to="/privacy-policy" className="hover:text-white transition-colors">
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/terms-of-use" className="hover:text-white transition-colors">
-                    Terms of Use
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/cookie-policy" className="hover:text-white transition-colors">
-                    Cookie Policy
-                  </Link>
-                </li>
-              </ul>
-            </div>
+                         {/* Legal */}
+             <div className="text-center md:text-left">
+               <h4 className="text-lg font-semibold mb-4">Legal</h4>
+               <ul className="space-y-2 text-sm text-gray-300">
+                 <li>
+                   <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                     Privacy Policy
+                   </a>
+                 </li>
+                 <li>
+                   <a href="/terms-of-use" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                     Terms of Use
+                   </a>
+                 </li>
+                 <li>
+                   <a href="/cookie-policy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                     Cookie Policy
+                   </a>
+                 </li>
+               </ul>
+             </div>
 
-            {/* Contact */}
-            <div className="text-center md:text-left">
-              <h4 className="text-lg font-semibold mb-4">Contact</h4>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li>
-                  <a href="mailto:support@goaiz.com" className="hover:text-white transition-colors">
-                    support@goaiz.com
-                  </a>
-                </li>
-                <li>
-                  <a href="tel:+1234567890" className="hover:text-white transition-colors">
-                    +1 (234) 567-890
-                  </a>
-                </li>
-              </ul>
-            </div>
+                         {/* Contact */}
+             <div className="text-center md:text-left">
+               <h4 className="text-lg font-semibold mb-4">Contact</h4>
+               <ul className="space-y-2 text-sm text-gray-300">
+                 <li>
+                   <a href="mailto:support@goaiz.com" className="hover:text-white transition-colors">
+                     support@goaiz.com
+                   </a>
+                 </li>
+               </ul>
+             </div>
           </div>
 
           {/* Copyright */}

@@ -197,11 +197,7 @@ const CookieConsent = () => {
                 </p>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="font-medium">Email:</p>
-                  <p>privacy@goaiz.com</p>
-                  <p className="font-medium mt-2">Address:</p>
-                  <p>Go AIz Technologies<br />
-                  [Your Business Address]<br />
-                  [City, State, ZIP]</p>
+                  <p>support@goaiz.com</p>
                 </div>
               </div>
             </section>
