@@ -1,0 +1,34 @@
+User-agent: *
+Allow: /
+
+# Allow crawling of main pages
+Allow: /
+Allow: /merchantspro
+Allow: /privacy-policy
+Allow: /terms-of-use
+Allow: /cookie-policy
+
+# Disallow admin and private areas
+Disallow: /dashboard
+Disallow: /login
+Disallow: /subscription
+Disallow: /subscription-usd
+Disallow: /promotions
+Disallow: /mobile-numbers
+Disallow: /whatsapp-campaigns
+Disallow: /reports
+Disallow: /api/
+
+# Disallow temporary and system files
+Disallow: /temp/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /*.txt$
+
+# Sitemap location (update with your actual sitemap URL)
+Sitemap: https://www.goaiz.com/sitemap.xml
+
+# Crawl delay (optional - tells crawlers to wait between requests)
+Crawl-delay: 1 
