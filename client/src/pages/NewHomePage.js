@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { 
   Code, 
   Cloud, 
@@ -17,6 +17,7 @@ import {
   X,
   Shield
 } from 'lucide-react';
+import CookieConsentPopup from '../components/CookieConsentPopup';
 
 const NewHomePage = () => {
   const navigate = useNavigate();
@@ -752,8 +753,82 @@ const NewHomePage = () => {
 
              {/* Footer */}
        <footer className="bg-gray-800 text-white py-8">
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-           <p>&copy; 2025 by Go AIz Technologies. All rights reserved.</p>
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+             {/* Company Info */}
+             <div className="text-center md:text-left">
+               <div className="flex items-center justify-center md:justify-start mb-4">
+                 <Shield className="h-8 w-8 text-blue-400 mr-2" />
+                 <h3 className="text-xl font-bold">Go AIz Technologies</h3>
+               </div>
+               <p className="text-gray-300 text-sm">
+                 Empowering businesses with innovative software solutions and digital transformation.
+               </p>
+             </div>
+
+             {/* Quick Links */}
+             <div className="text-center md:text-left">
+               <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+               <ul className="space-y-2 text-sm text-gray-300">
+                 <li>
+                   <Link to="/" className="hover:text-white transition-colors">
+                     Home
+                   </Link>
+                 </li>
+                 <li>
+                   <Link to="/merchantspro" className="hover:text-white transition-colors">
+                     Merchants Pro
+                   </Link>
+                 </li>
+                 <li>
+                   <a href="#services" className="hover:text-white transition-colors">
+                     Services
+                   </a>
+                 </li>
+               </ul>
+             </div>
+
+             {/* Legal */}
+             <div className="text-center md:text-left">
+               <h4 className="text-lg font-semibold mb-4">Legal</h4>
+               <ul className="space-y-2 text-sm text-gray-300">
+                 <li>
+                   <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                     Privacy Policy
+                   </a>
+                 </li>
+                 <li>
+                   <a href="/terms-of-use" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                     Terms of Use
+                   </a>
+                 </li>
+                 <li>
+                   <a href="/cookie-policy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                     Cookie Policy
+                   </a>
+                 </li>
+               </ul>
+             </div>
+
+             {/* Contact */}
+             <div className="text-center md:text-left">
+               <h4 className="text-lg font-semibold mb-4">Contact</h4>
+               <ul className="space-y-2 text-sm text-gray-300">
+                 <li>
+                   <a href="mailto:support@goaiz.com" className="hover:text-white transition-colors">
+                     support@goaiz.com
+                   </a>
+                 </li>
+               </ul>
+             </div>
+           </div>
+
+           {/* Copyright */}
+           <div className="border-t border-gray-700 mt-8 pt-8 text-center">
+             <p className="text-gray-300 text-sm">
+               &copy; 2025 Go AIz Technologies. All rights reserved.
+             </p>
+           </div>
          </div>
        </footer>
 
@@ -853,6 +928,9 @@ const NewHomePage = () => {
            </div>
          </div>
        )}
+
+       {/* Cookie Consent Popup */}
+       <CookieConsentPopup />
      </div>
    );
  };
