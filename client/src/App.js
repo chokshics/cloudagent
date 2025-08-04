@@ -11,6 +11,9 @@ import WhatsAppCampaigns from './pages/WhatsAppCampaigns';
 import SubscriptionPage from './pages/SubscriptionPage';
 import SubscriptionUSD from './pages/SubscriptionUSD';
 import Reports from './pages/Reports';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfUse from './pages/TermsOfUse';
+import CookieConsent from './pages/CookieConsent';
 import Layout from './components/Layout';
 import LoadingSpinner from './components/LoadingSpinner';
 
@@ -27,6 +30,9 @@ function App() {
       <Route path="/" element={<NewHomePage />} />
       <Route path="/merchantspro" element={<HomePage />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-of-use" element={<TermsOfUse />} />
+      <Route path="/cookie-policy" element={<CookieConsent />} />
       
       {/* Protected routes */}
       {user ? (

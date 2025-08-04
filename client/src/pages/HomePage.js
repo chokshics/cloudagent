@@ -208,8 +208,87 @@ const HomePage = () => {
 
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p>&copy; 2025 Go AIz Technologies. All rights reserved.</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Company Info */}
+            <div className="text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start mb-4">
+                <Store className="h-8 w-8 text-indigo-400 mr-2" />
+                <h3 className="text-xl font-bold">Merchants Pro</h3>
+              </div>
+              <p className="text-gray-300 text-sm">
+                Empowering businesses with WhatsApp marketing solutions.
+              </p>
+            </div>
+
+            {/* Quick Links */}
+            <div className="text-center md:text-left">
+              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+              <ul className="space-y-2 text-sm text-gray-300">
+                <li>
+                  <Link to="/" className="hover:text-white transition-colors">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/merchantspro" className="hover:text-white transition-colors">
+                    Merchants Pro
+                  </Link>
+                </li>
+                <li>
+                  <a href="#features" className="hover:text-white transition-colors">
+                    Features
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Legal */}
+            <div className="text-center md:text-left">
+              <h4 className="text-lg font-semibold mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm text-gray-300">
+                <li>
+                  <Link to="/privacy-policy" className="hover:text-white transition-colors">
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/terms-of-use" className="hover:text-white transition-colors">
+                    Terms of Use
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/cookie-policy" className="hover:text-white transition-colors">
+                    Cookie Policy
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div className="text-center md:text-left">
+              <h4 className="text-lg font-semibold mb-4">Contact</h4>
+              <ul className="space-y-2 text-sm text-gray-300">
+                <li>
+                  <a href="mailto:support@goaiz.com" className="hover:text-white transition-colors">
+                    support@goaiz.com
+                  </a>
+                </li>
+                <li>
+                  <a href="tel:+1234567890" className="hover:text-white transition-colors">
+                    +1 (234) 567-890
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="border-t border-gray-700 mt-8 pt-8 text-center">
+            <p className="text-gray-300 text-sm">
+              &copy; 2025 Go AIz Technologies. All rights reserved.
+            </p>
+          </div>
         </div>
       </footer>
 
