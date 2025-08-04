@@ -64,7 +64,7 @@ const NewHomePage = () => {
 
   const stats = [
     { number: "50+", label: "Projects Delivered" },
-    { number: "1000+", label: "Development Hours" },
+    { number: "10000+", label: "Development Hours" },
     { number: "15+", label: "Technologies Mastered" },
     { number: "10+", label: "Years Experience" },
     { number: "25+", label: "Happy Clients" }
@@ -204,7 +204,7 @@ const NewHomePage = () => {
                     <div className="text-sm text-gray-600">Years of Software Engineering Experience</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-600">1000+</div>
+                    <div className="text-2xl font-bold text-purple-600">10000+</div>
                     <div className="text-sm text-gray-600">Hours of Work Delivered</div>
                   </div>
                   <div className="text-center">
@@ -312,10 +312,7 @@ const NewHomePage = () => {
                     <span className="text-gray-700 text-sm">Performance optimization</span>
                   </div>
                 </div>
-                <div className="flex items-center text-blue-600 font-semibold text-sm">
-                  <span>Learn More</span>
-                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                </div>
+
               </div>
             </div>
             
@@ -348,10 +345,7 @@ const NewHomePage = () => {
                     <span className="text-gray-700 text-sm">Cost optimization</span>
                   </div>
                 </div>
-                <div className="flex items-center text-green-600 font-semibold text-sm">
-                  <span>Learn More</span>
-                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                </div>
+
               </div>
             </div>
             
@@ -384,10 +378,7 @@ const NewHomePage = () => {
                     <span className="text-gray-700 text-sm">Automation</span>
                   </div>
                 </div>
-                <div className="flex items-center text-purple-600 font-semibold text-sm">
-                  <span>Learn More</span>
-                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                </div>
+
               </div>
             </div>
             
@@ -420,10 +411,7 @@ const NewHomePage = () => {
                     <span className="text-gray-700 text-sm">Scalability planning</span>
                   </div>
                 </div>
-                <div className="flex items-center text-orange-600 font-semibold text-sm">
-                  <span>Learn More</span>
-                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                </div>
+
               </div>
             </div>
             
@@ -456,10 +444,7 @@ const NewHomePage = () => {
                     <span className="text-gray-700 text-sm">Enterprise solutions</span>
                   </div>
                 </div>
-                <div className="flex items-center text-red-600 font-semibold text-sm">
-                  <span>Learn More</span>
-                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                </div>
+
               </div>
             </div>
           </div>

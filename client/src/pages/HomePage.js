@@ -151,6 +151,12 @@ const HomePage = () => {
             </div>
             <div className="flex space-x-4">
               <button
+                onClick={() => navigate('/')}
+                className="px-4 py-2 rounded-md font-medium text-gray-600 hover:text-indigo-600"
+              >
+                Home
+              </button>
+              <button
                 onClick={() => setActiveTab('login')}
                 className={`px-4 py-2 rounded-md font-medium ${
                   activeTab === 'login'
@@ -424,7 +430,7 @@ const HomePage = () => {
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p>&copy; 2025 Go AIz. All rights reserved.</p>
+          <p>&copy; 2025 Go AIz Technologies. All rights reserved.</p>
         </div>
       </footer>
     </div>
