@@ -37,10 +37,18 @@ const requireSuperAdmin = (req, res, next) => {
   next();
 };
 
-// Middleware to check if user is admin or shopkeeper
+// Middleware to check if user is admin, shopkeeper, or merchant
 const requireShopkeeperOrAdmin = (req, res, next) => {
-  if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'shopkeeper')) {
-    return res.status(403).json({ error: 'Access denied. Admin or shopkeeper access required.' });
+  if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'shopkeeper' && req.user.role !== 'merchant')) {
+    return res.status(403).json({ error: 'Access denied. Admin, shopkeeper, or merchant access required.' });
+  }
+  next();
+};
+
+// Middleware specifically for subscription access (allows all authenticated users)
+const requireSubscriptionAccess = (req, res, next) => {
+  if (!req.user) {
+    return res.status(403).json({ error: 'Access denied. Authentication required.' });
   }
   next();
 };
@@ -68,6 +76,7 @@ module.exports = {
   requireAdmin,
   requireSuperAdmin,
   requireShopkeeperOrAdmin,
+  requireSubscriptionAccess,
   verifyUser,
   JWT_SECRET
 }; 

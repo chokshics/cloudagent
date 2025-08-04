@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const { getDatabase } = require('../database/init');
-const { authenticateToken, requireShopkeeperOrAdmin } = require('../middleware/auth');
+const { authenticateToken, requireSubscriptionAccess } = require('../middleware/auth');
 const nodemailer = require('nodemailer');
 
 // Apply authentication middleware to all routes
 router.use(authenticateToken);
-router.use(requireShopkeeperOrAdmin);
+router.use(requireSubscriptionAccess);
 
 // Get all subscription plans
 router.get('/plans', (req, res) => {
