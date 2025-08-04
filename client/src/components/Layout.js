@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { 
   Home, 
@@ -13,13 +13,12 @@ import {
   Crown,
   BarChart3
 } from 'lucide-react';
-import CurrencySelectionModal from './CurrencySelectionModal';
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showCurrencyModal, setShowCurrencyModal] = useState(false);
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -66,7 +65,12 @@ const Layout = ({ children }) => {
             {/* Subscription Button */}
             <button
               onClick={() => {
-                setShowCurrencyModal(true);
+                // Route based on user's country
+                if (user?.country === 'India') {
+                  navigate('/subscription');
+                } else {
+                  navigate('/subscription-usd');
+                }
                 setSidebarOpen(false);
               }}
               className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-left ${
@@ -106,7 +110,14 @@ const Layout = ({ children }) => {
             
             {/* Subscription Button */}
             <button
-              onClick={() => setShowCurrencyModal(true)}
+              onClick={() => {
+                // Route based on user's country
+                if (user?.country === 'India') {
+                  navigate('/subscription');
+                } else {
+                  navigate('/subscription-usd');
+                }
+              }}
               className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-left ${
                 isActive('/subscription') || isActive('/subscription-usd')
                   ? 'bg-primary-100 text-primary-900'
@@ -158,11 +169,6 @@ const Layout = ({ children }) => {
         </main>
       </div>
 
-      {/* Currency Selection Modal */}
-      <CurrencySelectionModal
-        isOpen={showCurrencyModal}
-        onClose={() => setShowCurrencyModal(false)}
-      />
     </div>
   );
 };
