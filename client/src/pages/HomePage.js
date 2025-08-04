@@ -219,6 +219,16 @@ const HomePage = () => {
         onClose={() => setShowRegistrationModal(false)}
         onRegistrationSuccess={() => {
           setActiveTab('login');
+          // Scroll to login section after successful registration
+          setTimeout(() => {
+            const loginSection = document.querySelector('.max-w-md.mx-auto');
+            if (loginSection) {
+              loginSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+              });
+            }
+          }, 100);
         }}
       />
     </div>

@@ -14,34 +14,34 @@ const SubscriptionUSD = () => {
     {
       id: 1,
       name: 'Free',
-      description: 'Perfect for getting started',
+      description: 'Basic plan with limited campaigns',
       price_usd: 0,
-      whatsapp_send_limit: 10,
-      mobile_number_limit: 10
+      whatsapp_send_limit: 1,
+      mobile_number_limit: 5
     },
     {
       id: 2,
       name: 'Starter',
-      description: 'Great for small businesses',
+      description: 'Perfect for small businesses',
       price_usd: 20,
-      whatsapp_send_limit: 100,
-      mobile_number_limit: 50
+      whatsapp_send_limit: 2,
+      mobile_number_limit: 25
     },
     {
       id: 3,
       name: 'Professional',
-      description: 'Ideal for growing businesses',
+      description: 'For growing businesses',
       price_usd: 50,
-      whatsapp_send_limit: 500,
+      whatsapp_send_limit: 5,
       mobile_number_limit: 100
     },
     {
       id: 4,
       name: 'Enterprise',
-      description: 'For large scale operations',
+      description: 'Unlimited campaigns for large businesses',
       price_usd: 100,
-      whatsapp_send_limit: 1000,
-      mobile_number_limit: 200
+      whatsapp_send_limit: 5,
+      mobile_number_limit: 250
     }
   ];
 

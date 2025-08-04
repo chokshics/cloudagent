@@ -151,7 +151,10 @@ const Layout = ({ children }) => {
                 <span className="text-sm font-medium text-gray-700">{user?.username}</span>
               </div>
               <button
-                onClick={logout}
+                onClick={() => {
+                  logout();
+                  window.location.href = 'https://www.goaiz.com/merchantspro';
+                }}
                 className="flex items-center gap-x-2 text-sm font-medium text-gray-700 hover:text-gray-900"
               >
                 <LogOut className="h-5 w-5" />
