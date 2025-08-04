@@ -83,7 +83,7 @@ const validateRegistration = [
   body('username').trim().notEmpty().withMessage('Username is required').isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
   body('password').notEmpty().withMessage('Password is required').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
   body('country').trim().notEmpty().withMessage('Country is required').isIn(['India', 'United States', 'Europe', 'Other']).withMessage('Please select a valid country'),
-  body('role').optional().isIn(['admin', 'shopkeeper']).withMessage('Invalid role')
+  body('role').optional().isIn(['admin', 'shopkeeper', 'merchant']).withMessage('Invalid role')
 ];
 
 const validateLogin = [
