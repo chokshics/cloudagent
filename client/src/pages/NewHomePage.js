@@ -133,13 +133,13 @@ const NewHomePage = () => {
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center py-1">
             <div className="flex items-center space-x-3">
-              <div className="h-24 overflow-hidden flex items-center">
+              <div className="h-20 overflow-hidden flex items-center">
                 <img 
                   src="/logo.png?v=2" 
                   alt="Go Alz Technologies Logo" 
-                  className="w-auto max-h-full object-contain"
+                  className="w-auto h-full object-contain"
                   aria-label="Go Alz Technologies Logo"
                 />
               </div>
