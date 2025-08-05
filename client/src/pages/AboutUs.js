@@ -51,39 +51,33 @@ const AboutUs = () => {
 
   const milestones = [
     {
-      year: "2015",
-      title: "Company Founded",
+      year: "2024",
+      title: "Journey Started",
       description: "Started with a vision to transform businesses through innovative technology solutions"
     },
     {
-      year: "2018",
+      year: "2024",
       title: "First Major Project",
       description: "Successfully delivered our first enterprise-level software solution"
     },
     {
-      year: "2020",
+      year: "2024",
       title: "Cloud Expertise",
       description: "Expanded services to include comprehensive cloud solutions and DevOps consulting"
     },
     {
-      year: "2022",
+      year: "2025",
       title: "AI Integration",
       description: "Began incorporating AI and machine learning capabilities into our solutions"
     },
     {
-      year: "2024",
+      year: "2025",
       title: "Global Expansion",
       description: "Serving clients across multiple continents with diverse technology needs"
     }
   ];
 
-  const teamStats = [
-    { number: "50+", label: "Expert Developers", icon: <Users className="w-6 h-6" /> },
-    { number: "100+", label: "Projects Delivered", icon: <CheckCircle className="w-6 h-6" /> },
-    { number: "10+", label: "Years Experience", icon: <Clock className="w-6 h-6" /> },
-    { number: "25+", label: "Happy Clients", icon: <Star className="w-6 h-6" /> },
-    { number: "15+", label: "Technologies", icon: <TrendingUp className="w-6 h-6" /> }
-  ];
+
 
   return (
     <div className="min-h-screen bg-white">
@@ -92,14 +86,14 @@ const AboutUs = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-1">
             <div className="flex items-center space-x-3">
-              <div className="h-20 overflow-hidden flex items-center">
+              <Link to="/" className="h-20 overflow-hidden flex items-center hover:opacity-80 transition-opacity">
                 <img 
                   src="/logo.png?v=2" 
                   alt="Go Alz Technologies Logo" 
-                  className="w-auto h-40 object-contain"
+                  className="w-auto h-40 object-contain cursor-pointer"
                   aria-label="Go Alz Technologies Logo"
                 />
-              </div>
+              </Link>
             </div>
             <div className="flex space-x-4">
               <Link
@@ -277,56 +271,9 @@ const AboutUs = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-4">Our Impact in Numbers</h2>
-            <p className="text-blue-100 text-xl">Delivering excellence across every project</p>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-            {teamStats.map((stat, index) => (
-              <div key={index} className="text-center group">
-                <div className="flex justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                    {stat.icon}
-                  </div>
-                </div>
-                <div className="text-3xl font-bold text-white mb-2">{stat.number}</div>
-                <div className="text-blue-100 text-sm">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">Ready to Transform Your Business?</h2>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Let's discuss how our innovative technology solutions can help your organization achieve its digital transformation goals.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center"
-              >
-                <span>Get Started Today</span>
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
-              <a
-                href="mailto:sales@goaiz.com"
-                className="bg-white text-blue-600 px-8 py-4 rounded-xl font-medium border-2 border-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center"
-              >
-                <span>Contact Us</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+
+
 
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-8">

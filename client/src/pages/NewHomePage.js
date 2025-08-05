@@ -135,14 +135,14 @@ const NewHomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-1">
             <div className="flex items-center space-x-3">
-              <div className="h-20 overflow-hidden flex items-center">
+              <Link to="/" className="h-20 overflow-hidden flex items-center hover:opacity-80 transition-opacity">
                 <img 
                   src="/logo.png?v=2" 
                   alt="Go Alz Technologies Logo" 
-                  className="w-auto h-40 object-contain"
+                  className="w-auto h-40 object-contain cursor-pointer"
                   aria-label="Go Alz Technologies Logo"
                 />
-              </div>
+              </Link>
             </div>
             <div className="flex space-x-4">
               <Link
