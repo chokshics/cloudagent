@@ -176,7 +176,7 @@ const NewHomePage = () => {
                   Trusted by Global Businesses
                 </div>
                
-               <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-6 leading-tight">
+               <h1 className="text-xl lg:text-2xl font-bold text-gray-900 mb-6 leading-tight">
                  AI-Driven Technology Partner for Building, Scaling & Innovating{' '}
                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                    Software Products
