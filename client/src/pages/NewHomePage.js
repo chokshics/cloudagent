@@ -173,14 +173,14 @@ const NewHomePage = () => {
                 </div>
                
                <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-                 Digital IT Partner for Your{' '}
+                 AI-Driven Technology Partner for Building, Scaling & Innovating{' '}
                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                   Business
+                   Software Products
                  </span>
                </h1>
                
                <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                 Looking for <span className="font-semibold text-blue-600">Digital Transformation</span> of your business? 
+                 Looking for <span className="font-semibold text-blue-600">Digital Transformation and AI enabled smart solutions</span> of your business? 
                  We provide comprehensive software engineering, cloud solutions, DevOps consulting, and product development 
                  services to help your business grow.
                </p>
