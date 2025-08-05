@@ -145,6 +145,12 @@ const NewHomePage = () => {
               </div>
             </div>
             <div className="flex space-x-4">
+              <Link
+                to="/about-us"
+                className="text-gray-600 hover:text-blue-600 px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                About Us
+              </Link>
               <button
                 onClick={handleMerchantsProClick}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center space-x-2"
@@ -767,6 +773,11 @@ const NewHomePage = () => {
                  <li>
                    <Link to="/" className="hover:text-white transition-colors">
                      Home
+                   </Link>
+                 </li>
+                 <li>
+                   <Link to="/about-us" className="hover:text-white transition-colors">
+                     About Us
                    </Link>
                  </li>
                  <li>

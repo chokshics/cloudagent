@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import NewHomePage from './pages/NewHomePage';
 import HomePage from './pages/HomePage';
+import AboutUs from './pages/AboutUs';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Promotions from './pages/Promotions';
@@ -29,6 +30,7 @@ function App() {
       {/* Public routes */}
       <Route path="/" element={<NewHomePage />} />
       <Route path="/merchantspro" element={<HomePage />} />
+      <Route path="/about-us" element={<AboutUs />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-of-use" element={<TermsOfUse />} />
