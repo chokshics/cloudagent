@@ -135,12 +135,10 @@ const NewHomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-3">
-              <img 
-                src="/logo.png" 
-                alt="Go Alz Technologies Logo" 
-                className="h-10 w-auto"
-                aria-label="Go Alz Technologies Logo"
-              />
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center" aria-label="Go AIz Technologies Logo">
+                <span className="text-white font-bold text-xl">G</span>
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900">Go AIz Technologies</h1>
             </div>
             <div className="flex space-x-4">
               <button
@@ -174,7 +172,7 @@ const NewHomePage = () => {
                   Trusted by Global Businesses
                 </div>
                
-               <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+               <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6 leading-tight">
                  AI-Driven Technology Partner for Building, Scaling & Innovating{' '}
                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                    Software Products
