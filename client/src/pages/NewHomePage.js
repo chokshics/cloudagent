@@ -139,7 +139,7 @@ const NewHomePage = () => {
                 <img 
                   src="/logo.png?v=2" 
                   alt="Go Alz Technologies Logo" 
-                  className="w-auto h-32 object-contain"
+                  className="w-auto h-40 object-contain"
                   aria-label="Go Alz Technologies Logo"
                 />
               </div>
