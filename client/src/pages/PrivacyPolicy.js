@@ -10,8 +10,12 @@ const PrivacyPolicy = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-3">
-              <Store className="h-8 w-8 text-indigo-600" />
-              <h1 className="text-2xl font-bold text-gray-900">Go AIz Technologies</h1>
+              <img 
+                src="/logo.png?v=2" 
+                alt="Go Alz Technologies Logo" 
+                className="h-8 w-auto"
+                aria-label="Go Alz Technologies Logo"
+              />
             </div>
             <Link
               to="/merchantspro"
