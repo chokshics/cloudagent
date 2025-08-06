@@ -323,7 +323,15 @@ const NewHomePage = () => {
                     <span className="text-gray-700 text-sm">Performance optimization</span>
                   </div>
                 </div>
-
+                <a 
+                  href="/software-engineering" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors group-hover:translate-x-1"
+                >
+                  Learn more
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </a>
               </div>
             </div>
             
@@ -356,13 +364,15 @@ const NewHomePage = () => {
                     <span className="text-gray-700 text-sm">Cost optimization</span>
                   </div>
                 </div>
-                <Link 
-                  to="/cloud-solutions" 
+                <a 
+                  href="/cloud-solutions" 
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center text-green-600 hover:text-green-700 font-medium transition-colors group-hover:translate-x-1"
                 >
                   Learn more
                   <ArrowRight className="w-4 h-4 ml-1" />
-                </Link>
+                </a>
               </div>
             </div>
             
@@ -395,13 +405,15 @@ const NewHomePage = () => {
                     <span className="text-gray-700 text-sm">Automation</span>
                   </div>
                 </div>
-                <Link 
-                  to="/devops-consulting" 
+                <a 
+                  href="/devops-consulting" 
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium transition-colors group-hover:translate-x-1"
                 >
                   Learn more
                   <ArrowRight className="w-4 h-4 ml-1" />
-                </Link>
+                </a>
               </div>
             </div>
             
@@ -434,40 +446,56 @@ const NewHomePage = () => {
                     <span className="text-gray-700 text-sm">Scalability planning</span>
                   </div>
                 </div>
-
+                <a 
+                  href="/product-engineering" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium transition-colors group-hover:translate-x-1"
+                >
+                  Learn more
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </a>
               </div>
             </div>
             
-            {/* Building New Software */}
+            {/* Software Quality Engineering */}
             <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-bl-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
               <div className="relative z-10">
                 <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Building2 className="w-8 h-8 text-white" />
+                  <Shield className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Building New Software</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Software Quality Engineering</h3>
                 <p className="text-gray-600 mb-6 leading-relaxed">
-                  Turn your ideas into powerful, scalable software solutions
+                  Ensure your software meets the highest quality standards with comprehensive testing and quality assurance
                 </p>
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform">
                     <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                    <span className="text-gray-700 text-sm">Custom applications</span>
+                    <span className="text-gray-700 text-sm">Automated testing</span>
                   </div>
                   <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-75">
                     <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                    <span className="text-gray-700 text-sm">Web platforms</span>
+                    <span className="text-gray-700 text-sm">Quality assurance</span>
                   </div>
                   <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-100">
                     <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
-                    <span className="text-gray-700 text-sm">Mobile apps</span>
+                    <span className="text-gray-700 text-sm">Performance testing</span>
                   </div>
                   <div className="flex items-center space-x-3 group-hover:translate-x-2 transition-transform delay-150">
                     <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
-                    <span className="text-gray-700 text-sm">Enterprise solutions</span>
+                    <span className="text-gray-700 text-sm">Security testing</span>
                   </div>
                 </div>
-
+                <a 
+                  href="/software-quality-engineering" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-red-600 hover:text-red-700 font-medium transition-colors group-hover:translate-x-1"
+                >
+                  Learn more
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </a>
               </div>
             </div>
           </div>

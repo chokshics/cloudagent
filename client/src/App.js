@@ -17,6 +17,9 @@ import TermsOfUse from './pages/TermsOfUse';
 import CookieConsent from './pages/CookieConsent';
 import CloudSolutions from './pages/CloudSolutions';
 import DevOpsConsulting from './pages/DevOpsConsulting';
+import SoftwareEngineering from './pages/SoftwareEngineering';
+import ProductEngineering from './pages/ProductEngineering';
+import SoftwareQualityEngineering from './pages/SoftwareQualityEngineering';
 import Layout from './components/Layout';
 import LoadingSpinner from './components/LoadingSpinner';
 
@@ -35,6 +38,9 @@ function App() {
       <Route path="/about-us" element={<AboutUs />} />
       <Route path="/cloud-solutions" element={<CloudSolutions />} />
       <Route path="/devops-consulting" element={<DevOpsConsulting />} />
+      <Route path="/software-engineering" element={<SoftwareEngineering />} />
+      <Route path="/product-engineering" element={<ProductEngineering />} />
+      <Route path="/software-quality-engineering" element={<SoftwareQualityEngineering />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-of-use" element={<TermsOfUse />} />
