@@ -66,20 +66,20 @@ const NewHomePage = () => {
   const stats = [
     { 
       heading: "Tech Expertise", 
-      number: "25000+ hours of engineering excellence", 
-      label: "Experts in AWS, Azure, DevOps & More" 
+      number: "25,000+ Hours", 
+      label: "Engineering Excellence in AWS, Azure & DevOps" 
     },
     { 
-      heading: "Delivery & Reliability", 
-      number: "95% On-Time Project Delivery Rate", 
-      label: "99.9% Uptime Achieved for Managed Services Clients" 
+      heading: "Delivery Excellence", 
+      number: "95% On-Time", 
+      label: "Project Delivery with 99.9% Uptime" 
     },
     { number: "Technologies Mastered", label: "15+" },
     { number: "Years of Experience", label: "10+" },
     { 
       heading: "Global Reach", 
-      number: "Serving Startups to Enterprises Worldwide", 
-      label: "" 
+      number: "Startups to Enterprises", 
+      label: "Worldwide Client Base" 
     }
   ];
 
@@ -523,26 +523,23 @@ const NewHomePage = () => {
           
           <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
+              <div key={index} className="text-center group hover:transform hover:scale-105 transition-all duration-300">
                 {stat.heading && (
-                  <div className="text-lg font-semibold text-blue-200 mb-2">{stat.heading}</div>
+                  <div className="text-sm font-medium text-blue-200 mb-3 tracking-wide uppercase">{stat.heading}</div>
                 )}
-                <div className={`font-bold text-white mb-2 ${
-                  stat.number.includes('hours') || stat.number.includes('95%') || stat.number.includes('Serving') 
+                <div className={`font-bold text-white mb-3 leading-tight ${
+                  stat.number.includes('Hours') || stat.number.includes('On-Time') || stat.number.includes('Enterprises') 
                     ? 'text-lg' 
                     : stat.number.includes('Technologies') || stat.number.includes('Years')
-                    ? 'text-xl'
-                    : 'text-2xl'
+                    ? 'text-lg'
+                    : 'text-3xl'
                 }`}>
                   {stat.number}
                 </div>
                 {stat.label && stat.label !== "" && (
-                  <>
-                    <div className="flex justify-center mb-2">
-                      <div className="w-1 h-1 bg-blue-300 rounded-full"></div>
-                    </div>
-                    <div className="text-blue-100 text-sm">{stat.label}</div>
-                  </>
+                  <div className="text-blue-100 text-xs leading-relaxed max-w-full">
+                    {stat.label}
+                  </div>
                 )}
               </div>
             ))}
