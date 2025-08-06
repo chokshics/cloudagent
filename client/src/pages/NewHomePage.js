@@ -64,11 +64,23 @@ const NewHomePage = () => {
   ];
 
   const stats = [
-    { number: "50+", label: "Projects Delivered" },
-    { number: "10000+", label: "Development Hours" },
+    { 
+      heading: "Tech Expertise:", 
+      number: "25000+ hours of engineering excellence", 
+      label: "Experts in AWS, Azure, DevOps & More" 
+    },
+    { 
+      heading: "Delivery & Reliability", 
+      number: "95% On-Time Project Delivery Rate", 
+      label: "99.9% Uptime Achieved for Managed Services Clients" 
+    },
     { number: "15+", label: "Technologies Mastered" },
     { number: "10+", label: "Years Experience" },
-    { number: "25+", label: "Happy Clients" }
+    { 
+      heading: "Global Reach:", 
+      number: "Serving Startups to Enterprises Worldwide", 
+      label: "" 
+    }
   ];
 
   const handleMerchantsProClick = () => {
@@ -512,8 +524,13 @@ const NewHomePage = () => {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-4xl font-bold text-white mb-2">{stat.number}</div>
-                <div className="text-blue-100 text-sm">{stat.label}</div>
+                {stat.heading && (
+                  <div className="text-lg font-semibold text-blue-200 mb-2">{stat.heading}</div>
+                )}
+                <div className="text-2xl font-bold text-white mb-2">{stat.number}</div>
+                {stat.label && (
+                  <div className="text-blue-100 text-sm">{stat.label}</div>
+                )}
               </div>
             ))}
           </div>
