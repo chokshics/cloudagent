@@ -525,19 +525,19 @@ const NewHomePage = () => {
             {stats.map((stat, index) => (
               <div key={index} className="text-center group hover:transform hover:scale-105 transition-all duration-300">
                 {stat.heading && (
-                  <div className="text-sm font-medium text-blue-200 mb-3 tracking-wide uppercase">{stat.heading}</div>
+                  <div className="text-lg font-bold text-blue-200 mb-3">{stat.heading}</div>
                 )}
-                <div className={`font-bold text-white mb-3 leading-tight ${
+                <div className={`text-blue-100 leading-relaxed max-w-full mb-3 ${
                   stat.number.includes('Hours') || stat.number.includes('On-Time') || stat.number.includes('Enterprises') 
                     ? 'text-lg' 
                     : stat.number.includes('Technologies') || stat.number.includes('Years')
-                    ? 'text-lg'
-                    : 'text-3xl'
+                    ? 'text-3xl font-bold text-white'
+                    : 'text-3xl font-bold text-white'
                 }`}>
                   {stat.number}
                 </div>
                 {stat.label && stat.label !== "" && (
-                  <div className="text-blue-100 text-xs leading-relaxed max-w-full">
+                  <div className="text-blue-100 text-sm leading-relaxed max-w-full">
                     {stat.label}
                   </div>
                 )}
