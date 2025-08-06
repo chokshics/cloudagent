@@ -65,7 +65,7 @@ const NewHomePage = () => {
 
   const stats = [
     { 
-      heading: "Tech Expertise:", 
+      heading: "Tech Expertise", 
       number: "25000+ hours of engineering excellence", 
       label: "Experts in AWS, Azure, DevOps & More" 
     },
@@ -74,10 +74,10 @@ const NewHomePage = () => {
       number: "95% On-Time Project Delivery Rate", 
       label: "99.9% Uptime Achieved for Managed Services Clients" 
     },
-    { number: "15+", label: "Technologies Mastered" },
-    { number: "10+", label: "Years Experience" },
+    { number: "Technologies Mastered", label: "15+" },
+    { number: "Years of Experience", label: "10+" },
     { 
-      heading: "Global Reach:", 
+      heading: "Global Reach", 
       number: "Serving Startups to Enterprises Worldwide", 
       label: "" 
     }
@@ -527,9 +527,22 @@ const NewHomePage = () => {
                 {stat.heading && (
                   <div className="text-lg font-semibold text-blue-200 mb-2">{stat.heading}</div>
                 )}
-                <div className="text-2xl font-bold text-white mb-2">{stat.number}</div>
-                {stat.label && (
-                  <div className="text-blue-100 text-sm">{stat.label}</div>
+                <div className={`font-bold text-white mb-2 ${
+                  stat.number.includes('hours') || stat.number.includes('95%') || stat.number.includes('Serving') 
+                    ? 'text-lg' 
+                    : stat.number.includes('Technologies') || stat.number.includes('Years')
+                    ? 'text-xl'
+                    : 'text-2xl'
+                }`}>
+                  {stat.number}
+                </div>
+                {stat.label && stat.label !== "" && (
+                  <>
+                    <div className="flex justify-center mb-2">
+                      <div className="w-1 h-1 bg-blue-300 rounded-full"></div>
+                    </div>
+                    <div className="text-blue-100 text-sm">{stat.label}</div>
+                  </>
                 )}
               </div>
             ))}
