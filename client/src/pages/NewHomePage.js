@@ -356,7 +356,13 @@ const NewHomePage = () => {
                     <span className="text-gray-700 text-sm">Cost optimization</span>
                   </div>
                 </div>
-
+                <Link 
+                  to="/cloud-solutions" 
+                  className="inline-flex items-center text-green-600 hover:text-green-700 font-medium transition-colors group-hover:translate-x-1"
+                >
+                  Learn more
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Link>
               </div>
             </div>
             
@@ -389,7 +395,13 @@ const NewHomePage = () => {
                     <span className="text-gray-700 text-sm">Automation</span>
                   </div>
                 </div>
-
+                <Link 
+                  to="/devops-consulting" 
+                  className="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium transition-colors group-hover:translate-x-1"
+                >
+                  Learn more
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Link>
               </div>
             </div>
             

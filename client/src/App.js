@@ -15,6 +15,8 @@ import Reports from './pages/Reports';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfUse from './pages/TermsOfUse';
 import CookieConsent from './pages/CookieConsent';
+import CloudSolutions from './pages/CloudSolutions';
+import DevOpsConsulting from './pages/DevOpsConsulting';
 import Layout from './components/Layout';
 import LoadingSpinner from './components/LoadingSpinner';
 
@@ -31,6 +33,8 @@ function App() {
       <Route path="/" element={<NewHomePage />} />
       <Route path="/merchantspro" element={<HomePage />} />
       <Route path="/about-us" element={<AboutUs />} />
+      <Route path="/cloud-solutions" element={<CloudSolutions />} />
+      <Route path="/devops-consulting" element={<DevOpsConsulting />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-of-use" element={<TermsOfUse />} />
