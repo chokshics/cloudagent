@@ -533,7 +533,7 @@ const NewHomePage = () => {
             {stats.map((stat, index) => (
               <div key={index} className="text-center group hover:transform hover:scale-105 transition-all duration-300">
                 {stat.heading && (
-                  <div className="text-lg font-bold text-blue-200 mb-3">{stat.heading}</div>
+                  <div className="text-lg font-bold text-white mb-3">{stat.heading}</div>
                 )}
                 <div className={`text-blue-100 leading-relaxed max-w-full mb-3 ${
                   stat.number.includes('Hours') || stat.number.includes('On-Time') || stat.number.includes('Enterprises') || stat.number.includes('Technologies') || stat.number.includes('Years')
