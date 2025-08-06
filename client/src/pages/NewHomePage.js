@@ -74,8 +74,16 @@ const NewHomePage = () => {
       number: "95% On-Time", 
       label: "Project Delivery with 99.9% Uptime" 
     },
-    { number: "Technologies Mastered", label: "15+" },
-    { number: "Years of Experience", label: "10+" },
+    { 
+      heading: "Technologies Mastered", 
+      number: "15+ Technologies", 
+      label: "Expert Level Proficiency" 
+    },
+    { 
+      heading: "Years of Experience", 
+      number: "10+ Years", 
+      label: "Deep Industry Knowledge" 
+    },
     { 
       heading: "Global Reach", 
       number: "Startups to Enterprises", 
@@ -528,10 +536,8 @@ const NewHomePage = () => {
                   <div className="text-lg font-bold text-blue-200 mb-3">{stat.heading}</div>
                 )}
                 <div className={`text-blue-100 leading-relaxed max-w-full mb-3 ${
-                  stat.number.includes('Hours') || stat.number.includes('On-Time') || stat.number.includes('Enterprises') 
+                  stat.number.includes('Hours') || stat.number.includes('On-Time') || stat.number.includes('Enterprises') || stat.number.includes('Technologies') || stat.number.includes('Years')
                     ? 'text-lg' 
-                    : stat.number.includes('Technologies') || stat.number.includes('Years')
-                    ? 'text-3xl font-bold text-white'
                     : 'text-3xl font-bold text-white'
                 }`}>
                   {stat.number}
