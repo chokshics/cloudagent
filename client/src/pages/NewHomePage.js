@@ -215,11 +215,11 @@ const NewHomePage = () => {
                     <div className="text-sm text-gray-600">Years of Software Engineering Experience</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-600">10000+</div>
-                    <div className="text-sm text-gray-600">Hours of Work Delivered</div>
+                    <div className="text-2xl font-bold text-purple-600">Certified</div>
+                    <div className="text-sm text-gray-600">Professionals</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-indigo-600">24/7</div>
+                    <div className="text-2xl font-bold text-indigo-600">On time</div>
                     <div className="text-sm text-gray-600">Support</div>
                   </div>
                 </div>
@@ -324,7 +324,7 @@ const NewHomePage = () => {
                   </div>
                 </div>
                 <a 
-                  href="/software-engineering" 
+                  href="/software-engineering#services" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors group-hover:translate-x-1"
@@ -365,7 +365,7 @@ const NewHomePage = () => {
                   </div>
                 </div>
                 <a 
-                  href="/cloud-solutions" 
+                  href="/cloud-solutions#services" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-green-600 hover:text-green-700 font-medium transition-colors group-hover:translate-x-1"
@@ -406,7 +406,7 @@ const NewHomePage = () => {
                   </div>
                 </div>
                 <a 
-                  href="/devops-consulting" 
+                  href="/devops-consulting#services" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium transition-colors group-hover:translate-x-1"
@@ -447,7 +447,7 @@ const NewHomePage = () => {
                   </div>
                 </div>
                 <a 
-                  href="/product-engineering" 
+                  href="/product-engineering#services" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium transition-colors group-hover:translate-x-1"
@@ -488,7 +488,7 @@ const NewHomePage = () => {
                   </div>
                 </div>
                 <a 
-                  href="/software-quality-engineering" 
+                  href="/software-quality-engineering#services" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-red-600 hover:text-red-700 font-medium transition-colors group-hover:translate-x-1"

@@ -287,7 +287,7 @@ const SoftwareEngineering = () => {
       </section>
 
       {/* Services Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+      <section id="services" className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-20 left-20 w-32 h-32 bg-blue-200 rounded-full opacity-10 animate-pulse"></div>
           <div className="absolute bottom-20 right-20 w-24 h-24 bg-purple-200 rounded-full opacity-15 animate-bounce"></div>
@@ -333,7 +333,7 @@ const SoftwareEngineering = () => {
       </section>
 
       {/* Technologies Section */}
-      <section className="py-20 bg-white relative overflow-hidden">
+      <section id="technologies" className="py-20 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Technologies We Use</h2>
@@ -359,7 +359,7 @@ const SoftwareEngineering = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+      <section id="benefits" className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose Our Software Engineering?</h2>
@@ -383,7 +383,7 @@ const SoftwareEngineering = () => {
       </section>
 
       {/* Process Section */}
-      <section className="py-20 bg-white relative overflow-hidden">
+      <section id="process" className="py-20 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Software Development Process</h2>
