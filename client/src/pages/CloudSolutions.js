@@ -177,7 +177,7 @@ const CloudSolutions = () => {
         </div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left side - Text content */}
             <div className="text-left">
               <div className="inline-flex items-center bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
@@ -224,44 +224,60 @@ const CloudSolutions = () => {
               </div>
             </div>
             
-            {/* Right side - Cloud illustration */}
+            {/* Right side - Promotional Image */}
             <div className="relative">
-              <div className="relative z-10 bg-white rounded-2xl shadow-2xl p-8 transform rotate-3 hover:rotate-0 transition-transform duration-500">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white">
-                    <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-3">
-                      <Cloud className="w-6 h-6" />
+              <div className="relative z-10 bg-white rounded-2xl shadow-2xl p-6 transform rotate-1 hover:rotate-0 transition-transform duration-500 overflow-hidden group">
+                <img 
+                  src="/cloud-solutions-promo.png" 
+                  alt="Scale Smarter with Cloud & DevOps - Professional cloud solutions and DevOps services" 
+                  className="w-full h-auto object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
+                  style={{ minHeight: '300px', maxHeight: '500px' }}
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }}
+                />
+                
+                {/* Fallback content if image fails to load */}
+                <div className="hidden bg-gradient-to-br from-blue-900 to-purple-900 rounded-xl p-6 lg:p-8 text-white" style={{ minHeight: '300px', maxHeight: '500px' }}>
+                  <div className="flex flex-col items-center justify-center h-full text-center">
+                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
+                      <Cloud className="w-8 h-8" />
                     </div>
-                    <h3 className="font-semibold mb-1">AWS</h3>
-                    <p className="text-blue-100 text-sm">Infrastructure</p>
-                  </div>
-                  <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white">
-                    <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-3">
-                      <Shield className="w-6 h-6" />
+                    <h3 className="text-2xl font-bold mb-2">Scale Smarter with Cloud & DevOps</h3>
+                    <p className="text-blue-100 mb-4">We help fast-growing software teams optimize and scale infrastructure on AWS & Azure</p>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="flex items-center">
+                        <CheckCircle className="w-4 h-4 mr-2 text-green-400" />
+                        <span>2,000+ Cloud Resources</span>
+                      </div>
+                      <div className="flex items-center">
+                        <CheckCircle className="w-4 h-4 mr-2 text-green-400" />
+                        <span>200+ CI/CD Pipelines</span>
+                      </div>
+                      <div className="flex items-center">
+                        <CheckCircle className="w-4 h-4 mr-2 text-green-400" />
+                        <span>10-50% Cost Savings</span>
+                      </div>
+                      <div className="flex items-center">
+                        <CheckCircle className="w-4 h-4 mr-2 text-green-400" />
+                        <span>15+ Secure Setups</span>
+                      </div>
                     </div>
-                    <h3 className="font-semibold mb-1">Security</h3>
-                    <p className="text-green-100 text-sm">Compliance</p>
-                  </div>
-                  <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white">
-                    <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-3">
-                      <Zap className="w-6 h-6" />
-                    </div>
-                    <h3 className="font-semibold mb-1">Performance</h3>
-                    <p className="text-purple-100 text-sm">Optimization</p>
-                  </div>
-                  <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-4 text-white">
-                    <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-3">
-                      <TrendingUp className="w-6 h-6" />
-                    </div>
-                    <h3 className="font-semibold mb-1">Scalability</h3>
-                    <p className="text-orange-100 text-sm">Growth</p>
                   </div>
                 </div>
+                
+                {/* Overlay with professional styling */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl"></div>
+                
+                {/* Floating elements for visual appeal */}
+                <div className="absolute -top-2 -right-2 w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full opacity-60 animate-bounce"></div>
+                <div className="absolute -bottom-2 -left-2 w-12 h-12 bg-gradient-to-r from-pink-400 to-purple-500 rounded-full opacity-50 animate-pulse"></div>
               </div>
               
-              {/* Floating elements */}
-              <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full opacity-80 animate-bounce"></div>
-              <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-r from-pink-400 to-purple-500 rounded-full opacity-60 animate-pulse"></div>
+              {/* Decorative elements */}
+              <div className="absolute top-1/2 left-0 w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-400 transform -translate-y-1/2 -translate-x-6"></div>
+              <div className="absolute bottom-1/2 right-0 w-24 h-1 bg-gradient-to-r from-purple-400 to-pink-400 transform translate-y-1/2 translate-x-6"></div>
             </div>
           </div>
         </div>

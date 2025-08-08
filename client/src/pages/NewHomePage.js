@@ -385,7 +385,7 @@ const NewHomePage = () => {
                   </div>
                 </div>
                 <a 
-                  href="/cloud-solutions#services" 
+                  href="/cloud-solutions" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-green-600 hover:text-green-700 font-medium transition-colors group-hover:translate-x-1"
