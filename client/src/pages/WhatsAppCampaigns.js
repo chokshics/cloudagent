@@ -361,7 +361,7 @@ const WhatsAppCampaigns = () => {
                         {log.promotion_title || 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {log.phone_number}
+                        {log.mobile_number}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span

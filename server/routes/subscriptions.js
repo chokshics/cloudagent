@@ -566,8 +566,8 @@ router.post('/complete-usd-payment', [
       }
     });
 
-    // Create email content
-    const emailContent = `
+    // Create email content for sales team
+    const salesEmailContent = `
       <h2>USD Subscription Payment Request</h2>
       <p><strong>Plan:</strong> ${planName}</p>
       <p><strong>Amount:</strong> $${priceUSD}</p>
@@ -582,18 +582,76 @@ router.post('/complete-usd-payment', [
       <p><em>This is a USD payment request for subscription via WISE. Please process the payment and send an invoice to the user.</em></p>
     `;
 
-    // Email options
-    const mailOptions = {
+    // Create invoice email content for user
+    const userInvoiceContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #4F46E5; margin: 0;">Invoice</h1>
+          <p style="color: #6B7280; margin: 5px 0;">CloudAgent Subscription</p>
+        </div>
+        
+        <div style="background-color: #F9FAFB; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h2 style="color: #1F2937; margin: 0 0 10px 0;">Subscription Details</h2>
+          <p style="margin: 5px 0;"><strong>Plan:</strong> ${planName}</p>
+          <p style="margin: 5px 0;"><strong>Amount:</strong> $${priceUSD}</p>
+          <p style="margin: 5px 0;"><strong>Billing Period:</strong> Monthly</p>
+          <p style="margin: 5px 0;"><strong>Payment Method:</strong> WISE Transfer</p>
+        </div>
+        
+        <div style="background-color: #F3F4F6; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h3 style="color: #1F2937; margin: 0 0 15px 0;">Payment Instructions</h3>
+          <p style="margin: 10px 0; color: #374151;">Please complete your payment using WISE transfer to the following details:</p>
+          <ul style="color: #374151; margin: 10px 0; padding-left: 20px;">
+            <li>Account Name: CloudAgent Solutions</li>
+            <li>Bank: [Bank Details will be provided separately]</li>
+            <li>Amount: $${priceUSD}</li>
+            <li>Reference: ${planName}-${Date.now()}</li>
+          </ul>
+        </div>
+        
+        <div style="background-color: #EFF6FF; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h3 style="color: #1E40AF; margin: 0 0 10px 0;">What's Included</h3>
+          <ul style="color: #1E40AF; margin: 10px 0; padding-left: 20px;">
+            <li>WhatsApp Campaign Management</li>
+            <li>Mobile Number Management</li>
+            <li>Promotion Management</li>
+            <li>Analytics and Reporting</li>
+            <li>24/7 Customer Support</li>
+          </ul>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E7EB;">
+          <p style="color: #6B7280; margin: 5px 0;">Thank you for choosing CloudAgent!</p>
+          <p style="color: #6B7280; margin: 5px 0;">If you have any questions, please contact us at support@goaiz.com</p>
+        </div>
+      </div>
+    `;
+
+    // Send email to sales team
+    const salesMailOptions = {
       from: process.env.EMAIL_USER || 'your-email@gmail.com',
       to: 'sales@goaiz.com',
       subject: `USD Subscription Payment Request - ${planName} Plan`,
-      html: emailContent
+      html: salesEmailContent
     };
 
-    // Send email
-    await transporter.sendMail(mailOptions);
+    // Send invoice email to user
+    const userMailOptions = {
+      from: process.env.EMAIL_USER || 'your-email@gmail.com',
+      to: userData.email,
+      subject: `Invoice - ${planName} Plan Subscription - $${priceUSD}`,
+      html: userInvoiceContent
+    };
+
+    // Send both emails
+    await Promise.all([
+      transporter.sendMail(salesMailOptions),
+      transporter.sendMail(userMailOptions)
+    ]);
 
     console.log(`✅ USD Payment Request Sent: User ${userData.first_name} ${userData.last_name}, Plan: ${planName}, Amount: $${priceUSD}`);
+    console.log(`✅ Invoice email sent to user: ${userData.email}`);
+    console.log(`✅ Sales notification sent to: sales@goaiz.com`);
 
     res.json({
       message: 'Payment request sent successfully. An invoice will be sent to your email soon.',

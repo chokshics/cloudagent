@@ -63,7 +63,7 @@ const SubscriptionUSD = () => {
     },
     {
       onSuccess: (data) => {
-        toast.success('Payment request sent! An invoice will be sent to your email soon.');
+        toast.success('Payment request sent! Check your email for the invoice with payment instructions.');
         queryClient.invalidateQueries('current-subscription');
         setSelectedPlan(null);
       },
@@ -258,7 +258,7 @@ const SubscriptionUSD = () => {
                   <div>
                     <h4 className="text-sm font-medium text-yellow-800 mb-2">Payment Process</h4>
                     <p className="text-sm text-yellow-700 mb-2">
-                      Payment in USD will be supported via WISE. An invoice will be sent to your registered email address soon to complete payment.
+                      Payment in USD is supported via WISE transfer. An invoice with payment instructions will be sent to your registered email address immediately after clicking "Complete Payment".
                     </p>
                     <p className="text-sm text-yellow-700">
                       Thank you for choosing our USD subscription option.

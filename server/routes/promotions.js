@@ -59,7 +59,13 @@ router.post('/', uploadMiddleware, [
   body('title').notEmpty().withMessage('Title is required'),
   body('description').optional(),
   body('discount_percentage').optional().isInt({ min: 0, max: 100 }).withMessage('Discount percentage must be between 0 and 100'),
-  body('discount_amount').optional().isFloat({ min: 0 }).withMessage('Discount amount must be positive'),
+  body('discount_amount').optional().custom((value) => {
+    if (value === '' || value === null || value === undefined) {
+      return true; // Allow empty values
+    }
+    const num = parseFloat(value);
+    return !isNaN(num) && num >= 0;
+  }).withMessage('Discount amount must be a positive number'),
   body('start_date').optional().isISO8601().withMessage('Start date must be a valid date'),
   body('end_date').optional().isISO8601().withMessage('End date must be a valid date'),
   body('is_active').optional().isBoolean().withMessage('is_active must be a boolean')
@@ -80,6 +86,12 @@ router.post('/', uploadMiddleware, [
       is_active = true
     } = req.body;
 
+    // Convert empty strings to null for optional fields
+    const processedDiscountPercentage = discount_percentage === '' ? null : discount_percentage;
+    const processedDiscountAmount = discount_amount === '' ? null : discount_amount;
+    const processedStartDate = start_date === '' ? null : start_date;
+    const processedEndDate = end_date === '' ? null : end_date;
+
     // Handle uploaded image
     let image_url = null;
     if (req.file) {
@@ -96,8 +108,8 @@ router.post('/', uploadMiddleware, [
         start_date, end_date, is_active, image_url, created_by
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
-      title, description, discount_percentage, discount_amount,
-      start_date, end_date, is_active, image_url, req.user.userId
+      title, description, processedDiscountPercentage, processedDiscountAmount,
+      processedStartDate, processedEndDate, is_active, image_url, req.user.userId
     ], function(err) {
       if (err) {
         return res.status(500).json({ error: 'Failed to create promotion' });
@@ -131,7 +143,13 @@ router.put('/:id', uploadMiddleware, [
   body('title').optional().notEmpty().withMessage('Title cannot be empty'),
   body('description').optional(),
   body('discount_percentage').optional().isInt({ min: 0, max: 100 }).withMessage('Discount percentage must be between 0 and 100'),
-  body('discount_amount').optional().isFloat({ min: 0 }).withMessage('Discount amount must be positive'),
+  body('discount_amount').optional().custom((value) => {
+    if (value === '' || value === null || value === undefined) {
+      return true; // Allow empty values
+    }
+    const num = parseFloat(value);
+    return !isNaN(num) && num >= 0;
+  }).withMessage('Discount amount must be a positive number'),
   body('start_date').optional().isISO8601().withMessage('Start date must be a valid date'),
   body('end_date').optional().isISO8601().withMessage('End date must be a valid date'),
   body('is_active').optional().isBoolean().withMessage('is_active must be a boolean')
@@ -168,7 +186,12 @@ router.put('/:id', uploadMiddleware, [
       Object.keys(req.body).forEach(key => {
         if (req.body[key] !== undefined) {
           updateFields.push(`${key} = ?`);
-          updateValues.push(req.body[key]);
+          // Convert empty strings to null for optional fields
+          let value = req.body[key];
+          if (value === '' && ['discount_percentage', 'discount_amount', 'start_date', 'end_date', 'description'].includes(key)) {
+            value = null;
+          }
+          updateValues.push(value);
         }
       });
 

@@ -110,8 +110,8 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
       setFormData({
         title: promotion.title || '',
         description: promotion.description || '',
-        discount_percentage: promotion.discount_percentage || '',
-        discount_amount: promotion.discount_amount || '',
+        discount_percentage: promotion.discount_percentage !== null ? promotion.discount_percentage : '',
+        discount_amount: promotion.discount_amount !== null ? promotion.discount_amount : '',
         start_date: promotion.start_date ? promotion.start_date.split('T')[0] : '',
         end_date: promotion.end_date ? promotion.end_date.split('T')[0] : '',
         is_active: promotion.is_active
@@ -209,10 +209,11 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
     // Prepare data for submission
     const submitData = {
       ...formData,
-      discount_percentage: formData.discount_percentage ? parseInt(formData.discount_percentage) : null,
-      discount_amount: formData.discount_amount ? parseFloat(formData.discount_amount) : null,
-      start_date: formData.start_date || null,
-      end_date: formData.end_date || null
+      discount_percentage: formData.discount_percentage && formData.discount_percentage.trim() !== '' ? parseInt(formData.discount_percentage) : null,
+      discount_amount: formData.discount_amount && formData.discount_amount.trim() !== '' ? parseFloat(formData.discount_amount) : null,
+      start_date: formData.start_date && formData.start_date.trim() !== '' ? formData.start_date : null,
+      end_date: formData.end_date && formData.end_date.trim() !== '' ? formData.end_date : null,
+      description: formData.description && formData.description.trim() !== '' ? formData.description : null
     };
 
     if (promotion) {
@@ -327,7 +328,7 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="discount_percentage" className="block text-sm font-medium text-gray-700">
-                    Discount Percentage
+                    Discount Percentage <span className="text-gray-500 text-xs">(Optional)</span>
                   </label>
                   <input
                     type="number"
@@ -345,7 +346,7 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
 
                 <div>
                   <label htmlFor="discount_amount" className="block text-sm font-medium text-gray-700">
-                    Discount Amount ($)
+                    Discount Amount ($) <span className="text-gray-500 text-xs">(Optional)</span>
                   </label>
                   <input
                     type="number"
