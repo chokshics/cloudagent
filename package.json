@@ -1,7 +1,7 @@
 {
-  "name": "admin-portal",
+  "name": "merchant-portal",
   "version": "1.0.0",
-  "description": "Admin portal with promotion management and WhatsApp campaigns",
+  "description": "Merchant portal with promotion management and WhatsApp campaigns",
   "main": "server/index.js",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
@@ -40,7 +40,7 @@
     "promotion",
     "whatsapp"
   ],
-  "author": "Admin Portal Team",
+  "author": "Merchant Portal Team",
   "license": "MIT"
 
 }
