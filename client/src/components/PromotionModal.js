@@ -209,11 +209,11 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
     // Prepare data for submission
     const submitData = {
       ...formData,
-      discount_percentage: formData.discount_percentage && formData.discount_percentage.trim() !== '' ? parseInt(formData.discount_percentage) : null,
-      discount_amount: formData.discount_amount && formData.discount_amount.trim() !== '' ? parseFloat(formData.discount_amount) : null,
-      start_date: formData.start_date && formData.start_date.trim() !== '' ? formData.start_date : null,
-      end_date: formData.end_date && formData.end_date.trim() !== '' ? formData.end_date : null,
-      description: formData.description && formData.description.trim() !== '' ? formData.description : null
+      discount_percentage: formData.discount_percentage && String(formData.discount_percentage).trim() !== '' ? parseInt(formData.discount_percentage) : null,
+      discount_amount: formData.discount_amount && String(formData.discount_amount).trim() !== '' ? parseFloat(formData.discount_amount) : null,
+      start_date: formData.start_date && String(formData.start_date).trim() !== '' ? formData.start_date : null,
+      end_date: formData.end_date && String(formData.end_date).trim() !== '' ? formData.end_date : null,
+      description: formData.description && String(formData.description).trim() !== '' ? formData.description : null
     };
 
     if (promotion) {
