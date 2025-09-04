@@ -129,7 +129,7 @@ router.get('/debug', (req, res) => {
 });
 
 // Helper function to send WhatsApp messages
-async function sendWhatsAppMessages(req, res, to, message, promotionId) {
+async function sendWhatsAppMessages(req, res, to, message, promotionId, imageUrl = null) {
   const results = [];
   const failedNumbers = [];
 
@@ -157,11 +157,25 @@ async function sendWhatsAppMessages(req, res, to, message, promotionId) {
       console.log(`📤 Sending WhatsApp to: ${phoneNumber} -> +${formattedNumber}`);
       console.log(`📤 From: whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`);
       
-      const twilioMessage = await twilioClient.messages.create({
+      // Prepare message data
+      const messageData = {
         from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
         to: `whatsapp:+${formattedNumber}`,
         body: message
-      });
+      };
+
+      // Add media URL if image is provided
+      if (imageUrl) {
+        // Convert relative URL to absolute URL
+        const fullImageUrl = imageUrl.startsWith('http') 
+          ? imageUrl 
+          : `${req.protocol}://${req.get('host')}${imageUrl}`;
+        
+        messageData.mediaUrl = [fullImageUrl];
+        console.log(`📷 Including image: ${fullImageUrl}`);
+      }
+      
+      const twilioMessage = await twilioClient.messages.create(messageData);
 
       // Log successful message
       const logQuery = `
@@ -277,8 +291,22 @@ router.post('/send', [
         });
       }
 
-      // Continue with sending messages
-      sendWhatsAppMessages(req, res, to, message, promotionId);
+      // Get promotion image if promotionId is provided
+      if (promotionId) {
+        const promotionQuery = `SELECT image_url FROM promotions WHERE id = ? AND created_by = ?`;
+        db.get(promotionQuery, [promotionId, req.user.userId], (err, promotion) => {
+          if (err) {
+            console.error('Error fetching promotion:', err);
+            return res.status(500).json({ error: 'Database error' });
+          }
+          
+          const imageUrl = promotion ? promotion.image_url : null;
+          sendWhatsAppMessages(req, res, to, message, promotionId, imageUrl);
+        });
+      } else {
+        // No promotion, send text only
+        sendWhatsAppMessages(req, res, to, message, promotionId, null);
+      }
     });
 
   } catch (error) {
