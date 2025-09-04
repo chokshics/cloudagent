@@ -60,7 +60,19 @@ const HomePage = () => {
                 Home
               </button>
               <button
-                onClick={() => setActiveTab('login')}
+                onClick={() => {
+                  setActiveTab('login');
+                  // Scroll to login section
+                  setTimeout(() => {
+                    const loginSection = document.querySelector('.max-w-md.mx-auto');
+                    if (loginSection) {
+                      loginSection.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                      });
+                    }
+                  }, 100);
+                }}
                 className={`px-4 py-2 rounded-md font-medium ${
                   activeTab === 'login'
                     ? 'bg-indigo-600 text-white'

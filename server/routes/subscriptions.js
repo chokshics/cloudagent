@@ -600,13 +600,31 @@ router.post('/complete-usd-payment', [
         
         <div style="background-color: #F3F4F6; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
           <h3 style="color: #1F2937; margin: 0 0 15px 0;">Payment Instructions</h3>
-          <p style="margin: 10px 0; color: #374151;">Please complete your payment using WISE transfer to the following details:</p>
-          <ul style="color: #374151; margin: 10px 0; padding-left: 20px;">
-            <li>Account Name: CloudAgent Solutions</li>
-            <li>Bank: [Bank Details will be provided separately]</li>
-            <li>Amount: $${priceUSD}</li>
-            <li>Reference: ${planName}-${Date.now()}</li>
-          </ul>
+          <p style="margin: 10px 0; color: #374151;">Please complete your payment using WISE transfer. Click the button below to start your payment:</p>
+          
+          <div style="text-align: center; margin: 20px 0;">
+            <a href="https://wise.com" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #00B9FF 0%, #9C27B0 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(0, 185, 255, 0.3);">
+              💳 Pay with WISE
+            </a>
+          </div>
+          
+          <div style="background-color: #FFFFFF; padding: 15px; border-radius: 6px; border-left: 4px solid #00B9FF; margin: 15px 0;">
+            <h4 style="color: #1F2937; margin: 0 0 10px 0; font-size: 14px;">Bank Transfer Details:</h4>
+            <ul style="color: #374151; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.6;">
+              <li><strong>Account Name:</strong> Chintan S Chokshi</li>
+              <li><strong>Bank Name:</strong> ICICI Bank</li>
+              <li><strong>Branch:</strong> RACE COURSE CIRCLE</li>
+              <li><strong>City:</strong> Vadodara</li>
+              <li><strong>Account Number:</strong> 000301513589</li>
+              <li><strong>IFSC Code:</strong> ICIC0000003</li>
+              <li><strong>Amount:</strong> $${priceUSD}</li>
+              <li><strong>Reference:</strong> ${planName}-${Date.now()}</li>
+            </ul>
+          </div>
+          
+          <p style="margin: 15px 0 0 0; color: #6B7280; font-size: 14px; font-style: italic;">
+            💡 <strong>Tip:</strong> Use the reference number when making the transfer to help us process your subscription faster.
+          </p>
         </div>
         
         <div style="background-color: #EFF6FF; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
