@@ -3,6 +3,7 @@ const { body, validationResult } = require('express-validator');
 const { getDatabase } = require('../database/init');
 const { authenticateToken, requireShopkeeperOrAdmin } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
+const { s3Upload, uploadToS3Middleware } = require('../middleware/s3Upload');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -296,66 +297,38 @@ router.delete('/:id', (req, res) => {
   });
 });
 
-// Upload image for goaiz.com template
-const goaizStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    // Create goaiz uploads directory if it doesn't exist
-    const uploadDir = path.join(__dirname, '..', 'uploads', 'goaiz');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    // Generate unique filename with timestamp
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const filename = file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname);
-    cb(null, filename);
-  }
-});
-
-const goaizUpload = multer({
-  storage: goaizStorage,
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed!'), false);
-    }
-  },
-  limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
-  }
-});
-
-router.post('/upload-goaiz-image', goaizUpload.single('image'), (req, res) => {
+// Upload image to S3 for goaiz.com template
+router.post('/upload-goaiz-image', s3Upload.single('image'), uploadToS3Middleware('uploads/goaiz'), (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file provided' });
     }
 
-    const filename = req.file.filename;
-    // Use your actual server domain instead of goaiz.com
-    const serverDomain = process.env.SERVER_DOMAIN || `${req.protocol}://${req.get('host')}`;
-    const goaizUrl = `${serverDomain}/uploads/goaiz/${filename}`;
+    if (!req.s3Upload) {
+      return res.status(500).json({ error: 'S3 upload failed' });
+    }
+
+    const { fileName, goaizUrl, s3Url } = req.s3Upload;
     
-    console.log('📷 Image uploaded for goaiz.com template:', {
-      filename: filename,
+    console.log('📷 Image uploaded to S3 for goaiz.com template:', {
+      fileName: fileName,
       goaizUrl: goaizUrl,
+      s3Url: s3Url,
       originalName: req.file.originalname,
       size: req.file.size
     });
 
     res.json({
       success: true,
-      filename: filename,
+      filename: fileName,
       goaizUrl: goaizUrl,
-      message: 'Image uploaded successfully for goaiz.com template'
+      s3Url: s3Url,
+      message: 'Image uploaded successfully to S3 for goaiz.com template'
     });
 
   } catch (error) {
-    console.error('Goaiz image upload error:', error);
-    res.status(500).json({ error: 'Failed to upload image for goaiz.com template' });
+    console.error('S3 goaiz image upload error:', error);
+    res.status(500).json({ error: 'Failed to upload image to S3 for goaiz.com template' });
   }
 });
 

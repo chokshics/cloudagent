@@ -604,7 +604,8 @@ function mapPromotionToTemplateVariables(promotion, req) {
   const imageUrl = promotion.goaiz_image_url || promotion.image_url;
   
   if (imageUrl) {
-    // Extract filename from the image URL
+    // Extract filename from the goaiz.com URL format
+    // Expected format: https://www.goaiz.com/uploads/goaiz/filename.jpg
     const imagePath = imageUrl.startsWith('http') 
       ? imageUrl 
       : imageUrl;
@@ -612,6 +613,12 @@ function mapPromotionToTemplateVariables(promotion, req) {
     // Get just the filename without extension (e.g., "worldmap" from "worldmap.jpg")
     const fullFilename = imagePath.split('/').pop() || '';
     imageFilename = fullFilename.replace(/\.[^/.]+$/, ''); // Remove file extension
+    
+    console.log('🖼️ Template image mapping:', {
+      originalUrl: imageUrl,
+      fullFilename: fullFilename,
+      imageFilename: imageFilename
+    });
   }
 
   // Build promotion description with template variables
