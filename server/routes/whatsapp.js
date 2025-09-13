@@ -255,8 +255,8 @@ async function sendWhatsAppMessages(req, res, to, message, promotionId, imageUrl
 
   // Increment WhatsApp campaigns count (1 campaign = 1 increment, regardless of number of recipients)
   db.run(
-    'UPDATE user_subscriptions SET whatsapp_sends_used = whatsapp_sends_used + 1 WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
-    [req.user.userId],
+    'UPDATE user_subscriptions SET whatsapp_sends_used = whatsapp_sends_used + 1 WHERE user_id = ? AND id = (SELECT id FROM user_subscriptions WHERE user_id = ? ORDER BY created_at DESC LIMIT 1)',
+    [req.user.userId, req.user.userId],
     function(err) {
       if (err) {
         console.error('Failed to update campaign count:', err);
@@ -646,16 +646,17 @@ function mapPromotionToTemplateVariables(promotion, req) {
   // {3} - Image filename (e.g., "test.jpg" for https://your-server.com/uploads/goaiz/{3})
   // {4} - Company name or additional info
   
+  // Build template variables - ensure all required variables are present
   const templateVariables = {
-    '1': '', // Keep empty as requested
-    '2': description.trim(),
-    '3': imageUrl, // Full URL
-    '4': '' // Keep empty as requested
+    '1': '', // Empty as requested
+    '2': description && description.trim() ? description.trim() : 'No description',
+    '3': imageUrl && imageUrl.trim() ? imageUrl.trim() : '',
+    '4': '' // Empty as requested
   };
 
   console.log('📋 Template variables mapped:', {
     variable1: templateVariables['1'] || '(empty)',
-    description: templateVariables['2'].substring(0, 100) + '...',
+    description: templateVariables['2'] ? templateVariables['2'].substring(0, 100) + '...' : '(empty)',
     imageUrl: templateVariables['3'] || 'No image',
     variable4: templateVariables['4'] || '(empty)'
   });
@@ -807,8 +808,8 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
 
   // Increment WhatsApp campaigns count
   db.run(
-    'UPDATE user_subscriptions SET whatsapp_sends_used = whatsapp_sends_used + 1 WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
-    [req.user.userId],
+    'UPDATE user_subscriptions SET whatsapp_sends_used = whatsapp_sends_used + 1 WHERE user_id = ? AND id = (SELECT id FROM user_subscriptions WHERE user_id = ? ORDER BY created_at DESC LIMIT 1)',
+    [req.user.userId, req.user.userId],
     function(err) {
       if (err) {
         console.error('Failed to update campaign count:', err);
