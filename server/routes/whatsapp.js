@@ -640,28 +640,35 @@ function mapPromotionToTemplateVariables(promotion, req) {
   }
 
   // Map to template variables
-  // Template expects:
-  // {1} - Promotion title
-  // {2} - Promotion description (with discount info)
-  // {3} - Image filename (e.g., "test.jpg" for https://your-server.com/uploads/goaiz/{3})
-  // {4} - Company name or additional info
+  // Template expects (based on user's example):
+  // {1} - Name (e.g., "John")
+  // {2} - Description (e.g., "Summer sale - 10% off")
+  // {3} - Company name (e.g., "Go Alz Technologies")
+  // {4} - Just the filename (e.g., "1757742343766-w29670-indmap.jpg")
   
   // Build template variables - ALL variables must be included for Twilio
-  // Template expects: {1}, {2}, {3}, {4}
+  
+  // Extract just the filename from the image URL
+  let imageFilename = '';
+  if (imageUrl && imageUrl.trim()) {
+    const fullFilename = imageUrl.split('/').pop() || '';
+    imageFilename = fullFilename; // Keep the full filename with extension
+  }
+
   const templateVariables = {
-    '1': promotion.title || 'Special Offer', // Use promotion title or default
+    '1': 'Customer', // Default name
     '2': description && description.trim() ? description.trim() : 'Special offer available!',
-    '3': imageUrl && imageUrl.trim() ? imageUrl.trim() : '',
-    '4': process.env.COMPANY_NAME || 'Goaiz' // Use company name from env or default
+    '3': process.env.COMPANY_NAME || 'Goaiz', // Company name
+    '4': imageFilename || 'placeholder.jpg' // Just the filename
   };
 
   console.log('📋 Template variables mapped:', {
     variablesIncluded: Object.keys(templateVariables),
-    title: templateVariables['1'] || '(not included)',
+    name: templateVariables['1'] || '(not included)',
     description: templateVariables['2'] ? templateVariables['2'].substring(0, 100) + '...' : '(not included)',
-    imageUrl: templateVariables['3'] || '(not included)',
-    company: templateVariables['4'] || '(not included)',
-    note: 'All variables included as required by Twilio'
+    company: templateVariables['3'] || '(not included)',
+    filename: templateVariables['4'] || '(not included)',
+    note: 'Variables mapped according to template: {1}=name, {2}=description, {3}=company, {4}=filename'
   });
 
   return templateVariables;
@@ -688,6 +695,9 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
       console.log(`📤 Sending WhatsApp template to: ${phoneNumber} -> +${formattedNumber}`);
       console.log(`📤 Template: ${templateName}`);
       console.log(`📤 Content Variables:`, JSON.stringify(templateParams, null, 2));
+      console.log(`📤 Content Variables Type:`, typeof templateParams);
+      console.log(`📤 Content Variables Keys:`, Object.keys(templateParams));
+      console.log(`📤 Content Variables Values:`, Object.values(templateParams));
       
       // Prepare template message data
       // Check if template has media (image/document) in variables
@@ -706,7 +716,7 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
             from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
             to: `whatsapp:+${formattedNumber}`,
             contentSid: templateName,
-            contentVariables: templateParams,
+            contentVariables: JSON.stringify(templateParams),
             // For image templates, the media URL should be in contentVariables, not separate media field
             // Remove the media field and let the template handle the image via {3} variable
           };
@@ -716,7 +726,7 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
             from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
             to: `whatsapp:+${formattedNumber}`,
             contentSid: templateName,
-            contentVariables: templateParams,
+            contentVariables: JSON.stringify(templateParams),
             // For document templates, the media URL should be in contentVariables, not separate media field
             // Remove the media field and let the template handle the document via {3} variable
           };
@@ -730,11 +740,11 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
       } else {
         // Template without media - use standard format
         messageData = {
-        from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
-        to: `whatsapp:+${formattedNumber}`,
+          from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+          to: `whatsapp:+${formattedNumber}`,
           contentSid: templateName,
-        contentVariables: templateParams
-      };
+          contentVariables: JSON.stringify(templateParams)
+        };
         
         console.log('📝 Template without media:', {
           templateSid: templateName,
@@ -743,6 +753,8 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
       }
       
       console.log('📤 Final message data being sent to Twilio:', JSON.stringify(messageData, null, 2));
+      console.log('📤 Content Variables in messageData:', JSON.stringify(messageData.contentVariables, null, 2));
+      console.log('📤 Content Variables type:', typeof messageData.contentVariables);
       
       const twilioMessage = await twilioClient.messages.create(messageData);
       
