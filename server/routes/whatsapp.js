@@ -660,11 +660,17 @@ function mapPromotionToTemplateVariables(promotion, req) {
     imageFilename = 'placeholder.jpg';
   }
 
+  // Ensure we have a valid filename
+  if (!imageFilename || imageFilename === 'Goaiz' || imageFilename.length < 5) {
+    console.log('⚠️ Invalid filename detected, using placeholder:', imageFilename);
+    imageFilename = 'placeholder.jpg';
+  }
+
   const templateVariables = {
     '1': 'Customer', // Default name
     '2': description && description.trim() ? description.trim() : 'Special offer available!',
     '3': process.env.COMPANY_NAME || 'Goaiz', // Company name
-    '4': imageFilename || 'placeholder.jpg' // Just the filename
+    '4': imageFilename // Just the filename
   };
 
   console.log('📋 Template variables mapped:', {
