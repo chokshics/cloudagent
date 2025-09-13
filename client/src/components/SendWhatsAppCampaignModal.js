@@ -344,8 +344,8 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                           placeholder="Enter your Twilio template SID"
                         />
                         <p className="text-xs text-gray-500 mt-1">
-                          Template format: https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{3}.jpg<br/>
-                          Variables: Title → {1}, Description → {2}, Image filename (no ext) → {3}, Company → {4}
+                          Template format: https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{3}<br/>
+                          Variables: {1} → (empty), Description → {2}, Image filename → {3}, {4} → (empty)
                         </p>
                       </div>
                     ) : (
@@ -378,7 +378,7 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                           </div>
                           <div className="grid grid-cols-2 gap-2 text-xs">
                             <div className="bg-white p-2 rounded border">
-                              <span className="font-medium">{1}:</span> {promotion.title}
+                              <span className="font-medium">{1}:</span> (empty - not used)
                             </div>
                             <div className="bg-white p-2 rounded border">
                               <span className="font-medium">{2}:</span> {promotion.description?.substring(0, 30)}...
@@ -386,14 +386,14 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                             <div className="bg-white p-2 rounded border">
                               <span className="font-medium">{3}:</span> {
                                 promotion.goaiz_image_url 
-                                  ? promotion.goaiz_image_url.split('/').pop().replace(/\.[^/.]+$/, '') 
+                                  ? promotion.goaiz_image_url.split('/').pop()
                                   : promotion.image_url 
-                                    ? promotion.image_url.split('/').pop().replace(/\.[^/.]+$/, '') 
+                                    ? promotion.image_url.split('/').pop()
                                     : 'No Image'
                               }
                             </div>
                             <div className="bg-white p-2 rounded border">
-                              <span className="font-medium">{4}:</span> Cloud Solutions
+                              <span className="font-medium">{4}:</span> (empty - not used)
                             </div>
                           </div>
                           <div className="text-xs text-blue-700">

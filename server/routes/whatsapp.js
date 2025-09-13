@@ -647,17 +647,17 @@ function mapPromotionToTemplateVariables(promotion, req) {
   // {4} - Company name or additional info
   
   const templateVariables = {
-    '1': promotion.title,
+    '1': '', // Keep empty as requested
     '2': description.trim(),
-    '3': imageFilename, // Just the filename, not full URL
-    '4': process.env.COMPANY_NAME || 'Cloud Solutions'
+    '3': imageUrl, // Full URL
+    '4': '' // Keep empty as requested
   };
 
   console.log('📋 Template variables mapped:', {
-    title: templateVariables['1'],
+    variable1: templateVariables['1'] || '(empty)',
     description: templateVariables['2'].substring(0, 100) + '...',
-    imageFilename: templateVariables['3'] || 'No image',
-    company: templateVariables['4']
+    imageUrl: templateVariables['3'] || 'No image',
+    variable4: templateVariables['4'] || '(empty)'
   });
 
   return templateVariables;
@@ -696,28 +696,24 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
         const isImage = mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i);
         
         if (isImage) {
-          // Image template
+          // Image template - use the correct Twilio format
           messageData = {
             from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
             to: `whatsapp:+${formattedNumber}`,
             contentSid: templateName,
             contentVariables: templateParams,
-            media: [{
-              type: 'image',
-              link: mediaUrl
-            }]
+            // For image templates, the media URL should be in contentVariables, not separate media field
+            // Remove the media field and let the template handle the image via {3} variable
           };
         } else {
-          // Document template
+          // Document template - use the correct Twilio format
           messageData = {
             from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
             to: `whatsapp:+${formattedNumber}`,
             contentSid: templateName,
             contentVariables: templateParams,
-            media: [{
-              type: 'document',
-              link: mediaUrl
-            }]
+            // For document templates, the media URL should be in contentVariables, not separate media field
+            // Remove the media field and let the template handle the document via {3} variable
           };
         }
         
@@ -729,11 +725,11 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
       } else {
         // Template without media - use standard format
         messageData = {
-          from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
-          to: `whatsapp:+${formattedNumber}`,
+        from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+        to: `whatsapp:+${formattedNumber}`,
           contentSid: templateName,
-          contentVariables: templateParams
-        };
+        contentVariables: templateParams
+      };
         
         console.log('📝 Template without media:', {
           templateSid: templateName,
@@ -870,13 +866,13 @@ router.get('/validate-template/:templateSid', async (req, res) => {
         'Verify template is approved by WhatsApp'
       ],
       correctFormat: {
-        body: '🎉 {1}\\n\\n{2}\\n\\n_Reply STOP to unsubscribe_',
-        mediaUrl: 'https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{3}.jpg',
+        body: 'Hi {1}, check out our latest promotion: {2}\\n{4}\\nReply STOP to unsubscribe',
+        mediaUrl: 'https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{3}',
         variables: {
-          '1': 'Promotion Title',
+          '1': '(empty - not used)',
           '2': 'Promotion Description with discount info',
-          '3': 'Image filename without extension (e.g., 1757739134998-xeer4p-wmap)',
-          '4': 'Company Name'
+          '3': 'Image filename (e.g., 1757742343766-w29670-indmap.jpg)',
+          '4': '(empty - not used)'
         }
       }
     };
