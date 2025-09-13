@@ -150,7 +150,7 @@ router.post('/', uploadMiddleware, [
 });
 
 // Update a promotion
-router.put('/:id', uploadMiddleware, [
+router.put('/:id', s3Upload.single('image'), uploadToS3Middleware('uploads/goaiz'), [
   body('title').optional().notEmpty().withMessage('Title cannot be empty'),
   body('description').optional(),
   body('discount_percentage').optional().isInt({ min: 0, max: 100 }).withMessage('Discount percentage must be between 0 and 100'),
@@ -171,6 +171,23 @@ router.put('/:id', uploadMiddleware, [
       return res.status(400).json({ errors: errors.array() });
     }
 
+    // Check if S3 upload failed
+    if (req.file && !req.s3Upload) {
+      console.log('❌ S3 upload failed for promotion update:', {
+        hasFile: !!req.file,
+        hasS3Upload: !!req.s3Upload,
+        fileName: req.file ? req.file.originalname : 'no file'
+      });
+      return res.status(500).json({ error: 'Failed to upload image to S3' });
+    }
+
+    console.log('📤 Promotion update request:', {
+      promotionId: req.params.id,
+      hasFile: !!req.file,
+      hasS3Upload: !!req.s3Upload,
+      body: req.body
+    });
+
     const promotionId = req.params.id;
     const db = getDatabase();
 
@@ -188,11 +205,18 @@ router.put('/:id', uploadMiddleware, [
       let image_url = null;
       let goaiz_image_url = null;
       
-      if (req.file) {
-        image_url = `/uploads/${req.file.filename}`;
+      if (req.file && req.s3Upload) {
+        // Image uploaded to S3
+        image_url = req.s3Upload.s3Url;
+        goaiz_image_url = req.s3Upload.goaizUrl;
+        console.log('📤 Image uploaded to S3:', {
+          fileName: req.s3Upload.fileName,
+          s3Url: req.s3Upload.s3Url,
+          goaizUrl: req.s3Upload.goaizUrl
+        });
       }
       
-      // Handle goaiz image URL if provided
+      // Handle goaiz image URL if provided in request body
       if (req.body.goaiz_image_url) {
         goaiz_image_url = req.body.goaiz_image_url;
       }
