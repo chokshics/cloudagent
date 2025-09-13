@@ -646,6 +646,7 @@ function mapPromotionToTemplateVariables(promotion, req) {
   // {3} - Company name (e.g., "Go Alz Technologies")
   // {4} - Just the filename (e.g., "1757742343766-w29670-indmap.jpg")
   
+<<<<<<< HEAD
   // Build template variables - ALL variables must be included for Twilio
   
   // Extract just the filename from the image URL
@@ -669,6 +670,31 @@ function mapPromotionToTemplateVariables(promotion, req) {
     company: templateVariables['3'] || '(not included)',
     filename: templateVariables['4'] || '(not included)',
     note: 'Variables mapped according to template: {1}=name, {2}=description, {3}=company, {4}=filename'
+=======
+  // Build template variables - only include variables that have content
+  // Based on user request: {1} and {4} should be empty, but Twilio doesn't allow empty strings
+  // So we'll only include variables that are actually used
+  const templateVariables = {};
+  
+  // Only include description if it exists
+  if (description && description.trim()) {
+    templateVariables['2'] = description.trim();
+  }
+  
+  // Only include image URL if it exists
+  if (imageUrl && imageUrl.trim()) {
+    templateVariables['3'] = imageUrl.trim();
+  }
+  
+  // Note: Variables {1} and {4} are intentionally omitted as requested by user
+  // If the template requires them, we'll need to provide non-empty values
+
+  console.log('📋 Template variables mapped:', {
+    variablesIncluded: Object.keys(templateVariables),
+    description: templateVariables['2'] ? templateVariables['2'].substring(0, 100) + '...' : '(not included)',
+    imageUrl: templateVariables['3'] || '(not included)',
+    note: 'Only non-empty variables included. Variables {1} and {4} omitted as requested'
+>>>>>>> parent of 0d0c082e (commit)
   });
 
   return templateVariables;
