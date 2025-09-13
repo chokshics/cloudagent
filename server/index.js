@@ -5,30 +5,13 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
 
-// Load environment variables
+// Load environment variables - simplified approach
 console.log('🔧 Loading environment variables...');
-console.log('Current working directory:', process.cwd());
-console.log('Process ID:', process.pid);
-console.log('Parent process ID:', process.ppid);
 
-// Try to load .env file with error handling
-try {
-  const dotenv = require('dotenv');
-  const dotenvResult = dotenv.config();
-  
-  if (dotenvResult.error) {
-    console.log('⚠️  .env file not found or error loading:', dotenvResult.error.message);
-    console.log('📝 Using system environment variables...');
-  } else {
-    console.log('✅ .env file loaded successfully');
-    if (dotenvResult.parsed) {
-      console.log('📋 Environment variables loaded:', Object.keys(dotenvResult.parsed).length);
-    }
-  }
-} catch (error) {
-  console.log('⚠️  Error loading .env file:', error.message);
-  console.log('📝 Using system environment variables...');
-}
+// Simple dotenv loading without complex error handling
+require('dotenv').config();
+
+console.log('✅ Environment variables loaded');
 
 // Set default environment variables if not present
 if (!process.env.NODE_ENV) {
