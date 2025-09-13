@@ -8,25 +8,26 @@ const fs = require('fs');
 // Load environment variables
 console.log('🔧 Loading environment variables...');
 console.log('Current working directory:', process.cwd());
+console.log('Process ID:', process.pid);
+console.log('Parent process ID:', process.ppid);
 
 // Try to load .env file with error handling
-let dotenvResult;
 try {
-  dotenvResult = require('dotenv').config();
-  console.log('.env file exists:', fs.existsSync('.env'));
+  const dotenv = require('dotenv');
+  const dotenvResult = dotenv.config();
   
   if (dotenvResult.error) {
-    console.error('❌ Error loading .env file:', dotenvResult.error);
-    console.log('⚠️  Continuing without .env file...');
+    console.log('⚠️  .env file not found or error loading:', dotenvResult.error.message);
+    console.log('📝 Using system environment variables...');
   } else {
     console.log('✅ .env file loaded successfully');
     if (dotenvResult.parsed) {
-      console.log('Environment variables found:', Object.keys(dotenvResult.parsed));
+      console.log('📋 Environment variables loaded:', Object.keys(dotenvResult.parsed).length);
     }
   }
 } catch (error) {
-  console.error('❌ Error in dotenv configuration:', error);
-  console.log('⚠️  Continuing without .env file...');
+  console.log('⚠️  Error loading .env file:', error.message);
+  console.log('📝 Using system environment variables...');
 }
 
 // Set default environment variables if not present
