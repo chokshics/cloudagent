@@ -38,8 +38,9 @@ async function uploadToS3(file, folder = 'uploads/goaiz') {
     // Upload to S3
     const uploadResult = await s3.upload(uploadParams).promise();
     
-    // Generate goaiz.com URL format
-    const goaizUrl = `https://www.goaiz.com/${folder}/${fileName}`;
+    // Generate S3 URL format since goaiz.com is not configured to serve S3 files
+    const goaizUrl = `https://testingbucketchints.s3.ap-south-1.amazonaws.com/${folder}/${fileName}`;
+    const s3DirectUrl = uploadResult.Location;
     
     console.log('✅ S3 upload successful:', {
       s3Url: uploadResult.Location,
@@ -52,6 +53,7 @@ async function uploadToS3(file, folder = 'uploads/goaiz') {
       fileName: fileName,
       s3Url: uploadResult.Location,
       goaizUrl: goaizUrl,
+      s3DirectUrl: s3DirectUrl,
       key: uploadParams.Key,
       bucket: uploadParams.Bucket
     };

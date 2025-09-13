@@ -597,15 +597,15 @@ router.post('/send-promotion-template', [
 
 // Helper function to map promotion data to template variables
 function mapPromotionToTemplateVariables(promotion, req) {
-  // Extract filename without extension for goaiz.com template format
+  // Extract filename without extension for template format
   let imageFilename = '';
   
   // Prefer goaiz_image_url if available, otherwise use regular image_url
   const imageUrl = promotion.goaiz_image_url || promotion.image_url;
   
   if (imageUrl) {
-    // Extract filename from the goaiz.com URL format
-    // Expected format: https://www.goaiz.com/uploads/goaiz/filename.jpg
+    // Extract filename from the URL format
+    // Expected format: https://www.goaiz.com/uploads/goaiz/filename.jpg or S3 URL
     const imagePath = imageUrl.startsWith('http') 
       ? imageUrl 
       : imageUrl;
@@ -617,7 +617,8 @@ function mapPromotionToTemplateVariables(promotion, req) {
     console.log('🖼️ Template image mapping:', {
       originalUrl: imageUrl,
       fullFilename: fullFilename,
-      imageFilename: imageFilename
+      imageFilename: imageFilename,
+      note: 'Using filename for template variable {3}'
     });
   }
 
@@ -794,9 +795,9 @@ router.get('/validate-template/:templateSid', async (req, res) => {
         {
           type: 'media_url_format',
           severity: 'error',
-          message: 'Media URL needs correct format with file extension',
+          message: 'Media URL needs correct S3 format with file extension',
           current: 'https://www.goaiz.com/{2}.jpg',
-          recommended: 'https://www.goaiz.com/uploads/goaiz/{3}.jpg'
+          recommended: 'https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{3}.jpg'
         },
         {
           type: 'template_structure',
@@ -814,11 +815,11 @@ router.get('/validate-template/:templateSid', async (req, res) => {
       ],
       correctFormat: {
         body: '🎉 {1}\\n\\n{2}\\n\\n_Reply STOP to unsubscribe_',
-        mediaUrl: 'https://www.goaiz.com/uploads/goaiz/{3}.jpg',
+        mediaUrl: 'https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{3}.jpg',
         variables: {
           '1': 'Promotion Title',
           '2': 'Promotion Description with discount info',
-          '3': 'Image filename without extension (e.g., worldmap)',
+          '3': 'Image filename without extension (e.g., 1757739134998-xeer4p-wmap)',
           '4': 'Company Name'
         }
       }
@@ -830,7 +831,7 @@ router.get('/validate-template/:templateSid', async (req, res) => {
       nextSteps: [
         '1. Go to Twilio Console → Messaging → Content Template Builder',
         '2. Find template with SID: ' + templateSid,
-        '3. Update Media URL to: https://www.goaiz.com/uploads/goaiz/{3}.jpg',
+        '3. Update Media URL to: https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{3}.jpg',
         '4. Update Body to include {2} variable',
         '5. Save and test the template'
       ]

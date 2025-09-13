@@ -344,7 +344,7 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                           placeholder="Enter your Twilio template SID"
                         />
                         <p className="text-xs text-gray-500 mt-1">
-                          Template format: https://www.goaiz.com/uploads/goaiz/{3}.jpg<br/>
+                          Template format: https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{3}.jpg<br/>
                           Variables: Title → {1}, Description → {2}, Image filename (no ext) → {3}, Company → {4}
                         </p>
                       </div>
