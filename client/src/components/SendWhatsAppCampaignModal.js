@@ -344,7 +344,8 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                           placeholder="Enter your Twilio template SID"
                         />
                         <p className="text-xs text-gray-500 mt-1">
-                          Template will map: Title → {1}, Description → {2}, Image → {3}, Company → {4}
+                          Template format: https://www.goaiz.com/{3}<br/>
+                          Variables: Title → {1}, Description → {2}, Image filename → {3}, Company → {4}
                         </p>
                       </div>
                     ) : (
@@ -383,7 +384,7 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                               <span className="font-medium">{2}:</span> {promotion.description?.substring(0, 30)}...
                             </div>
                             <div className="bg-white p-2 rounded border">
-                              <span className="font-medium">{3}:</span> {promotion.image_url ? 'Image URL' : 'No Image'}
+                              <span className="font-medium">{3}:</span> {promotion.image_url ? promotion.image_url.split('/').pop() : 'No Image'}
                             </div>
                             <div className="bg-white p-2 rounded border">
                               <span className="font-medium">{4}:</span> Cloud Solutions

@@ -60,6 +60,7 @@ const whatsappRoutes = require('./routes/whatsapp');
 const subscriptionRoutes = require('./routes/subscriptions');
 const reportsRoutes = require('./routes/reports');
 const contactRoutes = require('./routes/contact');
+const imageUploadRoutes = require('./routes/imageUpload');
 const { initDatabase } = require('./database/init');
 
 const app = express();
@@ -121,6 +122,7 @@ app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/images', imageUploadRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -3,6 +3,9 @@ const { body, validationResult } = require('express-validator');
 const { getDatabase } = require('../database/init');
 const { authenticateToken, requireShopkeeperOrAdmin } = require('../middleware/auth');
 const { uploadMiddleware } = require('../middleware/upload');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const router = express.Router();
 
@@ -271,6 +274,67 @@ router.delete('/:id', (req, res) => {
       res.json({ message: 'Promotion deleted successfully' });
     });
   });
+});
+
+// Upload image for goaiz.com template
+const goaizStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    // Create goaiz uploads directory if it doesn't exist
+    const uploadDir = path.join(__dirname, '..', 'uploads', 'goaiz');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    // Generate unique filename with timestamp
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const filename = file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname);
+    cb(null, filename);
+  }
+});
+
+const goaizUpload = multer({
+  storage: goaizStorage,
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  },
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
+
+router.post('/upload-goaiz-image', goaizUpload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    const filename = req.file.filename;
+    const goaizUrl = `https://www.goaiz.com/${filename}`;
+    
+    console.log('📷 Image uploaded for goaiz.com template:', {
+      filename: filename,
+      goaizUrl: goaizUrl,
+      originalName: req.file.originalname,
+      size: req.file.size
+    });
+
+    res.json({
+      success: true,
+      filename: filename,
+      goaizUrl: goaizUrl,
+      message: 'Image uploaded successfully for goaiz.com template'
+    });
+
+  } catch (error) {
+    console.error('Goaiz image upload error:', error);
+    res.status(500).json({ error: 'Failed to upload image for goaiz.com template' });
+  }
 });
 
 module.exports = router; 

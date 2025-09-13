@@ -597,12 +597,16 @@ router.post('/send-promotion-template', [
 
 // Helper function to map promotion data to template variables
 function mapPromotionToTemplateVariables(promotion, req) {
-  // Convert relative image URL to absolute URL
-  let imageUrl = null;
+  // Extract filename from image URL for goaiz.com template format
+  let imageFilename = '';
   if (promotion.image_url) {
-    imageUrl = promotion.image_url.startsWith('http') 
+    // Extract filename from the image URL
+    const imagePath = promotion.image_url.startsWith('http') 
       ? promotion.image_url 
-      : `${req.protocol}://${req.get('host')}${promotion.image_url}`;
+      : promotion.image_url;
+    
+    // Get just the filename (e.g., "test.jpg" from "/uploads/test.jpg")
+    imageFilename = imagePath.split('/').pop() || '';
   }
 
   // Build promotion description with template variables
@@ -626,20 +630,20 @@ function mapPromotionToTemplateVariables(promotion, req) {
   // Template expects:
   // {1} - Promotion title
   // {2} - Promotion description (with discount info)
-  // {3} - Image URL (if available)
+  // {3} - Image filename (e.g., "test.jpg" for https://www.goaiz.com/{3})
   // {4} - Company name or additional info
   
   const templateVariables = {
     '1': promotion.title,
     '2': description.trim(),
-    '3': imageUrl || '', // Empty string if no image
+    '3': imageFilename, // Just the filename, not full URL
     '4': process.env.COMPANY_NAME || 'Cloud Solutions'
   };
 
   console.log('📋 Template variables mapped:', {
     title: templateVariables['1'],
     description: templateVariables['2'].substring(0, 100) + '...',
-    imageUrl: templateVariables['3'] ? 'Present' : 'Not provided',
+    imageFilename: templateVariables['3'] || 'No image',
     company: templateVariables['4']
   });
 
