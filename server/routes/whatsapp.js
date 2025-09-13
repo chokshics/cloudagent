@@ -122,7 +122,11 @@ router.get('/debug', (req, res) => {
     dotenvLoaded: typeof require('dotenv').config === 'function',
     cwd: process.cwd(),
     envFileExists: require('fs').existsSync('.env'),
-    pm2ProcessId: process.env.pm_id || 'not-pm2'
+    pm2ProcessId: process.env.pm_id || 'not-pm2',
+    // WhatsApp specific debugging
+    whatsappFromFormat: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+    isProductionNumber: process.env.TWILIO_WHATSAPP_NUMBER && !process.env.TWILIO_WHATSAPP_NUMBER.includes('14155238886'),
+    sandboxDetected: process.env.TWILIO_WHATSAPP_NUMBER && process.env.TWILIO_WHATSAPP_NUMBER.includes('14155238886')
   };
   
   res.json(debugInfo);
@@ -156,12 +160,15 @@ async function sendWhatsAppMessages(req, res, to, message, promotionId, imageUrl
       // Send WhatsApp message via Twilio
       console.log(`📤 Sending WhatsApp to: ${phoneNumber} -> +${formattedNumber}`);
       console.log(`📤 From: whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`);
+      console.log(`📤 Full from format: whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`);
+      console.log(`📤 Full to format: whatsapp:+${formattedNumber}`);
       
-      // Prepare message data
+      // Prepare message data - Use template for outbound messages
       const messageData = {
         from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
         to: `whatsapp:+${formattedNumber}`,
-        body: message
+        // Use a simple template format for outbound messages
+        body: `*${process.env.COMPANY_NAME || 'Cloud Solutions'}*\n\n${message}\n\n_This is a promotional message. Reply STOP to unsubscribe._`
       };
 
       // Add media URL if image is provided
@@ -205,6 +212,24 @@ async function sendWhatsAppMessages(req, res, to, message, promotionId, imageUrl
       console.error(`❌ Error details:`, error);
       console.error(`❌ Phone number: ${phoneNumber}, Formatted: +${formattedNumber}`);
       
+      // Handle specific WhatsApp errors
+      let errorMessage = error.message;
+      let errorType = 'unknown';
+      
+      if (error.message.includes('63016')) {
+        errorMessage = 'Cannot send freeform message outside 24-hour window. Message templates required for outbound marketing.';
+        errorType = 'template_required';
+      } else if (error.message.includes('63017')) {
+        errorMessage = 'WhatsApp number not found or invalid.';
+        errorType = 'invalid_number';
+      } else if (error.message.includes('63018')) {
+        errorMessage = 'WhatsApp message template not approved.';
+        errorType = 'template_not_approved';
+      } else if (error.message.includes('63019')) {
+        errorMessage = 'WhatsApp message template not found.';
+        errorType = 'template_not_found';
+      }
+      
       // Log failed message
       const logQuery = `
         INSERT INTO whatsapp_logs (mobile_number, message, status, error_message, promotion_id, created_by, created_at)
@@ -215,14 +240,15 @@ async function sendWhatsAppMessages(req, res, to, message, promotionId, imageUrl
         phoneNumber,
         message,
         'failed',
-        error.message,
+        errorMessage,
         promotionId || null,
         req.user.userId
       ]);
 
       failedNumbers.push({
         phoneNumber,
-        error: error.message
+        error: errorMessage,
+        errorType: errorType
       });
     }
   }
@@ -435,5 +461,305 @@ router.post('/test', async (req, res) => {
     });
   }
 });
+
+// Send WhatsApp message using template (for outbound marketing)
+router.post('/send-template', [
+  body('to').isArray().withMessage('Recipients must be an array'),
+  body('templateName').notEmpty().withMessage('Template name is required'),
+  body('templateParams').optional().isObject().withMessage('Template parameters must be an object'),
+  body('promotionId').optional().isInt().withMessage('Promotion ID must be a number')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { to, templateName, templateParams = {}, promotionId } = req.body;
+
+    // Check if user can send WhatsApp messages
+    const subscriptionQuery = `
+      SELECT 
+        us.whatsapp_sends_used,
+        sp.whatsapp_send_limit
+      FROM user_subscriptions us
+      JOIN subscription_plans sp ON us.plan_id = sp.id
+      WHERE us.user_id = ?
+      ORDER BY us.created_at DESC
+      LIMIT 1
+    `;
+    
+    db.get(subscriptionQuery, [req.user.userId], (err, subscription) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+      
+      if (!subscription) {
+        return res.status(403).json({ 
+          error: 'Subscription not found. Please contact support.' 
+        });
+      }
+      
+      if (subscription.whatsapp_sends_used >= subscription.whatsapp_send_limit) {
+        return res.status(403).json({ 
+          error: 'WhatsApp campaign limit reached. Please upgrade your plan to send more campaigns.',
+          sendsUsed: subscription.whatsapp_sends_used,
+          sendLimit: subscription.whatsapp_send_limit
+        });
+      }
+
+      // Send template messages
+      sendWhatsAppTemplateMessages(req, res, to, templateName, templateParams, promotionId);
+    });
+
+  } catch (error) {
+    console.error('WhatsApp template send error:', error);
+    res.status(500).json({ error: 'Failed to send WhatsApp template messages' });
+  }
+});
+
+// Send WhatsApp campaign using promotion data with template mapping
+router.post('/send-promotion-template', [
+  body('to').isArray().withMessage('Recipients must be an array'),
+  body('promotionId').isInt().withMessage('Promotion ID must be a number'),
+  body('templateSid').notEmpty().withMessage('Template SID is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { to, promotionId, templateSid } = req.body;
+
+    // Check if user can send WhatsApp messages
+    const subscriptionQuery = `
+      SELECT 
+        us.whatsapp_sends_used,
+        sp.whatsapp_send_limit
+      FROM user_subscriptions us
+      JOIN subscription_plans sp ON us.plan_id = sp.id
+      WHERE us.user_id = ?
+      ORDER BY us.created_at DESC
+      LIMIT 1
+    `;
+    
+    db.get(subscriptionQuery, [req.user.userId], (err, subscription) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+      
+      if (!subscription) {
+        return res.status(403).json({ 
+          error: 'Subscription not found. Please contact support.' 
+        });
+      }
+      
+      if (subscription.whatsapp_sends_used >= subscription.whatsapp_send_limit) {
+        return res.status(403).json({ 
+          error: 'WhatsApp campaign limit reached. Please upgrade your plan to send more campaigns.',
+          sendsUsed: subscription.whatsapp_sends_used,
+          sendLimit: subscription.whatsapp_send_limit
+        });
+      }
+
+      // Get promotion data
+      const promotionQuery = `
+        SELECT title, description, image_url, discount_percentage, discount_amount, 
+               start_date, end_date 
+        FROM promotions 
+        WHERE id = ? AND created_by = ?
+      `;
+      
+      db.get(promotionQuery, [promotionId, req.user.userId], (err, promotion) => {
+        if (err) {
+          console.error('Error fetching promotion:', err);
+          return res.status(500).json({ error: 'Database error' });
+        }
+        
+        if (!promotion) {
+          return res.status(404).json({ error: 'Promotion not found' });
+        }
+
+        // Map promotion data to template variables
+        const templateVariables = mapPromotionToTemplateVariables(promotion, req);
+        
+        // Send template messages with promotion data
+        sendWhatsAppTemplateMessages(req, res, to, templateSid, templateVariables, promotionId);
+      });
+    });
+
+  } catch (error) {
+    console.error('WhatsApp promotion template send error:', error);
+    res.status(500).json({ error: 'Failed to send WhatsApp promotion template messages' });
+  }
+});
+
+// Helper function to map promotion data to template variables
+function mapPromotionToTemplateVariables(promotion, req) {
+  // Convert relative image URL to absolute URL
+  let imageUrl = null;
+  if (promotion.image_url) {
+    imageUrl = promotion.image_url.startsWith('http') 
+      ? promotion.image_url 
+      : `${req.protocol}://${req.get('host')}${promotion.image_url}`;
+  }
+
+  // Build promotion description with template variables
+  let description = promotion.description || '';
+  
+  // Add discount information to description
+  if (promotion.discount_percentage) {
+    description += `\n\n🎉 Get ${promotion.discount_percentage}% OFF!`;
+  } else if (promotion.discount_amount) {
+    description += `\n\n💰 Save $${promotion.discount_amount}!`;
+  }
+  
+  // Add validity period if available
+  if (promotion.start_date && promotion.end_date) {
+    const startDate = new Date(promotion.start_date).toLocaleDateString();
+    const endDate = new Date(promotion.end_date).toLocaleDateString();
+    description += `\n\n📅 Valid from ${startDate} to ${endDate}`;
+  }
+
+  // Map to template variables
+  // Template expects:
+  // {1} - Promotion title
+  // {2} - Promotion description (with discount info)
+  // {3} - Image URL (if available)
+  // {4} - Company name or additional info
+  
+  const templateVariables = {
+    '1': promotion.title,
+    '2': description.trim(),
+    '3': imageUrl || '', // Empty string if no image
+    '4': process.env.COMPANY_NAME || 'Cloud Solutions'
+  };
+
+  console.log('📋 Template variables mapped:', {
+    title: templateVariables['1'],
+    description: templateVariables['2'].substring(0, 100) + '...',
+    imageUrl: templateVariables['3'] ? 'Present' : 'Not provided',
+    company: templateVariables['4']
+  });
+
+  return templateVariables;
+}
+
+// Helper function to send WhatsApp template messages
+async function sendWhatsAppTemplateMessages(req, res, to, templateName, templateParams, promotionId) {
+  const results = [];
+  const failedNumbers = [];
+
+  for (const phoneNumber of to) {
+    try {
+      // Format phone number for WhatsApp
+      let formattedNumber = phoneNumber.replace(/^\+/, '');
+      
+      if (formattedNumber.length === 10) {
+        formattedNumber = '91' + formattedNumber;
+      } else if (formattedNumber.startsWith('91') && formattedNumber.length === 12) {
+        formattedNumber = formattedNumber;
+      } else if (formattedNumber.startsWith('1') && formattedNumber.length === 11) {
+        formattedNumber = formattedNumber;
+      }
+
+      console.log(`📤 Sending WhatsApp template to: ${phoneNumber} -> +${formattedNumber}`);
+      console.log(`📤 Template: ${templateName}`);
+      
+      // Prepare template message data
+      const messageData = {
+        from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+        to: `whatsapp:+${formattedNumber}`,
+        contentSid: templateName, // This should be your approved template SID
+        contentVariables: templateParams
+      };
+      
+      const twilioMessage = await twilioClient.messages.create(messageData);
+
+      // Log successful message
+      const logQuery = `
+        INSERT INTO whatsapp_logs (mobile_number, message, status, twilio_sid, promotion_id, created_by, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+      `;
+      
+      db.run(logQuery, [
+        phoneNumber,
+        `Template: ${templateName}`,
+        'delivered',
+        twilioMessage.sid,
+        promotionId || null,
+        req.user.userId
+      ]);
+
+      results.push({
+        phoneNumber,
+        status: 'sent',
+        sid: twilioMessage.sid
+      });
+
+      console.log(`✅ WhatsApp template sent to ${phoneNumber}: ${twilioMessage.sid}`);
+
+    } catch (error) {
+      console.error(`❌ Failed to send WhatsApp template to ${phoneNumber}:`, error.message);
+      
+      let errorMessage = error.message;
+      let errorType = 'unknown';
+      
+      if (error.message.includes('63016')) {
+        errorMessage = 'Cannot send freeform message outside 24-hour window. Message templates required for outbound marketing.';
+        errorType = 'template_required';
+      } else if (error.message.includes('63017')) {
+        errorMessage = 'WhatsApp number not found or invalid.';
+        errorType = 'invalid_number';
+      } else if (error.message.includes('63018')) {
+        errorMessage = 'WhatsApp message template not approved.';
+        errorType = 'template_not_approved';
+      } else if (error.message.includes('63019')) {
+        errorMessage = 'WhatsApp message template not found.';
+        errorType = 'template_not_found';
+      }
+      
+      // Log failed message
+      const logQuery = `
+        INSERT INTO whatsapp_logs (mobile_number, message, status, error_message, promotion_id, created_by, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+      `;
+      
+      db.run(logQuery, [
+        phoneNumber,
+        `Template: ${templateName}`,
+        'failed',
+        errorMessage,
+        promotionId || null,
+        req.user.userId
+      ]);
+
+      failedNumbers.push({
+        phoneNumber,
+        error: errorMessage,
+        errorType: errorType
+      });
+    }
+  }
+
+  // Increment WhatsApp campaigns count
+  db.run(
+    'UPDATE user_subscriptions SET whatsapp_sends_used = whatsapp_sends_used + 1 WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
+    [req.user.userId],
+    function(err) {
+      if (err) {
+        console.error('Failed to update campaign count:', err);
+      }
+    }
+  );
+
+  res.json({
+    success: true,
+    message: `WhatsApp template campaign completed. ${results.length} sent, ${failedNumbers.length} failed`,
+    results,
+    failedNumbers
+  });
+}
 
 module.exports = router; 

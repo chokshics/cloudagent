@@ -11,6 +11,8 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
   const [previewMessage, setPreviewMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [campaignSent, setCampaignSent] = useState(false);
+  const [useTemplate, setUseTemplate] = useState(true);
+  const [templateSid, setTemplateSid] = useState('HX1f0ca4d69ef77795608fd507e6dd5375'); // Default template SID
   const queryClient = useQueryClient();
 
   // Query to get current subscription info
@@ -36,7 +38,19 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
   );
 
   const sendWhatsAppCampaignMutation = useMutation(
-    (data) => axios.post('/api/whatsapp/send', data),
+    (data) => {
+      // Use template-based sending for promotions
+      if (data.useTemplate && data.templateSid) {
+        return axios.post('/api/whatsapp/send-promotion-template', {
+          to: data.to,
+          promotionId: data.promotionId,
+          templateSid: data.templateSid
+        });
+      } else {
+        // Fallback to regular message sending
+        return axios.post('/api/whatsapp/send', data);
+      }
+    },
     {
       onSuccess: (response) => {
         queryClient.invalidateQueries('whatsapp-logs');
@@ -157,11 +171,23 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
       .filter(m => selectedNumbers.includes(m.id))
       .map(m => m.phone_number);
     
-    sendWhatsAppCampaignMutation.mutate({
-      to: selectedPhoneNumbers,
-      message: previewMessage,
-      promotionId: promotion.id
-    });
+    if (useTemplate) {
+      // Use template-based sending
+      sendWhatsAppCampaignMutation.mutate({
+        to: selectedPhoneNumbers,
+        promotionId: promotion.id,
+        useTemplate: true,
+        templateSid: templateSid
+      });
+    } else {
+      // Use regular message sending
+      sendWhatsAppCampaignMutation.mutate({
+        to: selectedPhoneNumbers,
+        message: previewMessage,
+        promotionId: promotion.id,
+        useTemplate: false
+      });
+    }
   };
 
   const handleClose = () => {
@@ -283,54 +309,120 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
 
               {/* Right Column - Message Preview */}
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Message Preview</h4>
+                <h4 className="text-sm font-medium text-gray-900 mb-3">Message Configuration</h4>
                 
                 <div className="space-y-4">
-                  <div>
-                    <label htmlFor="customMessage" className="block text-sm font-medium text-gray-700">
-                      Custom Message (Optional)
-                    </label>
-                    <textarea
-                      id="customMessage"
-                      value={customMessage}
-                      onChange={(e) => setCustomMessage(e.target.value)}
-                      rows={3}
-                      className="input mt-1"
-                      placeholder="Enter a custom message or leave empty to use default"
-                    />
+                  {/* Template Configuration */}
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h5 className="text-sm font-medium text-gray-900">WhatsApp Template</h5>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="useTemplate"
+                          checked={useTemplate}
+                          onChange={(e) => setUseTemplate(e.target.checked)}
+                          className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                        />
+                        <label htmlFor="useTemplate" className="ml-2 text-sm text-gray-700">
+                          Use Template
+                        </label>
+                      </div>
+                    </div>
+                    
+                    {useTemplate ? (
+                      <div>
+                        <label htmlFor="templateSid" className="block text-sm font-medium text-gray-700 mb-1">
+                          Template SID
+                        </label>
+                        <input
+                          type="text"
+                          id="templateSid"
+                          value={templateSid}
+                          onChange={(e) => setTemplateSid(e.target.value)}
+                          className="input text-sm"
+                          placeholder="Enter your Twilio template SID"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Template will map: Title → {1}, Description → {2}, Image → {3}, Company → {4}
+                        </p>
+                      </div>
+                    ) : (
+                      <div>
+                        <label htmlFor="customMessage" className="block text-sm font-medium text-gray-700">
+                          Custom Message
+                        </label>
+                        <textarea
+                          id="customMessage"
+                          value={customMessage}
+                          onChange={(e) => setCustomMessage(e.target.value)}
+                          rows={3}
+                          className="input mt-1"
+                          placeholder="Enter a custom message or leave empty to use default"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      WhatsApp Preview
+                      {useTemplate ? 'Template Mapping Preview' : 'WhatsApp Preview'}
                     </label>
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="flex items-start space-x-3">
-                        <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                            <Send className="h-4 w-4 text-green-600" />
+                    
+                    {useTemplate ? (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="space-y-3">
+                          <div className="text-sm">
+                            <span className="font-medium text-blue-900">Template Variables:</span>
                           </div>
-                        </div>
-                        <div className="flex-1">
-                          {/* Promotion Image */}
-                          {promotion.image_url && (
-                            <div className="mb-3">
-                              <img
-                                src={promotion.image_url}
-                                alt={promotion.title}
-                                className="w-full h-32 object-cover rounded-lg border border-gray-300"
-                              />
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="bg-white p-2 rounded border">
+                              <span className="font-medium">{1}:</span> {promotion.title}
                             </div>
-                          )}
-                          <div className="text-sm text-gray-900 whitespace-pre-wrap">
-                            {previewMessage}
+                            <div className="bg-white p-2 rounded border">
+                              <span className="font-medium">{2}:</span> {promotion.description?.substring(0, 30)}...
+                            </div>
+                            <div className="bg-white p-2 rounded border">
+                              <span className="font-medium">{3}:</span> {promotion.image_url ? 'Image URL' : 'No Image'}
+                            </div>
+                            <div className="bg-white p-2 rounded border">
+                              <span className="font-medium">{4}:</span> Cloud Solutions
+                            </div>
                           </div>
-                          <div className="mt-2 text-xs text-gray-500">
-                            {previewMessage.length} characters
+                          <div className="text-xs text-blue-700">
+                            💡 Template will automatically map promotion data to these variables
                           </div>
                         </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div className="flex items-start space-x-3">
+                          <div className="flex-shrink-0">
+                            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                              <Send className="h-4 w-4 text-green-600" />
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            {/* Promotion Image */}
+                            {promotion.image_url && (
+                              <div className="mb-3">
+                                <img
+                                  src={promotion.image_url}
+                                  alt={promotion.title}
+                                  className="w-full h-32 object-cover rounded-lg border border-gray-300"
+                                />
+                              </div>
+                            )}
+                            <div className="text-sm text-gray-900 whitespace-pre-wrap">
+                              {previewMessage}
+                            </div>
+                            <div className="mt-2 text-xs text-gray-500">
+                              {previewMessage.length} characters
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className={`border rounded-lg p-4 ${
