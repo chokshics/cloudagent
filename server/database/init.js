@@ -85,6 +85,28 @@ const initDatabase = async () => {
         )
       `);
 
+      // Create whatsapp_opt_ins table for consent management
+      db.run(`
+        CREATE TABLE IF NOT EXISTS whatsapp_opt_ins (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          phone_number TEXT NOT NULL,
+          name TEXT,
+          consent_method TEXT NOT NULL, -- 'website', 'sms', 'email', 'in_store', 'phone'
+          consent_timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+          ip_address TEXT,
+          user_agent TEXT,
+          consent_text TEXT, -- The exact text the user agreed to
+          is_active BOOLEAN DEFAULT 1,
+          opt_out_timestamp DATETIME,
+          opt_out_reason TEXT,
+          created_by INTEGER,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (created_by) REFERENCES users (id),
+          UNIQUE(phone_number)
+        )
+      `);
+
 
 
       // Create subscription_plans table

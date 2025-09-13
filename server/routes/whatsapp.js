@@ -132,13 +132,50 @@ router.get('/debug', (req, res) => {
   res.json(debugInfo);
 });
 
+// Helper function to check opt-in status
+async function checkOptInStatus(phoneNumber) {
+  return new Promise((resolve, reject) => {
+    // Format phone number
+    let formattedNumber = phoneNumber.replace(/^\+/, '');
+    if (formattedNumber.length === 10) {
+      formattedNumber = '91' + formattedNumber;
+    }
+
+    db.get(
+      'SELECT * FROM whatsapp_opt_ins WHERE phone_number = ? AND is_active = 1',
+      [formattedNumber],
+      (err, row) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(!!row); // Return true if opted in, false otherwise
+        }
+      }
+    );
+  });
+}
+
 // Helper function to send WhatsApp messages
 async function sendWhatsAppMessages(req, res, to, message, promotionId, imageUrl = null) {
   const results = [];
   const failedNumbers = [];
+  const notOptedIn = [];
 
   for (const phoneNumber of to) {
     try {
+      // Check opt-in status first
+      const isOptedIn = await checkOptInStatus(phoneNumber);
+      
+      if (!isOptedIn) {
+        console.log(`⚠️ Phone number ${phoneNumber} has not opted in for WhatsApp messages`);
+        notOptedIn.push({
+          phoneNumber,
+          error: 'User has not opted in for WhatsApp messages',
+          errorType: 'no_opt_in'
+        });
+        continue;
+      }
+
       // Format phone number for WhatsApp (remove + if present and add country code if needed)
       let formattedNumber = phoneNumber.replace(/^\+/, '');
       
@@ -266,9 +303,10 @@ async function sendWhatsAppMessages(req, res, to, message, promotionId, imageUrl
 
   res.json({
     success: true,
-    message: `WhatsApp campaign completed. ${results.length} sent, ${failedNumbers.length} failed`,
+    message: `WhatsApp campaign completed. ${results.length} sent, ${failedNumbers.length} failed, ${notOptedIn.length} not opted in`,
     results,
-    failedNumbers
+    failedNumbers,
+    notOptedIn
   });
 }
 
@@ -689,9 +727,23 @@ function mapPromotionToTemplateVariables(promotion, req) {
 async function sendWhatsAppTemplateMessages(req, res, to, templateName, templateParams, promotionId) {
   const results = [];
   const failedNumbers = [];
+  const notOptedIn = [];
 
   for (const phoneNumber of to) {
     try {
+      // Check opt-in status first
+      const isOptedIn = await checkOptInStatus(phoneNumber);
+      
+      if (!isOptedIn) {
+        console.log(`⚠️ Phone number ${phoneNumber} has not opted in for WhatsApp messages`);
+        notOptedIn.push({
+          phoneNumber,
+          error: 'User has not opted in for WhatsApp messages',
+          errorType: 'no_opt_in'
+        });
+        continue;
+      }
+
       // Format phone number for WhatsApp
       let formattedNumber = phoneNumber.replace(/^\+/, '');
       
@@ -855,9 +907,10 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
 
   res.json({
     success: true,
-    message: `WhatsApp template campaign completed. ${results.length} sent, ${failedNumbers.length} failed`,
+    message: `WhatsApp template campaign completed. ${results.length} sent, ${failedNumbers.length} failed, ${notOptedIn.length} not opted in`,
     results,
-    failedNumbers
+    failedNumbers,
+    notOptedIn
   });
 }
 
@@ -884,9 +937,16 @@ router.get('/validate-template/:templateSid', async (req, res) => {
         {
           type: 'template_structure',
           severity: 'info',
-          message: 'Template should use proper variable mapping',
+          message: 'Template should use proper variable mapping for marketing content',
           current: 'Body: "Check out our promotion: {1}"',
-          recommended: 'Body: "Hello {1}! 🎉\\n\\n{2}\\n\\nFrom {3}\\n\\n_Reply STOP to unsubscribe_"'
+          recommended: 'Body: "Hello {1}! 🎉\\n\\n{2}\\n\\nGet {3}% OFF!\\n\\nFrom {4}\\n\\n_Reply STOP to unsubscribe_"'
+        },
+        {
+          type: 'template_category',
+          severity: 'warning',
+          message: 'Submit as Marketing template - Utility templates are automatically converted to Marketing for promotional content',
+          current: 'Template category selection',
+          recommended: 'Always select "Marketing" category for promotional campaigns'
         },
         {
           type: 'template_header',
