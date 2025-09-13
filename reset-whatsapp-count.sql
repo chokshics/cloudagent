@@ -5,7 +5,7 @@ SELECT
   u.id,
   u.username,
   u.email,
-  sp.plan_name,
+  sp.name as plan_name,
   us.whatsapp_sends_used,
   sp.whatsapp_send_limit
 FROM users u

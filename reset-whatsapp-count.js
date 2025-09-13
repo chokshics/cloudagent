@@ -32,7 +32,7 @@ function resetWhatsAppCount(userId) {
       
       // Get current subscription info
       db.get(`
-        SELECT us.*, sp.plan_name 
+        SELECT us.*, sp.name as plan_name 
         FROM user_subscriptions us 
         JOIN subscription_plans sp ON us.plan_id = sp.id 
         WHERE us.user_id = ? 
@@ -80,7 +80,7 @@ function listUsersWithCounts() {
         u.id,
         u.username,
         u.email,
-        sp.plan_name,
+        sp.name as plan_name,
         us.whatsapp_sends_used,
         sp.whatsapp_send_limit
       FROM users u
