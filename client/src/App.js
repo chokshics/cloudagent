@@ -12,6 +12,7 @@ import WhatsAppCampaigns from './pages/WhatsAppCampaigns';
 import SubscriptionPage from './pages/SubscriptionPage';
 import SubscriptionUSD from './pages/SubscriptionUSD';
 import Reports from './pages/Reports';
+import OptInManagement from './pages/OptInManagement';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfUse from './pages/TermsOfUse';
 import CookieConsent from './pages/CookieConsent';
@@ -116,6 +117,17 @@ function App() {
         } />
       ) : (
         <Route path="/reports" element={<Navigate to="/dashboard" replace />} />
+      )}
+      
+      {/* Admin routes */}
+      {user && (user.role === 'admin' || user.role === 'superadmin') ? (
+        <Route path="/opt-in-management" element={
+          <Layout>
+            <OptInManagement />
+          </Layout>
+        } />
+      ) : (
+        <Route path="/opt-in-management" element={<Navigate to="/dashboard" replace />} />
       )}
       
       {/* Catch all route */}

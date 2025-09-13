@@ -11,7 +11,8 @@ import {
   LogOut,
   User,
   Crown,
-  BarChart3
+  BarChart3,
+  Shield
 } from 'lucide-react';
 
 const Layout = ({ children }) => {
@@ -25,6 +26,7 @@ const Layout = ({ children }) => {
     { name: 'Promotions', href: '/promotions', icon: Tag },
     { name: 'Mobile Numbers', href: '/mobile-numbers', icon: Users },
     { name: 'WhatsApp Campaigns', href: '/whatsapp-campaigns', icon: MessageSquare },
+    ...(user?.role === 'admin' || user?.role === 'superadmin' ? [{ name: 'Opt-in Management', href: '/opt-in-management', icon: Shield }] : []),
     ...(user?.role === 'superadmin' ? [{ name: 'Reports', href: '/reports', icon: BarChart3 }] : []),
   ];
 
