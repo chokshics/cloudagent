@@ -861,15 +861,15 @@ router.get('/validate-template/:templateSid', async (req, res) => {
           type: 'media_url_format',
           severity: 'error',
           message: 'Media URL needs correct S3 format with file extension',
-          current: 'https://www.goaiz.com/{2}.jpg',
-          recommended: 'https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{3}.jpg'
+          current: 'https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{4}',
+          recommended: 'https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{4}'
         },
         {
           type: 'template_structure',
           severity: 'info',
           message: 'Template should use proper variable mapping',
           current: 'Body: "Check out our promotion: {1}"',
-          recommended: 'Body: "🎉 {1}\\n\\n{2}\\n\\n_Reply STOP to unsubscribe_"'
+          recommended: 'Body: "Hello {1}! 🎉\\n\\n{2}\\n\\nFrom {3}\\n\\n_Reply STOP to unsubscribe_"'
         },
         {
           type: 'template_header',
@@ -886,13 +886,13 @@ router.get('/validate-template/:templateSid', async (req, res) => {
         'Verify template is approved by WhatsApp'
       ],
       correctFormat: {
-        body: 'Hi {1}, check out our latest promotion: {2}\\n{4}\\nReply STOP to unsubscribe',
-        mediaUrl: 'https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{3}',
+        body: 'Hello {1}! 🎉\\n\\n{2}\\n\\nFrom {3}\\n\\n_Reply STOP to unsubscribe_',
+        mediaUrl: 'https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{4}',
         variables: {
-          '1': '(empty - not used)',
+          '1': 'Customer name',
           '2': 'Promotion Description with discount info',
-          '3': 'Image filename (e.g., 1757742343766-w29670-indmap.jpg)',
-          '4': '(empty - not used)'
+          '3': 'Company name (Goaiz)',
+          '4': 'Image filename (e.g., 1757742343766-w29670-indmap.jpg)'
         }
       }
     };

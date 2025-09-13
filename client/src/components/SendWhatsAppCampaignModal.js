@@ -12,7 +12,7 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
   const [sending, setSending] = useState(false);
   const [campaignSent, setCampaignSent] = useState(false);
   const [useTemplate, setUseTemplate] = useState(true);
-  const [templateSid, setTemplateSid] = useState('HX1f0ca4d69ef77795608fd507e6dd5375'); // Default template SID
+  const [templateSid, setTemplateSid] = useState('HXb2acf6c8882247ff90039e7467fa56ac'); // Default template SID
   const queryClient = useQueryClient();
 
   // Query to get current subscription info
