@@ -646,19 +646,26 @@ function mapPromotionToTemplateVariables(promotion, req) {
   // {3} - Image filename (e.g., "test.jpg" for https://your-server.com/uploads/goaiz/{3})
   // {4} - Company name or additional info
   
-  // Build template variables - ensure all required variables are present
-  const templateVariables = {
-    '1': '', // Empty as requested
-    '2': description && description.trim() ? description.trim() : 'No description',
-    '3': imageUrl && imageUrl.trim() ? imageUrl.trim() : '',
-    '4': '' // Empty as requested
-  };
+  // Build template variables - only include non-empty variables
+  const templateVariables = {};
+  
+  // Add variables only if they have content
+  if (description && description.trim()) {
+    templateVariables['2'] = description.trim();
+  }
+  
+  if (imageUrl && imageUrl.trim()) {
+    templateVariables['3'] = imageUrl.trim();
+  }
+  
+  // For empty variables, we'll let the template handle them with default values
+  // Don't include empty variables in contentVariables as Twilio rejects them
 
   console.log('📋 Template variables mapped:', {
-    variable1: templateVariables['1'] || '(empty)',
-    description: templateVariables['2'] ? templateVariables['2'].substring(0, 100) + '...' : '(empty)',
-    imageUrl: templateVariables['3'] || 'No image',
-    variable4: templateVariables['4'] || '(empty)'
+    variablesIncluded: Object.keys(templateVariables),
+    description: templateVariables['2'] ? templateVariables['2'].substring(0, 100) + '...' : '(not included)',
+    imageUrl: templateVariables['3'] || '(not included)',
+    note: 'Empty variables (1, 4) are not included in contentVariables'
   });
 
   return templateVariables;
@@ -684,6 +691,7 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
 
       console.log(`📤 Sending WhatsApp template to: ${phoneNumber} -> +${formattedNumber}`);
       console.log(`📤 Template: ${templateName}`);
+      console.log(`📤 Content Variables:`, JSON.stringify(templateParams, null, 2));
       
       // Prepare template message data
       // Check if template has media (image/document) in variables
@@ -738,7 +746,11 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
         });
       }
       
+      console.log('📤 Final message data being sent to Twilio:', JSON.stringify(messageData, null, 2));
+      
       const twilioMessage = await twilioClient.messages.create(messageData);
+      
+      console.log('✅ Twilio message created successfully:', twilioMessage.sid);
 
       // Log successful message
       const logQuery = `
