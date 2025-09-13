@@ -646,26 +646,29 @@ function mapPromotionToTemplateVariables(promotion, req) {
   // {3} - Image filename (e.g., "test.jpg" for https://your-server.com/uploads/goaiz/{3})
   // {4} - Company name or additional info
   
-  // Build template variables - only include non-empty variables
+  // Build template variables - only include variables that have content
+  // Based on user request: {1} and {4} should be empty, but Twilio doesn't allow empty strings
+  // So we'll only include variables that are actually used
   const templateVariables = {};
   
-  // Add variables only if they have content
+  // Only include description if it exists
   if (description && description.trim()) {
     templateVariables['2'] = description.trim();
   }
   
+  // Only include image URL if it exists
   if (imageUrl && imageUrl.trim()) {
     templateVariables['3'] = imageUrl.trim();
   }
   
-  // For empty variables, we'll let the template handle them with default values
-  // Don't include empty variables in contentVariables as Twilio rejects them
+  // Note: Variables {1} and {4} are intentionally omitted as requested by user
+  // If the template requires them, we'll need to provide non-empty values
 
   console.log('📋 Template variables mapped:', {
     variablesIncluded: Object.keys(templateVariables),
     description: templateVariables['2'] ? templateVariables['2'].substring(0, 100) + '...' : '(not included)',
     imageUrl: templateVariables['3'] || '(not included)',
-    note: 'Empty variables (1, 4) are not included in contentVariables'
+    note: 'Only non-empty variables included. Variables {1} and {4} omitted as requested'
   });
 
   return templateVariables;
