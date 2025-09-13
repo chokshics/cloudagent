@@ -15,16 +15,41 @@ async function uploadToS3(file, folder = 'uploads/goaiz') {
     const fileExtension = path.extname(file.originalname);
     const fileName = `${timestamp}-${randomString}-${file.originalname.replace(fileExtension, '')}${fileExtension}`;
     
+    // Determine content type based on file extension if mimetype is not detected properly
+    let contentType = file.mimetype;
+    if (!contentType || contentType === 'application/octet-stream' || contentType === 'text/plain') {
+      const ext = fileExtension.toLowerCase();
+      switch (ext) {
+        case '.jpg':
+        case '.jpeg':
+          contentType = 'image/jpeg';
+          break;
+        case '.png':
+          contentType = 'image/png';
+          break;
+        case '.gif':
+          contentType = 'image/gif';
+          break;
+        case '.webp':
+          contentType = 'image/webp';
+          break;
+        default:
+          contentType = 'image/jpeg'; // Default to jpeg for images
+      }
+    }
+    
     // S3 upload parameters
     const uploadParams = {
       Bucket: process.env.AWS_S3_BUCKET || 'testingbucketchints',
       Key: `${folder}/${fileName}`,
       Body: file.buffer,
-      ContentType: file.mimetype,
+      ContentType: contentType,
       // ACL removed - bucket doesn't allow ACLs
       Metadata: {
         originalName: file.originalname,
-        uploadedAt: new Date().toISOString()
+        uploadedAt: new Date().toISOString(),
+        detectedMimeType: file.mimetype,
+        correctedContentType: contentType
       }
     };
 

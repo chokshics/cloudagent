@@ -6,10 +6,18 @@ const storage = multer.memoryStorage();
 
 // File filter
 const fileFilter = (req, file, cb) => {
+  console.log('🔍 File filter check:', {
+    originalName: file.originalname,
+    mimetype: file.mimetype,
+    fieldname: file.fieldname
+  });
+  
   // Accept only image files
   if (file.mimetype.startsWith('image/')) {
+    console.log('✅ File accepted:', file.originalname);
     cb(null, true);
   } else {
+    console.log('❌ File rejected:', file.originalname, 'Mimetype:', file.mimetype);
     cb(new Error('Only image files are allowed!'), false);
   }
 };
