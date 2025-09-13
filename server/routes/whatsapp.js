@@ -634,7 +634,7 @@ function mapPromotionToTemplateVariables(promotion, req) {
   // Template expects:
   // {1} - Promotion title
   // {2} - Promotion description (with discount info)
-  // {3} - Image filename (e.g., "test.jpg" for https://www.goaiz.com/{3})
+  // {3} - Image filename (e.g., "test.jpg" for https://your-server.com/uploads/goaiz/{3})
   // {4} - Company name or additional info
   
   const templateVariables = {

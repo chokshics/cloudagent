@@ -335,7 +335,9 @@ router.post('/upload-goaiz-image', goaizUpload.single('image'), (req, res) => {
     }
 
     const filename = req.file.filename;
-    const goaizUrl = `https://www.goaiz.com/${filename}`;
+    // Use your actual server domain instead of goaiz.com
+    const serverDomain = process.env.SERVER_DOMAIN || `${req.protocol}://${req.get('host')}`;
+    const goaizUrl = `${serverDomain}/uploads/goaiz/${filename}`;
     
     console.log('📷 Image uploaded for goaiz.com template:', {
       filename: filename,
