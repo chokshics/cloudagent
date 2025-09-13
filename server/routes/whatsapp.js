@@ -685,12 +685,61 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
       console.log(`📤 Template: ${templateName}`);
       
       // Prepare template message data
-      const messageData = {
-        from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
-        to: `whatsapp:+${formattedNumber}`,
-        contentSid: templateName, // This should be your approved template SID
-        contentVariables: templateParams
-      };
+      // Check if template has media (image/document) in variables
+      const hasMedia = templateParams['3'] && templateParams['3'].startsWith('http');
+      
+      let messageData;
+      
+      if (hasMedia) {
+        // Template with media - use the newer format
+        const mediaUrl = templateParams['3'];
+        const isImage = mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+        
+        if (isImage) {
+          // Image template
+          messageData = {
+            from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+            to: `whatsapp:+${formattedNumber}`,
+            contentSid: templateName,
+            contentVariables: templateParams,
+            media: [{
+              type: 'image',
+              link: mediaUrl
+            }]
+          };
+        } else {
+          // Document template
+          messageData = {
+            from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+            to: `whatsapp:+${formattedNumber}`,
+            contentSid: templateName,
+            contentVariables: templateParams,
+            media: [{
+              type: 'document',
+              link: mediaUrl
+            }]
+          };
+        }
+        
+        console.log('📷 Template with media:', {
+          templateSid: templateName,
+          mediaUrl: mediaUrl,
+          mediaType: isImage ? 'image' : 'document'
+        });
+      } else {
+        // Template without media - use standard format
+        messageData = {
+          from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+          to: `whatsapp:+${formattedNumber}`,
+          contentSid: templateName,
+          contentVariables: templateParams
+        };
+        
+        console.log('📝 Template without media:', {
+          templateSid: templateName,
+          variables: Object.keys(templateParams)
+        });
+      }
       
       const twilioMessage = await twilioClient.messages.create(messageData);
 
@@ -805,6 +854,13 @@ router.get('/validate-template/:templateSid', async (req, res) => {
           message: 'Template should use proper variable mapping',
           current: 'Body: "Check out our promotion: {1}"',
           recommended: 'Body: "🎉 {1}\\n\\n{2}\\n\\n_Reply STOP to unsubscribe_"'
+        },
+        {
+          type: 'template_header',
+          severity: 'warning',
+          message: 'Template header type must match media type',
+          current: 'Unknown header type',
+          recommended: 'Set header to "Image" for .jpg/.png files or "Document" for other files'
         }
       ],
       recommendations: [
