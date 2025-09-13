@@ -631,11 +631,11 @@ function mapPromotionToTemplateVariables(promotion, req) {
   }
 
   // Map to template variables
-  // Template expects (based on user's example):
+  // Template expects (swapped mapping):
   // {1} - Name (e.g., "John")
   // {2} - Description (e.g., "Summer sale - 10% off")
-  // {3} - Company name (e.g., "Go Alz Technologies")
-  // {4} - Just the filename (e.g., "1757742343766-w29670-indmap.jpg")
+  // {3} - Image filename (e.g., "1757742343766-w29670-indmap.jpg")
+  // {4} - Company name (e.g., "Go Alz Technologies")
   
   // Build template variables - ALL variables must be included for Twilio
   
@@ -669,17 +669,17 @@ function mapPromotionToTemplateVariables(promotion, req) {
   const templateVariables = {
     '1': 'Customer', // Default name
     '2': description && description.trim() ? description.trim() : 'Special offer available!',
-    '3': process.env.COMPANY_NAME || 'Goaiz', // Company name
-    '4': imageFilename // Just the filename
+    '3': imageFilename, // Image filename
+    '4': process.env.COMPANY_NAME || 'Goaiz' // Company name
   };
 
   console.log('📋 Template variables mapped:', {
     variablesIncluded: Object.keys(templateVariables),
     name: templateVariables['1'] || '(not included)',
     description: templateVariables['2'] ? templateVariables['2'].substring(0, 100) + '...' : '(not included)',
-    company: templateVariables['3'] || '(not included)',
-    filename: templateVariables['4'] || '(not included)',
-    note: 'Variables mapped according to template: {1}=name, {2}=description, {3}=company, {4}=filename'
+    filename: templateVariables['3'] || '(not included)',
+    company: templateVariables['4'] || '(not included)',
+    note: 'Variables mapped according to template: {1}=name, {2}=description, {3}=filename, {4}=company'
   });
 
   return templateVariables;
@@ -712,14 +712,15 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
       
       // Prepare template message data
       // Check if template has media (image/document) in variables
-      const hasMedia = templateParams['3'] && templateParams['3'].startsWith('http');
+      // Image filename is now in variable {3}
+      const hasMedia = templateParams['3'] && templateParams['3'].includes('.');
       
       let messageData;
       
       if (hasMedia) {
         // Template with media - use the newer format
-        const mediaUrl = templateParams['3'];
-        const isImage = mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+        const imageFilename = templateParams['3'];
+        const isImage = imageFilename.match(/\.(jpg|jpeg|png|gif|webp)$/i);
         
         if (isImage) {
           // Image template - use the correct Twilio format
@@ -745,7 +746,7 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
         
         console.log('📷 Template with media:', {
           templateSid: templateName,
-          mediaUrl: mediaUrl,
+          imageFilename: imageFilename,
           mediaType: isImage ? 'image' : 'document'
         });
       } else {
@@ -766,6 +767,10 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
       console.log('📤 Final message data being sent to Twilio:', JSON.stringify(messageData, null, 2));
       console.log('📤 Content Variables in messageData:', JSON.stringify(messageData.contentVariables, null, 2));
       console.log('📤 Content Variables type:', typeof messageData.contentVariables);
+      
+      // Debug the specific variable that should contain the filename
+      console.log('🔍 Variable {3} (filename) value:', templateParams['3']);
+      console.log('🔍 Variable {4} (company) value:', templateParams['4']);
       
       const twilioMessage = await twilioClient.messages.create(messageData);
       
@@ -873,8 +878,8 @@ router.get('/validate-template/:templateSid', async (req, res) => {
           type: 'media_url_format',
           severity: 'error',
           message: 'Media URL needs correct S3 format with file extension',
-          current: 'https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{4}',
-          recommended: 'https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{4}'
+          current: 'https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{3}',
+          recommended: 'https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{3}'
         },
         {
           type: 'template_structure',
@@ -898,13 +903,13 @@ router.get('/validate-template/:templateSid', async (req, res) => {
         'Verify template is approved by WhatsApp'
       ],
       correctFormat: {
-        body: 'Hello {1}! 🎉\\n\\n{2}\\n\\nFrom {3}\\n\\n_Reply STOP to unsubscribe_',
-        mediaUrl: 'https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{4}',
+        body: 'Hello {1}! 🎉\\n\\n{2}\\n\\nFrom {4}\\n\\n_Reply STOP to unsubscribe_',
+        mediaUrl: 'https://testingbucketchints.s3.ap-south-1.amazonaws.com/uploads/goaiz/{3}',
         variables: {
           '1': 'Customer name',
           '2': 'Promotion Description with discount info',
-          '3': 'Company name (Goaiz)',
-          '4': 'Image filename (e.g., 1757742343766-w29670-indmap.jpg)'
+          '3': 'Image filename (e.g., 1757742343766-w29670-indmap.jpg)',
+          '4': 'Company name (Goaiz)'
         }
       }
     };
