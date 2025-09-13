@@ -21,7 +21,7 @@ async function uploadToS3(file, folder = 'uploads/goaiz') {
       Key: `${folder}/${fileName}`,
       Body: file.buffer,
       ContentType: file.mimetype,
-      ACL: 'public-read', // Make file publicly accessible
+      // ACL removed - bucket doesn't allow ACLs
       Metadata: {
         originalName: file.originalname,
         uploadedAt: new Date().toISOString()
