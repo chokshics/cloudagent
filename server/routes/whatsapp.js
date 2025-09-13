@@ -597,30 +597,21 @@ router.post('/send-promotion-template', [
 
 // Helper function to map promotion data to template variables
 function mapPromotionToTemplateVariables(promotion, req) {
+  console.log('📋 Promotion data received for template mapping:', {
+    id: promotion.id,
+    title: promotion.title,
+    description: promotion.description,
+    goaiz_image_url: promotion.goaiz_image_url,
+    image_url: promotion.image_url
+  });
+  
   // Extract filename without extension for template format
   let imageFilename = '';
   
   // Prefer goaiz_image_url if available, otherwise use regular image_url
   const imageUrl = promotion.goaiz_image_url || promotion.image_url;
   
-  if (imageUrl) {
-    // Extract filename from the URL format
-    // Expected format: https://www.goaiz.com/uploads/goaiz/filename.jpg or S3 URL
-    const imagePath = imageUrl.startsWith('http') 
-      ? imageUrl 
-      : imageUrl;
-    
-    // Get just the filename without extension (e.g., "worldmap" from "worldmap.jpg")
-    const fullFilename = imagePath.split('/').pop() || '';
-    imageFilename = fullFilename.replace(/\.[^/.]+$/, ''); // Remove file extension
-    
-    console.log('🖼️ Template image mapping:', {
-      originalUrl: imageUrl,
-      fullFilename: fullFilename,
-      imageFilename: imageFilename,
-      note: 'Using filename for template variable {3}'
-    });
-  }
+  // This section will be handled later in the function
 
   // Build promotion description with template variables
   let description = promotion.description || '';
@@ -649,9 +640,24 @@ function mapPromotionToTemplateVariables(promotion, req) {
   // Build template variables - ALL variables must be included for Twilio
   
   // Extract just the filename from the image URL
+  console.log('🔍 Processing image URL:', {
+    imageUrl: imageUrl,
+    hasImageUrl: !!imageUrl,
+    imageUrlType: typeof imageUrl
+  });
+  
   if (imageUrl && imageUrl.trim()) {
     const fullFilename = imageUrl.split('/').pop() || '';
     imageFilename = fullFilename; // Keep the full filename with extension
+    
+    console.log('📁 Filename extracted:', {
+      fullFilename: fullFilename,
+      imageFilename: imageFilename,
+      note: 'Using full filename with extension for template variable {4}'
+    });
+  } else {
+    console.log('⚠️ No valid image URL, using placeholder');
+    imageFilename = 'placeholder.jpg';
   }
 
   const templateVariables = {
