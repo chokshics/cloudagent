@@ -344,8 +344,8 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                           placeholder="Enter your Twilio template SID"
                         />
                         <p className="text-xs text-gray-500 mt-1">
-                          Template format: https://www.goaiz.com/{3}<br/>
-                          Variables: Title → {1}, Description → {2}, Image filename → {3}, Company → {4}
+                          Template format: https://www.goaiz.com/uploads/goaiz/{3}.jpg<br/>
+                          Variables: Title → {1}, Description → {2}, Image filename (no ext) → {3}, Company → {4}
                         </p>
                       </div>
                     ) : (
@@ -386,9 +386,9 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                             <div className="bg-white p-2 rounded border">
                               <span className="font-medium">{3}:</span> {
                                 promotion.goaiz_image_url 
-                                  ? promotion.goaiz_image_url.split('/').pop() 
+                                  ? promotion.goaiz_image_url.split('/').pop().replace(/\.[^/.]+$/, '') 
                                   : promotion.image_url 
-                                    ? promotion.image_url.split('/').pop() 
+                                    ? promotion.image_url.split('/').pop().replace(/\.[^/.]+$/, '') 
                                     : 'No Image'
                               }
                             </div>

@@ -597,7 +597,7 @@ router.post('/send-promotion-template', [
 
 // Helper function to map promotion data to template variables
 function mapPromotionToTemplateVariables(promotion, req) {
-  // Extract filename from image URL for goaiz.com template format
+  // Extract filename without extension for goaiz.com template format
   let imageFilename = '';
   
   // Prefer goaiz_image_url if available, otherwise use regular image_url
@@ -609,8 +609,9 @@ function mapPromotionToTemplateVariables(promotion, req) {
       ? imageUrl 
       : imageUrl;
     
-    // Get just the filename (e.g., "test.jpg" from "/uploads/test.jpg" or "https://www.goaiz.com/test.jpg")
-    imageFilename = imagePath.split('/').pop() || '';
+    // Get just the filename without extension (e.g., "worldmap" from "worldmap.jpg")
+    const fullFilename = imagePath.split('/').pop() || '';
+    imageFilename = fullFilename.replace(/\.[^/.]+$/, ''); // Remove file extension
   }
 
   // Build promotion description with template variables
@@ -786,9 +787,9 @@ router.get('/validate-template/:templateSid', async (req, res) => {
         {
           type: 'media_url_format',
           severity: 'error',
-          message: 'Media URL contains template variables directly in URL',
+          message: 'Media URL needs correct format with file extension',
           current: 'https://www.goaiz.com/{2}.jpg',
-          recommended: 'https://www.goaiz.com/{3}'
+          recommended: 'https://www.goaiz.com/uploads/goaiz/{3}.jpg'
         },
         {
           type: 'template_structure',
@@ -806,11 +807,11 @@ router.get('/validate-template/:templateSid', async (req, res) => {
       ],
       correctFormat: {
         body: '🎉 {1}\\n\\n{2}\\n\\n_Reply STOP to unsubscribe_',
-        mediaUrl: 'https://www.goaiz.com/{3}',
+        mediaUrl: 'https://www.goaiz.com/uploads/goaiz/{3}.jpg',
         variables: {
           '1': 'Promotion Title',
           '2': 'Promotion Description with discount info',
-          '3': 'Image filename (e.g., image-1234567890-test.jpg)',
+          '3': 'Image filename without extension (e.g., worldmap)',
           '4': 'Company Name'
         }
       }
@@ -822,7 +823,7 @@ router.get('/validate-template/:templateSid', async (req, res) => {
       nextSteps: [
         '1. Go to Twilio Console → Messaging → Content Template Builder',
         '2. Find template with SID: ' + templateSid,
-        '3. Update Media URL to: https://www.goaiz.com/{3}',
+        '3. Update Media URL to: https://www.goaiz.com/uploads/goaiz/{3}.jpg',
         '4. Update Body to include {2} variable',
         '5. Save and test the template'
       ]
