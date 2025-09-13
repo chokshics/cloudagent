@@ -649,7 +649,6 @@ function mapPromotionToTemplateVariables(promotion, req) {
   // Build template variables - ALL variables must be included for Twilio
   
   // Extract just the filename from the image URL
-  let imageFilename = '';
   if (imageUrl && imageUrl.trim()) {
     const fullFilename = imageUrl.split('/').pop() || '';
     imageFilename = fullFilename; // Keep the full filename with extension
