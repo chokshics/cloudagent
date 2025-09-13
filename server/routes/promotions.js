@@ -97,8 +97,15 @@ router.post('/', uploadMiddleware, [
 
     // Handle uploaded image
     let image_url = null;
+    let goaiz_image_url = null;
+    
     if (req.file) {
       image_url = `/uploads/${req.file.filename}`;
+    }
+    
+    // Handle goaiz image URL if provided
+    if (req.body.goaiz_image_url) {
+      goaiz_image_url = req.body.goaiz_image_url;
     }
 
     const db = getDatabase();
@@ -108,11 +115,11 @@ router.post('/', uploadMiddleware, [
     db.run(`
       INSERT INTO promotions (
         title, description, discount_percentage, discount_amount, 
-        start_date, end_date, is_active, image_url, created_by
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        start_date, end_date, is_active, image_url, goaiz_image_url, created_by
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       title, description, processedDiscountPercentage, processedDiscountAmount,
-      processedStartDate, processedEndDate, is_active, image_url, req.user.userId
+      processedStartDate, processedEndDate, is_active, image_url, goaiz_image_url, req.user.userId
     ], function(err) {
       if (err) {
         return res.status(500).json({ error: 'Failed to create promotion' });
@@ -178,8 +185,15 @@ router.put('/:id', uploadMiddleware, [
 
       // Handle uploaded image
       let image_url = null;
+      let goaiz_image_url = null;
+      
       if (req.file) {
         image_url = `/uploads/${req.file.filename}`;
+      }
+      
+      // Handle goaiz image URL if provided
+      if (req.body.goaiz_image_url) {
+        goaiz_image_url = req.body.goaiz_image_url;
       }
 
       // Build update query dynamically
@@ -202,6 +216,12 @@ router.put('/:id', uploadMiddleware, [
       if (image_url) {
         updateFields.push('image_url = ?');
         updateValues.push(image_url);
+      }
+      
+      // Add goaiz_image_url to update if provided
+      if (goaiz_image_url) {
+        updateFields.push('goaiz_image_url = ?');
+        updateValues.push(goaiz_image_url);
       }
 
       if (updateFields.length === 0) {

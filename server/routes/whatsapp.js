@@ -565,7 +565,7 @@ router.post('/send-promotion-template', [
 
       // Get promotion data
       const promotionQuery = `
-        SELECT title, description, image_url, discount_percentage, discount_amount, 
+        SELECT title, description, image_url, goaiz_image_url, discount_percentage, discount_amount, 
                start_date, end_date 
         FROM promotions 
         WHERE id = ? AND created_by = ?
@@ -599,13 +599,17 @@ router.post('/send-promotion-template', [
 function mapPromotionToTemplateVariables(promotion, req) {
   // Extract filename from image URL for goaiz.com template format
   let imageFilename = '';
-  if (promotion.image_url) {
+  
+  // Prefer goaiz_image_url if available, otherwise use regular image_url
+  const imageUrl = promotion.goaiz_image_url || promotion.image_url;
+  
+  if (imageUrl) {
     // Extract filename from the image URL
-    const imagePath = promotion.image_url.startsWith('http') 
-      ? promotion.image_url 
-      : promotion.image_url;
+    const imagePath = imageUrl.startsWith('http') 
+      ? imageUrl 
+      : imageUrl;
     
-    // Get just the filename (e.g., "test.jpg" from "/uploads/test.jpg")
+    // Get just the filename (e.g., "test.jpg" from "/uploads/test.jpg" or "https://www.goaiz.com/test.jpg")
     imageFilename = imagePath.split('/').pop() || '';
   }
 
@@ -765,5 +769,72 @@ async function sendWhatsAppTemplateMessages(req, res, to, templateName, template
     failedNumbers
   });
 }
+
+// Validate template configuration
+router.get('/validate-template/:templateSid', async (req, res) => {
+  try {
+    const templateSid = req.params.templateSid;
+    
+    console.log('🔍 Validating template configuration for:', templateSid);
+    
+    // This is a mock validation - in reality you'd need to call Twilio API
+    // to get the actual template configuration
+    const templateValidation = {
+      templateSid: templateSid,
+      status: 'needs_review',
+      issues: [
+        {
+          type: 'media_url_format',
+          severity: 'error',
+          message: 'Media URL contains template variables directly in URL',
+          current: 'https://www.goaiz.com/{2}.jpg',
+          recommended: 'https://www.goaiz.com/{3}'
+        },
+        {
+          type: 'template_structure',
+          severity: 'info',
+          message: 'Template should use proper variable mapping',
+          current: 'Body: "Check out our promotion: {1}"',
+          recommended: 'Body: "🎉 {1}\\n\\n{2}\\n\\n_Reply STOP to unsubscribe_"'
+        }
+      ],
+      recommendations: [
+        'Update Media URL to use {3} variable instead of {2}.jpg',
+        'Ensure template variables are properly mapped',
+        'Test with actual image files uploaded to goaiz.com',
+        'Verify template is approved by WhatsApp'
+      ],
+      correctFormat: {
+        body: '🎉 {1}\\n\\n{2}\\n\\n_Reply STOP to unsubscribe_',
+        mediaUrl: 'https://www.goaiz.com/{3}',
+        variables: {
+          '1': 'Promotion Title',
+          '2': 'Promotion Description with discount info',
+          '3': 'Image filename (e.g., image-1234567890-test.jpg)',
+          '4': 'Company Name'
+        }
+      }
+    };
+    
+    res.json({
+      success: true,
+      templateValidation,
+      nextSteps: [
+        '1. Go to Twilio Console → Messaging → Content Template Builder',
+        '2. Find template with SID: ' + templateSid,
+        '3. Update Media URL to: https://www.goaiz.com/{3}',
+        '4. Update Body to include {2} variable',
+        '5. Save and test the template'
+      ]
+    });
+
+  } catch (error) {
+    console.error('Template validation error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to validate template configuration'
+    });
+  }
+});
 
 module.exports = router; 

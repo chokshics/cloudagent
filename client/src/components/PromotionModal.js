@@ -20,7 +20,28 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation(
-    (data) => {
+    async (data) => {
+      let goaizImageUrl = null;
+      
+      // Upload image to goaiz.com location if selected
+      if (selectedImage) {
+        const goaizFormData = new FormData();
+        goaizFormData.append('image', selectedImage);
+        
+        try {
+          const goaizResponse = await axios.post('/api/promotions/upload-goaiz-image', goaizFormData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+          goaizImageUrl = goaizResponse.data.goaizUrl;
+          console.log('📷 Image uploaded to goaiz.com:', goaizImageUrl);
+        } catch (error) {
+          console.error('Failed to upload to goaiz.com:', error);
+          // Continue with regular upload as fallback
+        }
+      }
+      
       const formData = new FormData();
       
       // Add all form fields
@@ -30,9 +51,14 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
         }
       });
       
-      // Add image file if selected
+      // Add image file if selected (for regular upload)
       if (selectedImage) {
         formData.append('image', selectedImage);
+      }
+      
+      // Add goaiz image URL if available
+      if (goaizImageUrl) {
+        formData.append('goaiz_image_url', goaizImageUrl);
       }
       
       return axios.post('/api/promotions', formData, {
@@ -63,7 +89,28 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
   );
 
   const updateMutation = useMutation(
-    (data) => {
+    async (data) => {
+      let goaizImageUrl = null;
+      
+      // Upload image to goaiz.com location if selected
+      if (selectedImage) {
+        const goaizFormData = new FormData();
+        goaizFormData.append('image', selectedImage);
+        
+        try {
+          const goaizResponse = await axios.post('/api/promotions/upload-goaiz-image', goaizFormData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+          goaizImageUrl = goaizResponse.data.goaizUrl;
+          console.log('📷 Image uploaded to goaiz.com:', goaizImageUrl);
+        } catch (error) {
+          console.error('Failed to upload to goaiz.com:', error);
+          // Continue with regular upload as fallback
+        }
+      }
+      
       const formData = new FormData();
       
       // Add all form fields
@@ -73,9 +120,14 @@ const PromotionModal = ({ isOpen, onClose, promotion }) => {
         }
       });
       
-      // Add image file if selected
+      // Add image file if selected (for regular upload)
       if (selectedImage) {
         formData.append('image', selectedImage);
+      }
+      
+      // Add goaiz image URL if available
+      if (goaizImageUrl) {
+        formData.append('goaiz_image_url', goaizImageUrl);
       }
       
       return axios.put(`/api/promotions/${promotion?.id}`, formData, {

@@ -384,7 +384,13 @@ const SendWhatsAppCampaignModal = ({ isOpen, onClose, promotion, mobileNumbers, 
                               <span className="font-medium">{2}:</span> {promotion.description?.substring(0, 30)}...
                             </div>
                             <div className="bg-white p-2 rounded border">
-                              <span className="font-medium">{3}:</span> {promotion.image_url ? promotion.image_url.split('/').pop() : 'No Image'}
+                              <span className="font-medium">{3}:</span> {
+                                promotion.goaiz_image_url 
+                                  ? promotion.goaiz_image_url.split('/').pop() 
+                                  : promotion.image_url 
+                                    ? promotion.image_url.split('/').pop() 
+                                    : 'No Image'
+                              }
                             </div>
                             <div className="bg-white p-2 rounded border">
                               <span className="font-medium">{4}:</span> Cloud Solutions
